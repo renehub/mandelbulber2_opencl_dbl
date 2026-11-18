@@ -11,8 +11,17 @@ The project should be kept updated and clean with the following steps (when nece
   - `mandelbulber2/tools/populateUiInformation.php # this makes a dry run, check output`
   - `mandelbulber2/tools/populateUiInformation.php nondry # this applies changes`
 - 3. Updating the opencl files with autogeneration from cpp code
-  - `mandelbulber2/tools/populateOpenCL.php # this makes a dry run, check output`
-  - `mandelbulber2/tools/populateOpenCL.php nondry # this applies changes`
+  - `mandelbulber2/tools/populateOpenCL.py # this makes a dry run, check output`
+  - `mandelbulber2/tools/populateOpenCL.py nondry # this applies changes`
+  - `mandelbulber2/tools/generateOpenCLPrecisionHeaders.py # dry run for the REAL / *D layouts`
+  - `mandelbulber2/tools/generateOpenCLPrecisionHeaders.py nondry # this applies the double-precision layouts`
+
+  The Python generators replace the old PHP generator. `populateOpenCL.py`
+  creates the generated kernel and host-side single layouts.
+  `generateOpenCLPrecisionHeaders.py` creates the precision-aware kernel
+  structures and the host-side `*D` structures used for runtime-selectable
+  double precision. Both generators are idempotent and must be run instead of
+  editing generated headers by hand.
 - 4. `mandelbulber2/tools/dos2unix.sh # fix file formatting issues`
 - 5. Add new language snippets, see also "(3) language system"
 - 6. Add new formula images, see also "(4) formula images"
