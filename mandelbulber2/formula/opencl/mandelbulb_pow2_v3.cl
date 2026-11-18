@@ -42,14 +42,14 @@ REAL4 MandelbulbPow2V3Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	z *= fractal->transformCommon.scaleA1;
 	aux->DE *= fabs(fractal->transformCommon.scaleA1);
 
-	aux->DE = aux->DE * 2.0f * length(z) + 1.0f;
+	aux->DE = aux->DE * 2.0 * length(z) + 1.0;
 	REAL rr = z.x * z.x + z.y * z.y;
 	REAL theta = atan2(z.z, native_sqrt(rr));
 	rr += z.z * z.z;
 	REAL phi = atan2(z.y, z.x);
 	REAL thetatemp = theta;
 
-	REAL phi_pow = 2.0f * phi + M_PI_F;
+	REAL phi_pow = 2.0 * phi + M_PI_F;
 	REAL theta_pow = theta + M_PI_F + M_PI_2_F;
 
 	if (fractal->transformCommon.functionEnabledBFalse) theta_pow = theta + thetatemp + M_PI_4_F;

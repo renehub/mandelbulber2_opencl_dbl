@@ -18,7 +18,7 @@
 REAL4 TransfAbsAddTgladFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 limit = fractal->transformCommon.additionConstant000;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	z = fabs(z + limit) - fabs(z - limit) - z;
 
@@ -26,9 +26,9 @@ REAL4 TransfAbsAddTgladFoldIteration(REAL4 z, __global sFractalCl *fractal, sExt
 			&& aux->i >= fractal->transformCommon.startIterationsA
 			&& aux->i < fractal->transformCommon.stopIterationsA)
 	{
-		REAL4 length = 2.0f * limit;
-		REAL4 tgladS = 1.0f / length;
-		REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 length = 2.0 * limit;
+		REAL4 tgladS = 1.0 / length;
+		REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 
 		if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 		if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;
@@ -61,7 +61,7 @@ REAL4 TransfAbsAddTgladFoldIteration(REAL4 z, __global sFractalCl *fractal, sExt
 		}
 		else
 		{
-			colorAdd += fractal->mandelbox.color.factor.x * (1.0f - (limit.x - fabs(z.x)) / limit.x);
+			colorAdd += fractal->mandelbox.color.factor.x * (1.0 - (limit.x - fabs(z.x)) / limit.x);
 		}
 
 		if (fabs(z.y) > limit.y)
@@ -70,7 +70,7 @@ REAL4 TransfAbsAddTgladFoldIteration(REAL4 z, __global sFractalCl *fractal, sExt
 		}
 		else
 		{
-			colorAdd += fractal->mandelbox.color.factor.y * (1.0f - (limit.y - fabs(z.y)) / limit.y);
+			colorAdd += fractal->mandelbox.color.factor.y * (1.0 - (limit.y - fabs(z.y)) / limit.y);
 		}
 
 		if (fabs(z.z) > limit.z)
@@ -79,7 +79,7 @@ REAL4 TransfAbsAddTgladFoldIteration(REAL4 z, __global sFractalCl *fractal, sExt
 		}
 		else
 		{
-			colorAdd += fractal->mandelbox.color.factor.z * (1.0f - (limit.z - fabs(z.z)) / limit.z);
+			colorAdd += fractal->mandelbox.color.factor.z * (1.0 - (limit.z - fabs(z.z)) / limit.z);
 		}
 	}
 

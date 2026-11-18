@@ -18,10 +18,10 @@ REAL4 QuaternionIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 {
 	(void)fractal;
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 	REAL newx = z.x * z.x - z.y * z.y - z.z * z.z;
-	REAL newy = 2.0f * z.x * z.y;
-	REAL newz = 2.0f * z.x * z.z;
+	REAL newy = 2.0 * z.x * z.y;
+	REAL newz = 2.0 * z.x * z.z;
 	z.x = newx;
 	z.y = newy;
 	z.z = newz;

@@ -16,7 +16,7 @@
 REAL4 TransfDIFSTorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 zc = z;
-	REAL temp = 0.0f;
+	REAL temp = 0.0;
 	REAL torD;
 	// swap axis
 	if (fractal->transformCommon.functionEnabledSwFalse)
@@ -46,7 +46,7 @@ REAL4 TransfDIFSTorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	temp = torD;
 	if (fractal->transformCommon.functionEnabledCFalse)
 	{
-		torD = max(fabs(torD) - fractal->transformCommon.offset0005, 0.0f);
+		torD = max(fabs(torD) - fractal->transformCommon.offset0005, 0.0);
 		T1 = torD;
 	}
 

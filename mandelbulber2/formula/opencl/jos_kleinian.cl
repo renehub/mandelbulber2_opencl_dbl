@@ -26,7 +26,7 @@ REAL4 JosKleinianIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	{
 		if (aux->i < 1)
 		{
-			REAL rr = 1.0f;
+			REAL rr = 1.0;
 			z += fractal->transformCommon.offset000;
 			rr = dot(z, z);
 			z *= fractal->transformCommon.maxR2d1 / rr;
@@ -44,15 +44,15 @@ REAL4 JosKleinianIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		REAL b = fractal->transformCommon.offset;
 		REAL f = sign(b);
 
-		REAL3 box1 = (REAL3){2.0f * box_size.x, a * box_size.y, 2.0f * box_size.z};
-		REAL3 box2 = (REAL3){-box_size.x, -box_size.y + 1.0f, -box_size.z};
+		REAL3 box1 = (REAL3){2.0 * box_size.x, a * box_size.y, 2.0 * box_size.z};
+		REAL3 box2 = (REAL3){-box_size.x, -box_size.y + 1.0, -box_size.z};
 		REAL3 wrapped = wrap(z.xyz, box1, box2);
 
 		z = (REAL4){wrapped.x, wrapped.y, wrapped.z, z.w};
 
 		// If above the separation line, rotate by 180deg about (-b/2, a/2)
-		if (z.y >= a * (0.5f + 0.2f * native_sin(f * M_PI_F * (z.x + b * 0.5f) / box_size.x)))
-			z = (REAL4){-b, a, 0.f, z.w} - z; // z.xy = vec2(-b, a) - z.xy;
+		if (z.y >= a * (0.5 + 0.2 * native_sin(f * M_PI_F * (z.x + b * 0.5) / box_size.x)))
+			z = (REAL4){-b, a, 0., z.w} - z; // z.xy = vec2(-b, a) - z.xy;
 
 		REAL rr = dot(z, z);
 
@@ -62,7 +62,7 @@ REAL4 JosKleinianIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 			aux->color = min(aux->color, length(colorVector)); // For coloring
 		}
 
-		REAL iR = 1.0f / rr;
+		REAL iR = 1.0 / rr;
 		z *= -iR;
 		z.x = -b - z.x;
 		z.y = a + z.y;
@@ -73,7 +73,7 @@ REAL4 JosKleinianIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		colorAdd += fractal->foldColor.difs0000.x * fabs(oldDE / aux->DE);
 		colorAdd += fractal->foldColor.difs0000.y * fabs(z.y);
 		colorAdd += fractal->foldColor.difs0000.z * fabs(z.y - oldZy);
@@ -101,7 +101,7 @@ REAL4 JosKleinianIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 				ff = fabs(ff - round(ff)) * fractal->transformCommon.constantMultiplierC111.y;
 				dd = dd + ff;
 			}
-			dd = bb * (1.0f - fractal->foldColor.difs1) + dd * fractal->foldColor.difs1; // mix
+			dd = bb * (1.0 - fractal->foldColor.difs1) + dd * fractal->foldColor.difs1; // mix
 
 			colorAdd += fractal->foldColor.difs0000.w * dd;
 		}

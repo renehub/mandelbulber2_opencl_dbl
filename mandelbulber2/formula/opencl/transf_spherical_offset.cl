@@ -16,8 +16,8 @@
 
 REAL4 TransfSphericalOffsetIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	// if (-length(z) > -1e-21f) -length(z) = -1e-21f;   //  z is neg.)
-	z *= 1.0f + fractal->transformCommon.offset / -length(z);
+	// if (-length(z) > -1e-21) -length(z) = -1e-21;   //  z is neg.)
+	z *= 1.0 + fractal->transformCommon.offset / -length(z);
 	z *= fractal->transformCommon.scale;
 	aux->DE = aux->DE * fractal->transformCommon.scale + fractal->analyticDE.offset1;
 	return z;

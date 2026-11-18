@@ -31,7 +31,7 @@ REAL4 KaleidoscopicIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			if (length < fractal->IFS.distance[i])
 			{
 				z -= fractal->IFS.direction[i]
-						 * (2.0f * (length - fractal->IFS.distance[i]) * fractal->IFS.intensity[i]);
+						 * (2.0 * (length - fractal->IFS.distance[i]) * fractal->IFS.intensity[i]);
 			}
 		}
 	}
@@ -41,22 +41,22 @@ REAL4 KaleidoscopicIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 	if (fractal->IFS.edgeEnabled)
 	{
-		if (fractal->IFS.edge.x > 0.0f) z.x = fractal->IFS.edge.x - fabs(fractal->IFS.edge.x - z.x);
-		if (fractal->IFS.edge.y > 0.0f) z.y = fractal->IFS.edge.y - fabs(fractal->IFS.edge.y - z.y);
-		if (fractal->IFS.edge.z > 0.0f) z.z = fractal->IFS.edge.z - fabs(fractal->IFS.edge.z - z.z);
+		if (fractal->IFS.edge.x > 0.0) z.x = fractal->IFS.edge.x - fabs(fractal->IFS.edge.x - z.x);
+		if (fractal->IFS.edge.y > 0.0) z.y = fractal->IFS.edge.y - fabs(fractal->IFS.edge.y - z.y);
+		if (fractal->IFS.edge.z > 0.0) z.z = fractal->IFS.edge.z - fabs(fractal->IFS.edge.z - z.z);
 	}
 
 	z *= fractal->IFS.scale;
 	if (fractal->IFS.mengerSpongeMode)
 	{
-		z.x -= fractal->IFS.offset.x * (fractal->IFS.scale - 1.0f);
-		z.y -= fractal->IFS.offset.y * (fractal->IFS.scale - 1.0f);
-		if (z.z > 0.5f * fractal->IFS.offset.z * (fractal->IFS.scale - 1.0f))
-			z.z -= fractal->IFS.offset.z * (fractal->IFS.scale - 1.0f);
+		z.x -= fractal->IFS.offset.x * (fractal->IFS.scale - 1.0);
+		z.y -= fractal->IFS.offset.y * (fractal->IFS.scale - 1.0);
+		if (z.z > 0.5 * fractal->IFS.offset.z * (fractal->IFS.scale - 1.0))
+			z.z -= fractal->IFS.offset.z * (fractal->IFS.scale - 1.0);
 	}
 	else
 	{
-		z -= fractal->IFS.offset * (fractal->IFS.scale - 1.0f);
+		z -= fractal->IFS.offset * (fractal->IFS.scale - 1.0);
 	}
 	aux->DE *= fabs(fractal->IFS.scale);
 	return z;

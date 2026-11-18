@@ -39,8 +39,8 @@ int GetInteger(int byte, __global char *array)
 }
 
 //------------------ MAIN RENDER FUNCTION --------------------
-kernel void fractal3D(__global float *outDistance, __global char *inBuff,
-	__constant sClInConstants *consts, float3 point)
+kernel void fractal3D(__global REAL *outDistance, __global char *inBuff,
+	__constant sClInConstants *consts, REAL3 point)
 {
 	//-------- decode data file ----------------
 	// main offset for materials
@@ -103,8 +103,8 @@ kernel void fractal3D(__global float *outDistance, __global char *inBuff,
 	calcParam.N = consts->params.N;
 	calcParam.normalCalculationMode = false;
 	calcParam.iterThreshMode = consts->params.iterThreshMode;
-	calcParam.distThresh = 1e-6f;
-	calcParam.detailSize = 1e-6f;
+	calcParam.distThresh = 1e-6;
+	calcParam.detailSize = 1e-6;
 
 	sRenderData renderData;
 	renderData.material = 0;
@@ -124,7 +124,7 @@ kernel void fractal3D(__global float *outDistance, __global char *inBuff,
 	formulaOut outF;
 
 	outF = CalculateDistance(consts, point, &calcParam, &renderData);
-	float dist = outF.distance;
+	REAL dist = outF.distance;
 
 	outDistance[0] = dist;
 }

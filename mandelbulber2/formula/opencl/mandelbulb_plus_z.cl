@@ -16,7 +16,7 @@
 
 REAL4 MandelbulbPlusZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 zTmp = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 zTmp = (REAL4){0.0, 0.0, 0.0, 0.0};
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
 		if (fractal->transformCommon.functionEnabledAxFalse) z.x = fabs(z.x);
@@ -30,20 +30,20 @@ REAL4 MandelbulbPlusZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 
 	REAL theta = (asin(z.z / aux->r) + fractal->bulb.betaAngleOffset) * fractal->transformCommon.int2;
 	REAL phi = (atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset) * fractal->transformCommon.int2;
-	REAL rp = pow(aux->r, fractal->transformCommon.int2 - 1.0f);
-	aux->DE = rp * aux->DE * fractal->transformCommon.int2 + 1.0f;
+	REAL rp = pow(aux->r, fractal->transformCommon.int2 - 1.0);
+	aux->DE = rp * aux->DE * fractal->transformCommon.int2 + 1.0;
 
 	rp *= aux->r;
 
 	if (!fractal->transformCommon.functionEnabledByFalse)
 	{
 		REAL sinth = native_sin(theta);
-		z = rp * (REAL4){sinth * native_cos(phi), native_sin(phi) * sinth, native_cos(theta), 0.0f};
+		z = rp * (REAL4){sinth * native_cos(phi), native_sin(phi) * sinth, native_cos(theta), 0.0};
 	}
 	else
 	{
 		REAL costh = native_cos(theta);
-		z = rp * (REAL4){costh * native_sin(phi), native_cos(phi) * costh, native_sin(theta), 0.0f};
+		z = rp * (REAL4){costh * native_sin(phi), native_cos(phi) * costh, native_sin(theta), 0.0};
 	}
 	z += aux->c * fractal->transformCommon.constantMultiplierC111;
 

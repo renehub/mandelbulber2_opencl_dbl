@@ -34,38 +34,38 @@
 
 #ifdef AUX_LIGHTS
 #if defined(SHADOWS) || defined(VOLUMETRIC_LIGHTS)
-float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
-	sShaderInputDataCl *input, __global sLightCl *light, float distance, float3 lightVector,
-	sClCalcParams *calcParam, float intensity)
+REAL3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
+	sShaderInputDataCl *input, __global sLightCl *light, REAL distance, REAL3 lightVector,
+	sClCalcParams *calcParam, REAL intensity)
 {
-	float3 lightShaded = 1.0;
-	float totalOpacity = 0.0f;
-	float shadowTemp = 1.0f;
+	REAL3 lightShaded = 1.0;
+	REAL totalOpacity = 0.0;
+	REAL shadowTemp = 1.0;
 
 	bool cloudMode = consts->params.cloudsEnable;
 
-	float DEFactor = consts->params.DEFactor;
+	REAL DEFactor = consts->params.DEFactor;
 	if (consts->params.iterFogEnabled || consts->params.distanceFogShadows || light->volumetric)
-		DEFactor = 1.0f;
+		DEFactor = 1.0;
 #ifdef CLOUDS
 	DEFactor = consts->params.DEFactor * consts->params.volumetricLightDEFactor;
 #endif
 
-	float start = input->distThresh;
+	REAL start = input->distThresh;
 
 #ifdef MC_SOFT_SHADOWS
-	float softRange;
+	REAL softRange;
 	if (light->type == lightDirectional)
 	{
 		softRange = tan(light->softShadowCone);
 	}
 	else
 	{
-		float lightSize = sqrt(intensity) * light->size;
+		REAL lightSize = sqrt(intensity) * light->size;
 		softRange = lightSize / distance;
 	}
 #else
-	float softRange = tan(light->softShadowCone);
+	REAL softRange = tan(light->softShadowCone);
 #endif
 
 	bool goThrough = input->material->subsurfaceScattering;
@@ -76,42 +76,42 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl input2 = *input;
 #endif
 
-	float maxSoft = 0.0f;
+	REAL maxSoft = 0.0;
 
 	const bool bSoft = !goThrough && !cloudMode && !consts->params.iterFogEnabled
 										 && !consts->params.distanceFogShadows && !consts->params.fogCastShadows
 										 && !consts->params.common.iterThreshMode && !consts->params.interiorMode
-										 && softRange > 0.0f
+										 && softRange > 0.0
 										 && !(consts->params.monteCarloSoftShadows && consts->params.DOFMonteCarlo);
 
 #ifdef MC_SOFT_SHADOWS
-	float3 randomVector;
-	randomVector.x = Random(10000, &input->randomSeed) / 5000.0f - 1.0f;
-	randomVector.y = Random(10000, &input->randomSeed) / 5000.0f - 1.0f;
-	randomVector.z = Random(10000, &input->randomSeed) / 5000.0f - 1.0f;
-	float randomSphereRadius = pow(Random(10000, &input->randomSeed) / 10000.0f, 1.0f / 3.0f);
-	float3 randomSphere = randomVector * (softRange * randomSphereRadius / length(randomVector));
+	REAL3 randomVector;
+	randomVector.x = Random(10000, &input->randomSeed) / 5000.0 - 1.0;
+	randomVector.y = Random(10000, &input->randomSeed) / 5000.0 - 1.0;
+	randomVector.z = Random(10000, &input->randomSeed) / 5000.0 - 1.0;
+	REAL randomSphereRadius = pow(Random(10000, &input->randomSeed) / 10000.0, 1.0 / 3.0);
+	REAL3 randomSphere = randomVector * (softRange * randomSphereRadius / length(randomVector));
 	lightVector += randomSphere;
 	lightVector = fast_normalize(lightVector);
 #endif // MC_SOFT_SHADOWS
 
 #if defined(USE_SUBSURFACE_SCATTERING) && defined(FULL_ENGINE)
-	float3 lightVectorUnmodified = lightVector;
+	REAL3 lightVectorUnmodified = lightVector;
 	bool wentThrough = false;
 #endif
 
-	float lastDistanceToClouds = 1e6f;
+	REAL lastDistanceToClouds = 1e6;
 	int count = 0;
-	float step = 0.0f;
+	REAL step = 0.0;
 
-	float3 point2 = input->point + start * lightVector;
+	REAL3 point2 = input->point + start * lightVector;
 
-	for (float i = start; i < distance; i += step)
+	for (REAL i = start; i < distance; i += step)
 	{
-		// float3 point2 = input->point + lightVector * i;
+		// REAL3 point2 = input->point + lightVector * i;
 		point2 += lightVector * step;
 
-		float dist_thresh;
+		REAL dist_thresh;
 		if (consts->params.iterFogEnabled || consts->params.distanceFogShadows || light->volumetric
 				|| cloudMode || goThrough)
 		{
@@ -131,7 +131,7 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 		formulaOut outF;
 
 		outF = CalculateDistance(consts, point2, calcParam, renderData);
-		float dist = outF.distance;
+		REAL dist = outF.distance;
 
 		// Apply per-object detailLevelMultiplier to dist_thresh dynamically
 		if (outF.objectId >= 0 && outF.objectId < renderData->numberOfObjects)
@@ -155,70 +155,70 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 
 		if (bSoft && !limitsAcheved)
 		{
-			float angle = (dist - dist_thresh) / i;
-			if (angle < 0.0f) angle = 0.0f;
-			if (dist < dist_thresh) angle = 0.0f;
-			float softShadow = 1.0f - angle / softRange;
+			REAL angle = (dist - dist_thresh) / i;
+			if (angle < 0.0) angle = 0.0;
+			if (dist < dist_thresh) angle = 0.0;
+			REAL softShadow = 1.0 - angle / softRange;
 			if (light->penetrating) softShadow *= (distance - i) / distance;
-			if (softShadow < 0.0f) softShadow = 0.0f;
+			if (softShadow < 0.0) softShadow = 0.0;
 			if (softShadow > maxSoft) maxSoft = softShadow;
 		}
 
 #ifdef ITER_FOG
 		{
-			float opacity =
+			REAL opacity =
 				IterOpacity(step, outF.iters, consts->params.N, consts->params.iterFogOpacityTrim,
 					consts->params.iterFogOpacityTrimHigh, consts->params.iterFogOpacity);
 
 			// FIXME: it needs to be rewritten to work with ObjectsTree
 			// #if (defined(USE_PRIMITIVES) && defined(ITER_FOG_SHAPE_FROM_PRIMITIVE))
-			//			if (opacity > 0.0f && renderData->primitivesGlobalData->primitiveIndexForIterFog >= 0)
+			//			if (opacity > 0.0 && renderData->primitivesGlobalData->primitiveIndexForIterFog >= 0)
 			//			{
 			//				int closestId = -1;
 			//
 			//				if (TotalDistanceToPrimitives(consts, renderData, point2, distance, dist_thresh,
 			// false, 							&closestId,
 			// renderData->primitivesGlobalData->primitiveIndexForIterFog) 						> dist_thresh)
-			// opacity = 0.0f;
+			// opacity = 0.0;
 			//			}
 			// #endif // USE_PRIMITIVES
 
 			opacity *= (distance - i) / distance;
-			opacity = min(opacity, 1.0f);
-			totalOpacity = opacity + (1.0f - opacity) * totalOpacity;
+			opacity = min(opacity, 1.0);
+			totalOpacity = opacity + (1.0 - opacity) * totalOpacity;
 		}
 #endif // ITER_FOG
 
 #if (defined(VOLUMETRIC_FOG) && defined(DIST_FOG_SHADOWS))
 		if (consts->params.distanceFogShadows)
 		{
-			float distanceShifted;
-			float opacity = DistanceFogOpacity(step, dist, consts->params.volFogDistanceFromSurface,
+			REAL distanceShifted;
+			REAL opacity = DistanceFogOpacity(step, dist, consts->params.volFogDistanceFromSurface,
 				consts->params.volFogDistanceFactor, consts->params.volFogDensity, &distanceShifted);
 
 			// FIXME: it needs to be rewritten to work with ObjectsTree
 			// #if (defined(USE_PRIMITIVES) && defined(DIST_FOG_SHAPE_FROM_PRIMITIVE))
-			//			if (opacity > 0.0f && renderData->primitivesGlobalData->primitiveIndexForDistFog >= 0)
+			//			if (opacity > 0.0 && renderData->primitivesGlobalData->primitiveIndexForDistFog >= 0)
 			//			{
 			//				int closestId = -1;
 			//
 			//				if (TotalDistanceToPrimitives(consts, renderData, point2, distance, dist_thresh,
 			// false, 							&closestId,
 			// renderData->primitivesGlobalData->primitiveIndexForDistFog) 						> dist_thresh)
-			// opacity = 0.0f;
+			// opacity = 0.0;
 			//			}
 			// #endif // USE_PRIMITIVES
 
 			opacity *= (distance - i) / distance;
-			opacity = min(opacity, 1.0f);
-			totalOpacity = opacity + (1.0f - opacity) * totalOpacity;
+			opacity = min(opacity, 1.0);
+			totalOpacity = opacity + (1.0 - opacity) * totalOpacity;
 		}
 #endif // VOL_OFG
 
 #if (defined(BASIC_FOG) && defined(BASIC_FOG_CAST_SHADOWS))
 		if (consts->params.fogCastShadows)
 		{
-			float opacity = step / consts->params.fogVisibility;
+			REAL opacity = step / consts->params.fogVisibility;
 
 			// FIXME: it needs to be rewritten to work with ObjectsTree
 			// #if (defined(USE_PRIMITIVES) && defined(BASIC_FOG_SHAPE_FROM_PRIMITIVE))
@@ -229,21 +229,21 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 			//				if (TotalDistanceToPrimitives(consts, renderData, point2, distance, dist_thresh,
 			// false, 							&closestId,
 			// renderData->primitivesGlobalData->primitiveIndexForBasicFog) 						> dist_thresh)
-			// opacity = 0.0f;
+			// opacity = 0.0;
 			//			}
 			// #endif // USE_PRIMITIVES
 
 			opacity *= (distance - i) / distance;
-			opacity = min(opacity, 1.0f);
-			totalOpacity = opacity + (1.0f - opacity) * totalOpacity;
+			opacity = min(opacity, 1.0);
+			totalOpacity = opacity + (1.0 - opacity) * totalOpacity;
 		}
 #endif // BASIC_FOG
 
 #ifdef CLOUDS
 		{
-			float distanceToClouds = 0.0f;
+			REAL distanceToClouds = 0.0;
 			bool calculateClouds = true;
-			float opacity = 0.0f;
+			REAL opacity = 0.0;
 
 			// FIXME: it needs to be rewritten to work with ObjectsTree
 			// #if (defined(USE_PRIMITIVES) && defined(CLOUDS_SHAPE_FROM_PRIMITIVE))
@@ -255,7 +255,7 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 			// false, 							&closestId, renderData->primitivesGlobalData->primitiveIndexForClouds)
 			// > dist_thresh)
 			//				{
-			//					opacity = 0.0f;
+			//					opacity = 0.0;
 			//					calculateClouds = false;
 			//				}
 			//			}
@@ -274,8 +274,8 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 
 			lastDistanceToClouds = distanceToClouds;
 			opacity *= (distance - i) / distance;
-			opacity = min(opacity, 1.0f);
-			totalOpacity = opacity + (1.0f - opacity) * totalOpacity;
+			opacity = min(opacity, 1.0);
+			totalOpacity = opacity + (1.0 - opacity) * totalOpacity;
 		}
 #endif // CLOUS
 
@@ -286,20 +286,20 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 			if (!wentThrough)
 			{
 				wentThrough = true;
-				float3 randomVector;
-				randomVector.x = Random(10000, &input->randomSeed) / 5000.0f - 1.0f;
-				randomVector.y = Random(10000, &input->randomSeed) / 5000.0f - 1.0f;
-				randomVector.z = Random(10000, &input->randomSeed) / 5000.0f - 1.0f;
-				float randomSphereRadius = pow(Random(10000, &input->randomSeed) / 10000.0f, 1.0f / 3.0f);
-				float3 randomSphere = randomVector * (0.95f * randomSphereRadius / length(randomVector));
+				REAL3 randomVector;
+				randomVector.x = Random(10000, &input->randomSeed) / 5000.0 - 1.0;
+				randomVector.y = Random(10000, &input->randomSeed) / 5000.0 - 1.0;
+				randomVector.z = Random(10000, &input->randomSeed) / 5000.0 - 1.0;
+				REAL randomSphereRadius = pow(Random(10000, &input->randomSeed) / 10000.0, 1.0 / 3.0);
+				REAL3 randomSphere = randomVector * (0.95 * randomSphereRadius / length(randomVector));
 				lightVector = lightVectorUnmodified + randomSphere;
 				lightVector = fast_normalize(lightVector);
 			}
 
-			float opacityFactor = dot(lightVector, lightVectorUnmodified);
+			REAL opacityFactor = dot(lightVector, lightVectorUnmodified);
 #endif // MC_SOFT_SHADOWS
 
-			float opacityCollected = 1.0f;
+			REAL opacityCollected = 1.0;
 #if defined(USE_INNER_COLORING) && defined(USE_DIFFUSE_GRADIENT)
 			if (material->insideColoringEnable && material->diffuseGradientEnable)
 			{
@@ -311,14 +311,14 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 			}
 #endif // USE_INNER_COLORING && USE_DIFFUSE_GRADIENT
 
-			float texOpacity = 0.0f;
+			REAL texOpacity = 0.0;
 #ifdef USE_TRANSPARENCY_ALPHA_TEXTURE
 			if (input->material->useTransparencyAlphaTexture)
 			{
-				float3 tex = TextureShader(consts, calcParam, &input2, renderData, objectData,
-					input2.material->transparencyAlphaTextureIndex, 1.0f);
+				REAL3 tex = TextureShader(consts, calcParam, &input2, renderData, objectData,
+					input2.material->transparencyAlphaTextureIndex, 1.0);
 				texOpacity =
-					(1.0f - tex.s0) * input2.material->transparencyAlphaTextureIntensityVol + 1e-6f;
+					(1.0 - tex.s0) * input2.material->transparencyAlphaTextureIntensityVol + 1e-6;
 				opacityCollected = opacityCollected * (1.0 - texOpacity) + texOpacity;
 			}
 #endif // USE_TRANSPARENCY_ALPHA_TEXTURE
@@ -327,26 +327,26 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 			if (input->material->perlinNoiseEnable && input->material->perlinNoiseTransparencyAlphaEnable)
 			{
 				PerlinNoiseForShaders(consts, calcParam, &input2, renderData, point2);
-				float alpha = (input->material->perlinNoiseTransparencyColorInvert)
-												? 1.0f - input2.perlinNoise
+				REAL alpha = (input->material->perlinNoiseTransparencyColorInvert)
+												? 1.0 - input2.perlinNoise
 												: input2.perlinNoise;
 				alpha =
-					clamp(alpha * input->material->perlinNoiseTransparencyAlphaIntensityVol, 0.0f, 1.0f);
-				alpha = 1.0f - alpha;
-				opacityCollected = opacityCollected * (1.0f - alpha) + alpha + 1e-6f;
+					clamp(alpha * input->material->perlinNoiseTransparencyAlphaIntensityVol, 0.0, 1.0);
+				alpha = 1.0 - alpha;
+				opacityCollected = opacityCollected * (1.0 - alpha) + alpha + 1e-6;
 			}
 #endif
 
-			float opacity =
-				(-1.0f + 1.0f / (opacityCollected * input->material->transparencyOfInterior)) * step;
+			REAL opacity =
+				(-1.0 + 1.0 / (opacityCollected * input->material->transparencyOfInterior)) * step;
 
 #ifdef MC_SOFT_SHADOWS
 			opacity *= opacityFactor;
 #endif
 
 			opacity *= (distance - i) / distance;
-			opacity = min(opacity, 1.0f);
-			totalOpacity = opacity + (1.0f - opacity) * totalOpacity;
+			opacity = min(opacity, 1.0);
+			totalOpacity = opacity + (1.0 - opacity) * totalOpacity;
 			dist = CalcDelta(point2, consts);
 		}
 		else
@@ -356,24 +356,24 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 		}
 #endif // USE_SUBSURFACE_SCATTERING
 
-		shadowTemp = 1.0f - totalOpacity;
+		shadowTemp = 1.0 - totalOpacity;
 
-		if ((!goThrough && (dist < dist_thresh || shadowTemp < 0.0f))
-				|| (goThrough && shadowTemp < 0.0001f))
+		if ((!goThrough && (dist < dist_thresh || shadowTemp < 0.0))
+				|| (goThrough && shadowTemp < 0.0001))
 		{
 			if (light->penetrating)
 			{
 				shadowTemp -= (distance - i) / distance;
-				if (shadowTemp < 0.0f) shadowTemp = 0.0f;
+				if (shadowTemp < 0.0) shadowTemp = 0.0;
 			}
 			else
 			{
-				shadowTemp = 0.0f;
+				shadowTemp = 0.0;
 			}
 			break;
 		}
 		step = min(dist, lastDistanceToClouds) * DEFactor;
-		step = max(step, 1e-6f);
+		step = max(step, 1e-6);
 
 		count++;
 		if (count > MAX_RAYMARCHING) break;
@@ -385,7 +385,7 @@ float3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 	}
 	else
 	{
-		lightShaded = 1.0f - maxSoft;
+		lightShaded = 1.0 - maxSoft;
 	}
 
 	return lightShaded;

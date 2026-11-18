@@ -34,8 +34,8 @@ REAL4 MandeltorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 
 	REAL theta = atan2(rh, z.y);
 
-	REAL px = z.x - native_cos(phi) * 1.5f;
-	REAL pz = z.z - native_sin(phi) * 1.5f;
+	REAL px = z.x - native_cos(phi) * 1.5;
+	REAL pz = z.z - native_sin(phi) * 1.5;
 	REAL rhrad = native_sqrt(px * px + pz * pz + z.y * z.y);
 	REAL rh1 = pow(rhrad, power2);
 	REAL rh2 = pow(rhrad, power1);
@@ -51,7 +51,7 @@ REAL4 MandeltorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	else // mode 2
 	{
 		REAL tangle = atan2(native_sqrt(px * px + pz * pz), z.y) * power2;
-		REAL sintheta = (1.5f + native_cos(tangle)) * rh2;
+		REAL sintheta = (1.5 + native_cos(tangle)) * rh2;
 		z.x = sintheta * native_cos(phipow);
 		z.z = sintheta * native_sin(phipow);
 		z.y = native_sin(tangle) * rh1; // mode 2
@@ -64,7 +64,7 @@ REAL4 MandeltorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 
 	if (!fractal->analyticDE.enabledFalse)
 	{
-		aux->DE = temp * aux->DE + 1.0f;
+		aux->DE = temp * aux->DE + 1.0;
 	}
 	else
 	{

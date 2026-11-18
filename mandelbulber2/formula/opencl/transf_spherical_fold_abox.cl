@@ -31,10 +31,10 @@ REAL4 TransfSphericalFoldAboxIteration(REAL4 z, __global sFractalCl *fractal, sE
 			aux->color += fractal->mandelbox.color.factorSp1;
 		}
 	}
-	else if (r2 < 1.0f)
+	else if (r2 < 1.0)
 	{
-		z *= 1.0f / r2;
-		aux->DE *= 1.0f / r2;
+		z *= 1.0 / r2;
+		aux->DE *= 1.0 / r2;
 		if (fractal->foldColor.auxColorEnabledFalse)
 		{
 			aux->color += fractal->mandelbox.color.factorSp2;

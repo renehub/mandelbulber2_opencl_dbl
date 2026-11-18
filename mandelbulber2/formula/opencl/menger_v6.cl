@@ -51,7 +51,7 @@ REAL4 MengerV6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 		{
 			z.y = fabs(z.y);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			t = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * t;
 			z.y = native_sin(psi) * t;
@@ -73,40 +73,40 @@ REAL4 MengerV6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 			&& aux->i < fractal->transformCommon.stopIterations1)
 	{
 		REAL4 n;
-		REAL col = 0.0f;
+		REAL col = 0.0;
 		z.y *= fractal->transformCommon.scaleA1;
-		z *= 0.5f;
+		z *= 0.5;
 
 		for (int k = 0; k < fractal->transformCommon.int8X; k++)
 		{
 			z *= fractal->transformCommon.scale3;
 			aux->DE *= fabs(fractal->transformCommon.scale3);
 			REAL4 Offset1 = fractal->transformCommon.offset222;
-			z.y = z.y - (2.0f * max(z.y, 0.0f)) + Offset1.y;
-			z.x = -(z.x - (2.0f * max(z.x, 0.0f)) + Offset1.x);
+			z.y = z.y - (2.0 * max(z.y, 0.0)) + Offset1.y;
+			z.x = -(z.x - (2.0 * max(z.x, 0.0)) + Offset1.x);
 
 			t = fractal->transformCommon.cosA;
 			n = (REAL4){t * fractal->transformCommon.sinB, fractal->transformCommon.sinA,
-				t * fractal->transformCommon.cosB, 0.0f};
+				t * fractal->transformCommon.cosB, 0.0};
 
 			t = length(n);
-			if (t == 0.0f) t = 1e-21f;
+			if (t == 0.0) t = 1e-21;
 			n /= t;
-			t = dot(z, n) * 2.0f;
-			z -= max(t, 0.0f) * n;
+			t = dot(z, n) * 2.0;
+			z -= max(t, 0.0) * n;
 
 			z.z += Offset1.z;
 			t = native_cos(fractal->transformCommon.angle45 * M_PI_180_F);
 			n = (REAL4){t * fractal->transformCommon.sinC,
 				native_sin(-fractal->transformCommon.angle45 * M_PI_180_F),
-				t * fractal->transformCommon.cosC, 0.0f};
+				t * fractal->transformCommon.cosC, 0.0};
 			t = length(n);
-			if (t == 0.0f) t = 1e-21f;
+			if (t == 0.0) t = 1e-21;
 			n /= t;
-			t = dot(z, n) * 2.0f;
-			z -= max(t, 0.0f) * n;
+			t = dot(z, n) * 2.0;
+			z -= max(t, 0.0) * n;
 
-			t = max((z.x + z.y), 0.0f);
+			t = max((z.x + z.y), 0.0);
 			z.y = z.y - t;
 			z.x = z.x - t + fractal->transformCommon.offset2;
 
@@ -115,11 +115,11 @@ REAL4 MengerV6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 			{
 				if (!fractal->transformCommon.functionEnabledOFalse)
 				{
-					if (z.z > -1.0f) col += fractal->foldColor.difs0000.y;
+					if (z.z > -1.0) col += fractal->foldColor.difs0000.y;
 				}
 				else
 				{
-					if (z.y < 1.0f) col += fractal->foldColor.difs0000.y;
+					if (z.y < 1.0) col += fractal->foldColor.difs0000.y;
 				}
 
 				if (z.x > -fractal->transformCommon.scaleA3 && z.y > -fractal->foldColor.difs1)
@@ -128,19 +128,19 @@ REAL4 MengerV6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 				if (z.x > -fractal->transformCommon.scaleA3 && z.z > -fractal->foldColor.difs1)
 					col += fractal->foldColor.difs0000.w; // x z
 
-				z.x = z.x - (2.0f * max(z.x, 0.0f)) + fractal->transformCommon.offsetA1;
-				z.x = z.x - (2.0f * max(z.x, 0.0f)) + fractal->transformCommon.offsetT1;
+				z.x = z.x - (2.0 * max(z.x, 0.0)) + fractal->transformCommon.offsetA1;
+				z.x = z.x - (2.0 * max(z.x, 0.0)) + fractal->transformCommon.offsetT1;
 
-				if (z.x + z.y < 0.0f) col += fractal->foldColor.difs0000.x; // diag;
+				if (z.x + z.y < 0.0) col += fractal->foldColor.difs0000.x; // diag;
 
 				aux->color = col;
 			}
 			else
 			{
-				z.x = z.x - (2.0f * max(z.x, 0.0f)) + fractal->transformCommon.offsetA1;
-				z.x = z.x - (2.0f * max(z.x, 0.0f)) + fractal->transformCommon.offsetT1;
+				z.x = z.x - (2.0 * max(z.x, 0.0)) + fractal->transformCommon.offsetA1;
+				z.x = z.x - (2.0 * max(z.x, 0.0)) + fractal->transformCommon.offsetT1;
 			}
-			t = max((z.x + z.y), 0.0f);
+			t = max((z.x + z.y), 0.0);
 			z.x -= t;
 			z.y -= t;
 
@@ -152,10 +152,10 @@ REAL4 MengerV6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 			}
 		}
 
-		REAL4 edgeDist = fabs(z) - (REAL4){1.0f, 1.0f, 1.0f, 0.0f};
-		edgeDist.x = max(edgeDist.x, 0.0f);
-		edgeDist.y = max(edgeDist.y, 0.0f);
-		edgeDist.z = max(edgeDist.z, 0.0f);
+		REAL4 edgeDist = fabs(z) - (REAL4){1.0, 1.0, 1.0, 0.0};
+		edgeDist.x = max(edgeDist.x, 0.0);
+		edgeDist.y = max(edgeDist.y, 0.0);
+		edgeDist.z = max(edgeDist.z, 0.0);
 		t = length(edgeDist); // + min(max(edgeDist.x, max(edgeDist.y, edgeDist.z)));
 
 		t /= aux->DE;

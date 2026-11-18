@@ -19,10 +19,10 @@ REAL4 BristorbrotIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 {
 	(void)fractal;
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 	REAL newx = z.x * z.x - z.y * z.y - z.z * z.z;
-	REAL newy = z.y * (2.0f * z.x - z.z);
-	REAL newz = z.z * (2.0f * z.x + z.y);
+	REAL newy = z.y * (2.0 * z.x - z.z);
+	REAL newz = z.z * (2.0 * z.x + z.y);
 	z.x = newx;
 	z.y = newy;
 	z.z = newz;

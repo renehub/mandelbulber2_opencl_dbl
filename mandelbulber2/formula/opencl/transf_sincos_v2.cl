@@ -36,15 +36,15 @@ REAL4 TransfSincosV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	if (fractal->transformCommon.functionEnabledAFalse)
 	{
 		REAL Voff = fractal->transformCommon.scale2;
-		REAL g = z.z - 2.0f * Voff * ang + Voff;
-		z.z = g - 2.0f * Voff * floor(g / (2.0f * Voff)) - Voff;
+		REAL g = z.z - 2.0 * Voff * ang + Voff;
+		z.z = g - 2.0 * Voff * floor(g / (2.0 * Voff)) - Voff;
 	}
 
 	z.y = native_sqrt(z.x * z.x + z.y * z.y) - fractal->transformCommon.radius1;
 	if (fractal->transformCommon.functionEnabledM)
 	{
-		z.x = (fractal->transformCommon.scaleA2 * ang + 1.0f)
-					- 2.0f * floor((fractal->transformCommon.scaleA2 * ang + 1.0f) / 2.0f) - 1.0f;
+		z.x = (fractal->transformCommon.scaleA2 * ang + 1.0)
+					- 2.0 * floor((fractal->transformCommon.scaleA2 * ang + 1.0) / 2.0) - 1.0;
 	}
 
 	ang = fractal->transformCommon.int6 * M_PI_2_F * ang;

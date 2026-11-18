@@ -57,9 +57,9 @@
 #endif
 
 // calculation of distance where ray-marching stops
-float CalcDistThresh(float3 point, __constant sClInConstants *consts)
+REAL CalcDistThresh(REAL3 point, __constant sClInConstants *consts)
 {
-	float distThresh;
+	REAL distThresh;
 	if (consts->params.common.iterThreshMode)
 	{
 		distThresh =
@@ -75,41 +75,41 @@ float CalcDistThresh(float3 point, __constant sClInConstants *consts)
 	}
 
 #if defined(PERSP_EQUIRECTANGULAR)
-	distThresh *= 0.5f;
+	distThresh *= 0.5;
 #endif
 
 #ifdef ADVANCED_QUALITY
 	distThresh = clamp(distThresh, consts->params.detailSizeMin, consts->params.detailSizeMax);
 #else
-	distThresh = max(distThresh, 1e-6f);
+	distThresh = max(distThresh, 1e-6);
 #endif
 
 	return distThresh;
 }
 
 // calculation of "voxel" size
-float CalcDelta(float3 point, __constant sClInConstants *consts)
+REAL CalcDelta(REAL3 point, __constant sClInConstants *consts)
 {
-	float delta;
+	REAL delta;
 	delta = length(consts->params.camera - point) * consts->params.resolution * consts->params.fov;
 
 #if defined(PERSP_EQUIRECTANGULAR)
-	delta *= 0.5f;
+	delta *= 0.5;
 #endif
 
-	delta = max(delta, 1e-6f);
+	delta = max(delta, 1e-6);
 	return delta;
 }
 
-formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 point,
+formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, REAL3 point,
 	sClCalcParams *calcParam, sRenderData *renderData, int hybridSequenceIndex, int internalObjectId)
 {
 	formulaOut out;
-	out.z = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
+	out.z = (REAL4)(0.0, 0.0, 0.0, 0.0);
 	out.iters = 0;
-	out.distance = 0.0f;
-	out.colorIndex = 0.0f;
-	out.orbitTrapR = 0.0f;
+	out.distance = 0.0;
+	out.colorIndex = 0.0;
+	out.orbitTrapR = 0.0;
 	out.maxiter = false;
 	out.objectId = 0;
 
@@ -135,7 +135,7 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 		// never use maxiter if normal vectors are calculated
 		if (calcParam->normalCalculationMode) maxiter = false;
 
-		if (maxiter) out.distance = 0.0f;
+		if (maxiter) out.distance = 0.0;
 
 		if (out.iters < consts->params.minN && out.distance < calcParam->detailSize)
 			out.distance = calcParam->detailSize;
@@ -143,7 +143,7 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 #ifdef INTERIOR_MODE
 		if (!calcParam->normalCalculationMode)
 		{
-			if (out.distance < 0.5f * calcParam->detailSize || maxiter)
+			if (out.distance < 0.5 * calcParam->detailSize || maxiter)
 			{
 				out.distance = calcParam->detailSize;
 				out.maxiter = false;
@@ -151,7 +151,7 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 		}
 		else
 		{
-			if (out.distance < 0.9f * calcParam->detailSize)
+			if (out.distance < 0.9 * calcParam->detailSize)
 			{
 				out.distance = calcParam->detailSize - out.distance;
 				out.maxiter = false;
@@ -163,14 +163,14 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 		{
 			if (out.distance < calcParam->detailSize)
 			{
-				out.distance = calcParam->detailSize * 1.01f;
+				out.distance = calcParam->detailSize * 1.01;
 			}
 		}
 
-		if (isnan(out.distance)) out.distance = 0.0f;
-		if (isinf(out.distance)) out.distance = 0.0f;
-		if (out.distance < 0.0f) out.distance = 0.0f;
-		if (out.distance > 5.0f) out.distance = 5.0f;
+		if (isnan(out.distance)) out.distance = 0.0;
+		if (isinf(out.distance)) out.distance = 0.0;
+		if (out.distance < 0.0) out.distance = 0.0;
+		if (out.distance > 5.0) out.distance = 5.0;
 	}
 #endif // ANALYTIC_DE
 
@@ -183,18 +183,18 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 	{
 
 #ifdef ADVANCED_QUALITY
-		float delta =
-			max(length(point) * 1.0e-6f, calcParam->detailSize * consts->params.deltaDERelativeDelta);
+		REAL delta =
+			max(length(point) * 1.0e-6, calcParam->detailSize * consts->params.deltaDERelativeDelta);
 #else
-		float delta = max(length(point) * 1.0e-6f, calcParam->detailSize * 0.1f);
+		REAL delta = max(length(point) * 1.0e-6, calcParam->detailSize * 0.1);
 #endif
-		float3 dr = 0.0f;
+		REAL3 dr = 0.0;
 
 		out = Fractal(consts, point, calcParam, calcModeDeltaDE1, NULL, internalObjectId, renderData,
 			hybridSequenceIndex, point, false);
 		calcParam->deltaDEMaxN = out.iters - 1;
-		float r = length(out.z);
-		float4 zFromIters = out.z;
+		REAL r = length(out.z);
+		REAL4 zFromIters = out.z;
 
 		bool maxiter = out.maxiter;
 
@@ -206,15 +206,15 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 		if (calcParam->normalCalculationMode) maxiter = false;
 #endif
 
-		float3 deltas[6];
-		deltas[0] = (float3){delta, 0.0f, 0.0f};
-		deltas[1] = (float3){-delta, 0.0f, 0.0f};
-		deltas[2] = (float3){0.0f, delta, 0.0f};
-		deltas[3] = (float3){0.0f, -delta, 0.0f};
-		deltas[4] = (float3){0.0f, 0.0f, delta};
-		deltas[5] = (float3){0.0f, 0.0f, -delta};
+		REAL3 deltas[6];
+		deltas[0] = (REAL3){delta, 0.0, 0.0};
+		deltas[1] = (REAL3){-delta, 0.0, 0.0};
+		deltas[2] = (REAL3){0.0, delta, 0.0};
+		deltas[3] = (REAL3){0.0, -delta, 0.0};
+		deltas[4] = (REAL3){0.0, 0.0, delta};
+		deltas[5] = (REAL3){0.0, 0.0, -delta};
 
-		float rDelta[6];
+		REAL rDelta[6];
 		for (int i = 0; i < 6; i++)
 		{
 			rDelta[i] = length(Fractal(consts, point + deltas[i], calcParam, calcModeDeltaDE2, NULL,
@@ -222,38 +222,38 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 					.z);
 			if (isnan(rDelta[i]) || isinf(rDelta[i]))
 			{
-				rDelta[i] = 0.0f;
+				rDelta[i] = 0.0;
 			}
 		}
 		dr.x = min(fabs(rDelta[0] - r), fabs(rDelta[1] - r)) / delta;
 		dr.y = min(fabs(rDelta[2] - r), fabs(rDelta[3] - r)) / delta;
 		dr.z = min(fabs(rDelta[4] - r), fabs(rDelta[5] - r)) / delta;
 
-		float d = length(dr);
+		REAL d = length(dr);
 
-		if (isinf(r) || isinf(d) || isnan(r) || isnan(d) || d < 1e-10f)
+		if (isinf(r) || isinf(d) || isnan(r) || isnan(d) || d < 1e-10)
 		{
 			out.distance = calcParam->detailSize;
 		}
 		else
 		{
 #ifdef DELTA_LINEAR_DE
-			out.distance = 0.5f * r / d;
+			out.distance = 0.5 * r / d;
 #elif DELTA_LOG_DE
-			out.distance = 0.5f * r * native_log(r) / d;
+			out.distance = 0.5 * r * native_log(r) / d;
 #elif DELTA_PSEUDO_KLEINIAN_DE
-			float rxy = native_sqrt(out.z.x * out.z.x + out.z.y * out.z.y);
-			out.distance = max(rxy - 0.92784f, fabs(rxy * out.z.z) / r) / d;
+			REAL rxy = native_sqrt(out.z.x * out.z.x + out.z.y * out.z.y);
+			out.distance = max(rxy - 0.92784, fabs(rxy * out.z.z) / r) / d;
 #elif DELTA_JOS_KLEINIAN_DE
-			float4 z = out.z;
-			float rxy = native_sqrt(z.x * z.x + z.z * z.z);
+			REAL4 z = out.z;
+			REAL rxy = native_sqrt(z.x * z.x + z.z * z.z);
 			out.distance = (fabs(rxy * z.y) / r) / d;
 			out.maxiter = false;
 #elif DELTA_MAXAXIS_DE
-			float4 absZ = fabs(zFromIters);
-			float maxZ = max(max(absZ.x, absZ.y), absZ.z);
-			float maxDr = max(max(fabs(dr.x), fabs(dr.y)), fabs(dr.z));
-			out.distance = 0.5f * maxZ / maxDr;
+			REAL4 absZ = fabs(zFromIters);
+			REAL maxZ = max(max(absZ.x, absZ.y), absZ.z);
+			REAL maxDr = max(max(fabs(dr.x), fabs(dr.y)), fabs(dr.z));
+			out.distance = 0.5 * maxZ / maxDr;
 #endif
 		}
 
@@ -263,7 +263,7 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 		// never use maxiter if normal vectors are calculated
 		if (calcParam->normalCalculationMode) maxiter = false;
 
-		if (maxiter) out.distance = 0.0f;
+		if (maxiter) out.distance = 0.0;
 
 		if (out.iters < consts->params.minN && out.distance < calcParam->detailSize)
 			out.distance = calcParam->detailSize;
@@ -271,7 +271,7 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 #ifdef INTERIOR_MODE
 		if (!calcParam->normalCalculationMode)
 		{
-			if (out.distance < 0.5f * calcParam->detailSize || maxiter)
+			if (out.distance < 0.5 * calcParam->detailSize || maxiter)
 			{
 				out.distance = calcParam->detailSize;
 				out.maxiter = false;
@@ -279,7 +279,7 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 		}
 		else
 		{
-			if (out.distance < 0.9f * calcParam->detailSize)
+			if (out.distance < 0.9 * calcParam->detailSize)
 			{
 				out.distance = calcParam->detailSize - out.distance;
 				out.maxiter = false;
@@ -291,12 +291,12 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, float3 poi
 		{
 			if (out.distance < calcParam->detailSize)
 			{
-				out.distance = calcParam->detailSize * 1.01f;
+				out.distance = calcParam->detailSize * 1.01;
 			}
 		}
 
-		if (out.distance < 0.0f) out.distance = 0.0f;
-		if (out.distance > 5.0f) out.distance = 5.0f;
+		if (out.distance < 0.0) out.distance = 0.0;
+		if (out.distance > 5.0) out.distance = 5.0;
 	}
 #endif // DELTA_DE
 
@@ -310,20 +310,20 @@ typedef struct
 	int level;
 	int closestObjectId;
 	int closestObjectSequence;
-	float cumulativeDistance;
-	float detailSize;
+	REAL cumulativeDistance;
+	REAL detailSize;
 	enumNodeTypeCl nodeType;
-	float3 transformedPoint;
+	REAL3 transformedPoint;
 	bool hasTransformedPoint;
 	cl_int smoothCombineEnable;
-	cl_float smoothCombineDistance;
+	REAL smoothCombineDistance;
 } ObjectTreeStackFrameCl;
 
 void mergeChildIntoParentCl(const ObjectTreeStackFrameCl *child, ObjectTreeStackFrameCl *parent,
-	__global sObjectDataCl *objectsData, int numberOfObjects, float detailSize,
+	__global sObjectDataCl *objectsData, int numberOfObjects, REAL detailSize,
 	bool normalCalculationMode)
 {
-	const float childDistance = child->cumulativeDistance;
+	const REAL childDistance = child->cumulativeDistance;
 
 	switch (parent->nodeType)
 	{
@@ -354,7 +354,7 @@ void mergeChildIntoParentCl(const ObjectTreeStackFrameCl *child, ObjectTreeStack
 				parent->hasTransformedPoint = child->hasTransformedPoint;
 			}
 
-			if (parent->cumulativeDistance >= 1e19f)
+			if (parent->cumulativeDistance >= 1e19)
 			{
 				parent->cumulativeDistance = childDistance;
 				parent->closestObjectId = child->closestObjectId;
@@ -362,9 +362,9 @@ void mergeChildIntoParentCl(const ObjectTreeStackFrameCl *child, ObjectTreeStack
 				parent->transformedPoint = child->transformedPoint;
 				parent->hasTransformedPoint = child->hasTransformedPoint;
 			}
-			else if (parent->detailSize > 0.0f && childDistance < parent->detailSize * 1.5)
+			else if (parent->detailSize > 0.0 && childDistance < parent->detailSize * 1.5)
 			{
-				const float limitDist = parent->detailSize * 1.5f;
+				const REAL limitDist = parent->detailSize * 1.5;
 
 				if (childDistance < limitDist)
 				{
@@ -388,8 +388,8 @@ void mergeChildIntoParentCl(const ObjectTreeStackFrameCl *child, ObjectTreeStack
 				}
 				else
 				{
-					const float adjustedDistance = max(limitDist - childDistance, parent->cumulativeDistance);
-					parent->cumulativeDistance = (adjustedDistance < 0.0f) ? 0.0f : adjustedDistance;
+					const REAL adjustedDistance = max(limitDist - childDistance, parent->cumulativeDistance);
+					parent->cumulativeDistance = (adjustedDistance < 0.0) ? 0.0 : adjustedDistance;
 					parent->closestObjectId = child->closestObjectId;
 					parent->closestObjectSequence = child->closestObjectSequence;
 					parent->transformedPoint = child->transformedPoint;
@@ -404,11 +404,11 @@ void mergeChildIntoParentCl(const ObjectTreeStackFrameCl *child, ObjectTreeStack
 		default:
 		{
 			const bool smoothEnabled = child->smoothCombineEnable;
-			const float smoothDistance = child->smoothCombineDistance;
+			const REAL smoothDistance = child->smoothCombineDistance;
 
-			if (smoothEnabled && parent->cumulativeDistance < 1e19f)
+			if (smoothEnabled && parent->cumulativeDistance < 1e19)
 			{
-				const float parentDistanceBefore = parent->cumulativeDistance;
+				const REAL parentDistanceBefore = parent->cumulativeDistance;
 				parent->cumulativeDistance =
 					opSmoothUnion(childDistance, parent->cumulativeDistance, smoothDistance);
 				if (childDistance < parentDistanceBefore)
@@ -432,23 +432,23 @@ void mergeChildIntoParentCl(const ObjectTreeStackFrameCl *child, ObjectTreeStack
 	}
 }
 
-formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
+formulaOut CalculateDistance(__constant sClInConstants *consts, REAL3 point,
 	sClCalcParams *calcParam, sRenderData *renderData)
 {
 	formulaOut out;
-	out.z = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
+	out.z = (REAL4)(0.0, 0.0, 0.0, 0.0);
 	out.iters = 0;
-	out.distance = 0.0f;
-	out.colorIndex = 0.0f;
-	out.orbitTrapR = 0.0f;
+	out.distance = 0.0;
+	out.colorIndex = 0.0;
+	out.orbitTrapR = 0.0;
 	out.maxiter = false;
 	out.objectId = 0;
 
-	float limitBoxDist = 0.0f;
+	REAL limitBoxDist = 0.0;
 	int totalIters = 0;
 
 #ifdef LIMITS_ENABLED
-	float3 boxDistance = max(point - consts->params.limitMax, -(point - consts->params.limitMin));
+	REAL3 boxDistance = max(point - consts->params.limitMax, -(point - consts->params.limitMin));
 	limitBoxDist = max(max(boxDistance.x, boxDistance.y), boxDistance.z);
 
 	if (limitBoxDist > calcParam->detailSize)
@@ -474,7 +474,7 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 	const int nodeCount = renderData->numberOfNodes;
 	const int numberOfObjects = renderData->numberOfObjects;
 
-	stack[0].cumulativeDistance = 1e20f;
+	stack[0].cumulativeDistance = 1e20;
 	stack[0].level = 0;
 	stack[0].closestObjectId = -1;
 	stack[0].closestObjectSequence = -1;
@@ -483,7 +483,7 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 	stack[0].transformedPoint = point;
 	stack[0].hasTransformedPoint = false;
 	stack[0].smoothCombineEnable = 0;
-	stack[0].smoothCombineDistance = 0.0f;
+	stack[0].smoothCombineDistance = 0.0;
 
 	int stackLevel = 0;
 	int numberOfFractalsToSkip = 0;
@@ -495,33 +495,33 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 		{
 			continue;
 		}
-		float distance = 1e20f;
+		REAL distance = 1e20;
 		int objectId = -1;
 		int sequenceIndex = -1;
 		int leafIters = 0;
 
 		// Apply combined inverse transform (world -> local space)
-		float3 pointLocal = Matrix44TransformPoint(node->worldToLocalMatrix, point);
+		REAL3 pointLocal = Matrix44TransformPoint(node->worldToLocalMatrix, point);
 
 		// Apply repeat in LOCAL space (leaf only)
 		// Scale repeat by absScale so that repeat distance is in world space (independent of scale)
-		const float absNodeScale = node->absScale;
-		float3 repeatForLocalSpace = node->repeat / absNodeScale;
-		float3 pointWithRepeat = modRepeat(pointLocal, repeatForLocalSpace);
+		const REAL absNodeScale = node->absScale;
+		REAL3 repeatForLocalSpace = node->repeat / absNodeScale;
+		REAL3 pointWithRepeat = modRepeat(pointLocal, repeatForLocalSpace);
 
-		float3 pointTransformed = pointWithRepeat;
-		const float detailMult = node->detailLevelMultiplier;
-		float savedDetailSize = calcParam->detailSize;
+		REAL3 pointTransformed = pointWithRepeat;
+		const REAL detailMult = node->detailLevelMultiplier;
+		REAL savedDetailSize = calcParam->detailSize;
 
-		if (absNodeScale > 0.0f && detailMult > 0.0f)
+		if (absNodeScale > 0.0 && detailMult > 0.0)
 		{
 			calcParam->detailSize = savedDetailSize / absNodeScale / detailMult;
 		}
-		else if (absNodeScale > 0.0f)
+		else if (absNodeScale > 0.0)
 		{
 			calcParam->detailSize = savedDetailSize / absNodeScale;
 		}
-		else if (detailMult > 0.0f)
+		else if (detailMult > 0.0)
 		{
 			calcParam->detailSize = savedDetailSize / detailMult;
 		}
@@ -565,14 +565,14 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 				if (objectId >= 0)
 				{
 #ifdef FRACTALIZE_TEXTURE
-					float reduceDisplacement = 1.0f;
-					float3 pointForDisplacement = FractalizeTexture(
+					REAL reduceDisplacement = 1.0;
+					REAL3 pointForDisplacement = FractalizeTexture(
 						point, consts, calcParam, renderData, objectId, sequenceIndex, &reduceDisplacement);
 #else
 #ifdef USE_DISPLACEMENT_TEXTURE
-					const float reduceDisplacement = 1.0f;
+					const REAL reduceDisplacement = 1.0;
 #endif
-					const float3 pointForDisplacement = point;
+					const REAL3 pointForDisplacement = point;
 #endif
 #ifdef USE_DISPLACEMENT_TEXTURE
 					distance = DisplacementMap(
@@ -592,7 +592,7 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 				if (primIdx >= 0 && primIdx < renderData->numberOfPrimitives)
 				{
 					__global sPrimitiveCl *primitive = &renderData->primitives[primIdx];
-					distance = PrimitiveDistanceByType(primitive, pointTransformed, 1e20f);
+					distance = PrimitiveDistanceByType(primitive, pointTransformed, 1e20);
 					distance *= absNodeScale;
 					objectId = node->internalObjectId;
 				}
@@ -601,7 +601,7 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 				if (objectId >= 0)
 				{
 #ifdef USE_DISPLACEMENT_TEXTURE
-					distance = DisplacementMap(distance, point, objectId, renderData, 1.0f);
+					distance = DisplacementMap(distance, point, objectId, renderData, 1.0);
 #endif
 #if defined(USE_PERLIN_NOISE) && defined(USE_PERLIN_NOISE_DISPLACEMENT)
 					distance = PerlinNoiseDisplacement(distance, point, renderData, objectId);
@@ -626,14 +626,14 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 				if (objectId >= 0)
 				{
 #ifdef FRACTALIZE_TEXTURE
-					float reduceDisplacement = 1.0f;
-					float3 pointForDisplacement = FractalizeTexture(
+					REAL reduceDisplacement = 1.0;
+					REAL3 pointForDisplacement = FractalizeTexture(
 						point, consts, calcParam, renderData, objectId, sequenceIndex, &reduceDisplacement);
 #else
 #ifdef USE_DISPLACEMENT_TEXTURE
-					const float reduceDisplacement = 1.0f;
+					const REAL reduceDisplacement = 1.0;
 #endif
-					const float3 pointForDisplacement = point;
+					const REAL3 pointForDisplacement = point;
 #endif
 #ifdef USE_DISPLACEMENT_TEXTURE
 					distance = DisplacementMap(
@@ -656,7 +656,7 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 				if (stackLevel < MAX_TREE_LEVELS)
 				{
 					stack[stackLevel].cumulativeDistance =
-						(node->type == nodeTypeBooleanMul) ? -1e20f : 1e20f;
+						(node->type == nodeTypeBooleanMul) ? -1e20 : 1e20;
 					stack[stackLevel].level = node->level;
 					stack[stackLevel].nodeType = node->type;
 					stack[stackLevel].closestObjectId = -1;
@@ -721,8 +721,8 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 	}
 #endif
 
-	float distFromCamera = length(point - consts->params.camera);
-	float distanceLimitMin = consts->params.viewDistanceMin - distFromCamera;
+	REAL distFromCamera = length(point - consts->params.camera);
+	REAL distanceLimitMin = consts->params.viewDistanceMin - distFromCamera;
 	out.distance = max(out.distance, distanceLimitMin);
 
 	if (distanceLimitMin > calcParam->detailSize)
@@ -736,7 +736,7 @@ formulaOut CalculateDistance(__constant sClInConstants *consts, float3 point,
 	out.hasTransformedPoint = stack[0].hasTransformedPoint;
 	out.sequenceIndex = stack[0].closestObjectSequence;
 
-	out.detailLevelMultiplier = 1.0f;
+	out.detailLevelMultiplier = 1.0;
 	if (stack[0].closestObjectId >= 0 && stack[0].closestObjectId < numberOfObjects)
 	{
 		out.detailLevelMultiplier =

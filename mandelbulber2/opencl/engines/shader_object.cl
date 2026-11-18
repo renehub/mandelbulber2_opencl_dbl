@@ -32,37 +32,37 @@
  * calculation of surface shader
  */
 
-float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
-	sShaderInputDataCl *input, sClCalcParams *calcParam, float3 *outSurfaceColor, float3 *outSpecular,
-	float3 *iridescenceOut, float3 *outShadow, float3 *outLuminosityEmissive, float *alphaOut,
+REAL3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
+	sShaderInputDataCl *input, sClCalcParams *calcParam, REAL3 *outSurfaceColor, REAL3 *outSpecular,
+	REAL3 *iridescenceOut, REAL3 *outShadow, REAL3 *outLuminosityEmissive, REAL *alphaOut,
 	sClGradientsCollection *gradients)
 {
-	float3 color = 0.7f;
+	REAL3 color = 0.7;
 
-	float3 shade = 0.0f;
-	float3 specular = 0.0f;
-	float3 shadow = 1.0f;
-	*alphaOut = 1.0f;
+	REAL3 shade = 0.0;
+	REAL3 specular = 0.0;
+	REAL3 shadow = 1.0;
+	*alphaOut = 1.0;
 
-	float3 fillLight = consts->params.fillLightColor;
+	REAL3 fillLight = TO_REAL3(consts->params.fillLightColor);
 
-	float3 surfaceColor = 1.0f;
+	REAL3 surfaceColor = 1.0;
 
 #if defined(USE_PERLIN_NOISE) && defined(USE_PERLIN_NOISE_COLOR)
 	if (input->material->perlinNoiseEnable && input->material->perlinNoiseColorEnable)
 	{
-		float perlinColInt = input->material->perlinNoiseColorIntensity;
-		float perlinIntN = 1.0f - input->material->perlinNoiseColorIntensity;
-		float perlin =
-			(input->material->perlinNoiseColorInvert) ? 1.0f - input->perlinNoise : input->perlinNoise;
+		REAL perlinColInt = input->material->perlinNoiseColorIntensity;
+		REAL perlinIntN = 1.0 - input->material->perlinNoiseColorIntensity;
+		REAL perlin =
+			(input->material->perlinNoiseColorInvert) ? 1.0 - input->perlinNoise : input->perlinNoise;
 
 #ifdef USE_SURFACE_GRADIENT
 		if (input->material->surfaceGradientEnable)
 		{
-			float colorPosition =
-				fmod(perlin * input->material->coloring_speed + input->material->paletteOffset, 1.0f);
+			REAL colorPosition =
+				fmod(perlin * input->material->coloring_speed + input->material->paletteOffset, 1.0);
 
-			float3 gradientColor = GetColorFromGradient(colorPosition, false, input->paletteSurfaceLength,
+			REAL3 gradientColor = GetColorFromGradient(colorPosition, false, input->paletteSurfaceLength,
 				input->palette + input->paletteSurfaceOffset);
 
 			surfaceColor *= gradientColor * perlinColInt + perlinIntN;
@@ -70,7 +70,7 @@ float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 		else
 #endif // USE_SURFACE_GRADIENT
 		{
-			float perlinCol = perlin * perlinColInt + perlinIntN;
+			REAL perlinCol = perlin * perlinColInt + perlinIntN;
 			surfaceColor *= perlinCol;
 		}
 	}
@@ -81,14 +81,14 @@ float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 
 #ifdef USE_TEXTURES
 #ifdef USE_COLOR_TEXTURE
-		float texColInt = input->material->colorTextureIntensity;
-		float texColIntN = 1.0f - texColInt;
-		surfaceColor *= input->texColor * texColInt + texColIntN;
+		REAL texColInt = input->material->colorTextureIntensity;
+		REAL texColIntN = 1.0 - texColInt;
+		surfaceColor *= TO_REAL3(input->texColor) * texColInt + texColIntN;
 #endif
 #endif
 	}
 
-	float3 AO = 0.0f;
+	REAL3 AO = 0.0;
 	if (consts->params.ambientOcclusionEnabled)
 	{
 #ifdef AO_MODE_FAST
@@ -97,38 +97,38 @@ float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 #ifdef AO_MODE_MULTIPLE_RAYS
 		AO = AmbientOcclusion(consts, renderData, input, calcParam);
 #endif
-		AO *= consts->params.ambientOcclusion * consts->params.ambientOcclusionColor;
+		AO *= consts->params.ambientOcclusion * TO_REAL3(consts->params.ambientOcclusionColor);
 	}
 
-	float3 envMapping = 0.0f;
+	REAL3 envMapping = 0.0;
 #ifdef USE_ENV_MAPPING
 	envMapping = EnvMappingShader(consts, renderData, input);
 	envMapping *= input->material->reflectance;
 #ifdef USE_TEXTURES
 #ifdef USE_DIFFUSION_TEXTURE
-	envMapping *= input->texDiffuse;
+	envMapping *= TO_REAL3(input->texDiffuse);
 #endif
 #endif
 
 #endif
 
-	float3 auxLights = 0.0f;
-	float3 auxSpecular = 0.0f;
+	REAL3 auxLights = 0.0;
+	REAL3 auxSpecular = 0.0;
 
 #ifdef AUX_LIGHTS
 	auxLights = AuxLightsShader(
 		consts, renderData, input, calcParam, surfaceColor, gradients, &auxSpecular, outShadow);
 #endif
 
-	float3 fakeLights = 0.0f;
-	float3 fakeLightsSpecular = 0.0f;
+	REAL3 fakeLights = 0.0;
+	REAL3 fakeLightsSpecular = 0.0;
 #ifdef FAKE_LIGHTS
 	fakeLights =
 		FakeLightsShader(consts, input, calcParam, surfaceColor, gradients, &fakeLightsSpecular,
 			renderData);
 #endif
 
-	float3 iridescence = 1.0f;
+	REAL3 iridescence = 1.0;
 #ifdef USE_IRIDESCENCE
 	if (input->material->iridescenceEnabled)
 	{
@@ -137,9 +137,9 @@ float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 #endif
 	*iridescenceOut = iridescence;
 
-	float3 totalSpecular = (fakeLightsSpecular + auxSpecular) * iridescence;
+	REAL3 totalSpecular = (fakeLightsSpecular + auxSpecular) * iridescence;
 
-	float3 luminosity;
+	REAL3 luminosity;
 #ifdef USE_LUMINOSITY_GRADIENT
 	if (input->material->useColorsFromPalette && input->material->luminosityGradientEnable)
 	{
@@ -154,16 +154,16 @@ float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 #if defined(USE_PERLIN_NOISE) && defined(USE_PERLIN_NOISE_LUMINOSITY)
 	if (input->material->perlinNoiseEnable && input->material->perlinNoiseLuminosityEnable)
 	{
-		float perlinLumInt = input->material->perlinNoiseLuminosityIntensity;
-		float perlin = (input->material->perlinNoiseLuminosityInvert) ? 1.0f - input->perlinNoise
+		REAL perlinLumInt = input->material->perlinNoiseLuminosityIntensity;
+		REAL perlin = (input->material->perlinNoiseLuminosityInvert) ? 1.0 - input->perlinNoise
 																																	: input->perlinNoise;
 #ifdef USE_LUMINOSITY_GRADIENT
 		if (input->material->luminosityGradientEnable)
 		{
-			float colorPosition =
-				fmod(perlin * input->material->coloring_speed + input->material->paletteOffset, 1.0f);
+			REAL colorPosition =
+				fmod(perlin * input->material->coloring_speed + input->material->paletteOffset, 1.0);
 
-			float3 gradientColor = GetColorFromGradient(colorPosition, false,
+			REAL3 gradientColor = GetColorFromGradient(colorPosition, false,
 				input->paletteLuminosityLength, input->palette + input->paletteLuminosityOffset);
 
 			luminosity += gradientColor * perlinLumInt;
@@ -171,7 +171,7 @@ float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 		else
 #endif // USE_LUMINOSITY_GRADIENT
 		{
-			float perlinCol = perlin * perlinLumInt;
+			REAL perlinCol = perlin * perlinLumInt;
 			luminosity *= perlinCol;
 		}
 	}
@@ -179,7 +179,7 @@ float3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 
 #ifdef USE_TEXTURES
 #ifdef USE_LUMINOSITY_TEXTURE
-	luminosity += input->texLuminosity * input->material->luminosityTextureIntensity;
+	luminosity += TO_REAL3(input->texLuminosity) * input->material->luminosityTextureIntensity;
 #endif
 #endif
 

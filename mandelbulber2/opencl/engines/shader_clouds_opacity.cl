@@ -33,67 +33,67 @@
  */
 
 #ifdef CLOUDS
-float CloudOpacity(__constant sClInConstants *consts, __global uchar *perlinNoiseSeeds,
-	float3 point, float distance, float detailSize, float *distanceOut)
+REAL CloudOpacity(__constant sClInConstants *consts, __global uchar *perlinNoiseSeeds,
+	REAL3 point, REAL distance, REAL detailSize, REAL *distanceOut)
 {
-	float h = 1.0f; // height factor
-	float3 point2;
-	float distToGeometry = 0.0f;
-	float opacityOut = 0.0f;
+	REAL h = 1.0; // height factor
+	REAL3 point2;
+	REAL distToGeometry = 0.0;
+	REAL opacityOut = 0.0;
 
 	if (consts->params.cloudsPlaneShape)
 	{
 		point2 =
 			Matrix33MulFloat3(consts->params.mRotCloudsRotation, point - consts->params.cloudsCenter);
-		// h = clamp(1.0f - fabs(2.0f / consts->params.cloudsHeight * (point2.z)), 0.0f, 1.0f);
-		h = clamp(1.0f / (pow(point2.z / consts->params.cloudsHeight * 2.0f, 6.0f) + 0.99f) - 0.01f,
-			0.0f, 1.0f);
+		// h = clamp(1.0 - fabs(2.0 / consts->params.cloudsHeight * (point2.z)), 0.0, 1.0);
+		h = clamp(1.0 / (pow(point2.z / consts->params.cloudsHeight * 2.0, 6.0) + 0.99) - 0.01,
+			0.0, 1.0);
 
-		distToGeometry = max(fabs(point2.z) - consts->params.cloudsHeight * 2.0f, 0.0f)
+		distToGeometry = max(fabs(point2.z) - consts->params.cloudsHeight * 2.0, 0.0)
 										 * consts->params.cloudsDEApproaching;
 	}
 	else
 	{
-		h = 1.0f;
+		h = 1.0;
 		point2 = point;
 	}
 
 	if (consts->params.cloudsDistanceMode)
 	{
-		//		h *= clamp(2.0f
-		//								 - fabs(3.0f / consts->params.cloudsDistanceLayer
+		//		h *= clamp(2.0
+		//								 - fabs(3.0 / consts->params.cloudsDistanceLayer
 		//												* (distance - consts->params.cloudsDistance)),
 		//
-		//			0.0f, 1.0f);
+		//			0.0, 1.0);
 
-		h = clamp(1.0f
+		h = clamp(1.0
 									/ (pow((distance - consts->params.cloudsDistance)
-													 / consts->params.cloudsDistanceLayer * 2.0f,
-											 6.0f)
-										 + 0.99f)
-								- 0.01f,
-			0.0f, 1.0f);
+													 / consts->params.cloudsDistanceLayer * 2.0,
+											 6.0)
+										 + 0.99)
+								- 0.01,
+			0.0, 1.0);
 
 		distToGeometry = max(distToGeometry, fabs(distance - consts->params.cloudsDistance)
-																					 - consts->params.cloudsDistanceLayer * 2.0f)
+																					 - consts->params.cloudsDistanceLayer * 2.0)
 										 * consts->params.cloudsDEApproaching;
 	}
 
-	float distToCloud = distToGeometry;
-	if (h > 0.0f)
+	REAL distToCloud = distToGeometry;
+	if (h > 0.0)
 	{
-		float opacity = NormalizedOctavePerlinNoise3D_0_1(point2.x / consts->params.cloudsPeriod,
+		REAL opacity = NormalizedOctavePerlinNoise3D_0_1(point2.x / consts->params.cloudsPeriod,
 			point2.y / consts->params.cloudsPeriod, point2.z / consts->params.cloudsPeriod,
 			consts->params.cloudsSpeed * consts->params.frameNo, consts->params.cloudsIterations,
 			perlinNoiseSeeds);
 
-		distToCloud = fabs(1.0f - opacity - consts->params.cloudsDensity) * 0.2f
+		distToCloud = fabs(1.0 - opacity - consts->params.cloudsDensity) * 0.2
 									* consts->params.cloudsPeriod * consts->params.cloudsDEMultiplier;
 
-		opacity = clamp(opacity - 1.0f + consts->params.cloudsDensity * 2.0f, 0.0f, 1.0f);
+		opacity = clamp(opacity - 1.0 + consts->params.cloudsDensity * 2.0, 0.0, 1.0);
 
 		if (consts->params.cloudsSharpEdges)
-			opacity = 0.5f * (1.0f + tanh((opacity - 0.5f) * consts->params.cloudsSharpness));
+			opacity = 0.5 * (1.0 + tanh((opacity - 0.5) * consts->params.cloudsSharpness));
 
 		opacity *= consts->params.cloudsOpacity;
 
@@ -102,8 +102,8 @@ float CloudOpacity(__constant sClInConstants *consts, __global uchar *perlinNois
 
 	//*distanceOut = max(distToGeometry, distToCloud);
 	*distanceOut = max(max(distToGeometry, distToCloud),
-		max(consts->params.cloudsPeriod * 0.02f / consts->params.cloudsDetailAccuracy,
-			detailSize * 5.0f / consts->params.cloudsDetailAccuracy));
+		max(consts->params.cloudsPeriod * 0.02 / consts->params.cloudsDetailAccuracy,
+			detailSize * 5.0 / consts->params.cloudsDetailAccuracy));
 
 	return opacityOut;
 }

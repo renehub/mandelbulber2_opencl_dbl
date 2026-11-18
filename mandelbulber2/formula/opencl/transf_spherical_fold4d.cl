@@ -18,7 +18,7 @@ REAL4 TransfSphericalFold4dIteration(REAL4 z, __global sFractalCl *fractal, sExt
 {
 	// REAL r2 = dot(z, z);
 	// REAL r2 = z.x * z.x + z.y * z.y;
-	// if (r2 < 1e-21f && r2 > -1e-21f) r2 = (r2 > 0) ? 1e-21f : -1e-21f;
+	// if (r2 < 1e-21 && r2 > -1e-21) r2 = (r2 > 0) ? 1e-21 : -1e-21;
 	// r2 += z.z * z.z;
 	REAL rr = dot(z, z);
 	z += fractal->transformCommon.offset0000;

@@ -19,15 +19,15 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 {
 	REAL4 oldZ = z;
 	REAL4 zCol = z;
-	REAL rrCol = 0.0f;
-	REAL colorAdd = 0.0f;
+	REAL rrCol = 0.0;
+	REAL colorAdd = 0.0;
 	// spherical fold
 	if (fractal->transformCommon.functionEnabledSFalse
 			&& aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
-		REAL para = 0.0f;
-		REAL paraAddP0 = 0.0f;
+		REAL para = 0.0;
+		REAL paraAddP0 = 0.0;
 		if (fractal->transformCommon.functionEnabledyFalse)
 		{
 			if (fractal->Cpara.enabledLinear)
@@ -60,13 +60,13 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 				// Curvi part on "true"
 				if (fractal->Cpara.enabledCurves)
 				{
-					REAL paraAdd = 0.0f;
+					REAL paraAdd = 0.0;
 					REAL paraIt;
-					if (lengthAB > 2.0f * fractal->Cpara.iterA) // stop  error, todo fix.
+					if (lengthAB > 2.0 * fractal->Cpara.iterA) // stop  error, todo fix.
 					{
-						REAL curve1 = (grade2 - grade1) / (4.0f * fractal->Cpara.iterA);
+						REAL curve1 = (grade2 - grade1) / (4.0 * fractal->Cpara.iterA);
 						REAL tempL = lengthAB - fractal->Cpara.iterA;
-						REAL curve2 = (grade3 - grade2) / (4.0f * tempL);
+						REAL curve2 = (grade3 - grade2) / (4.0 * tempL);
 						if (aux->i < 2 * fractal->Cpara.iterA)
 						{
 							paraIt = tempA - fabs(tempA - aux->i);
@@ -81,11 +81,11 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 					}
 				}
 			}
-			paraAddP0 = 0.0f;
+			paraAddP0 = 0.0;
 			if (fractal->Cpara.enabledParabFalse)
 			{ // parabolic = paraOffset + iter *slope + (iter *iter *scale)
 				paraAddP0 = fractal->Cpara.parabOffset0 + (aux->i * fractal->Cpara.parabSlope)
-										+ (aux->i * aux->i * 0.001f * fractal->Cpara.parabScale);
+										+ (aux->i * aux->i * 0.001 * fractal->Cpara.parabScale);
 			}
 		}
 		para += paraAddP0 + fractal->transformCommon.minR2p25;
@@ -95,7 +95,7 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		rrCol = rr;
 		z += fractal->mandelbox.offset;
 
-		// if (rr < 1e-21f) rr = 1e-21f;
+		// if (rr < 1e-21) rr = 1e-21;
 		if (rr < para)
 		{
 			REAL tglad_factor1 = fractal->transformCommon.maxR2d1 / para;
@@ -120,8 +120,8 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		REAL4 gap = fractal->transformCommon.constantMultiplier000;
 		z.y = fabs(z.y);
 		z.z = fabs(z.z);
-		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-		REAL t = max(0.0f, dot1);
+		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+		REAL t = max(0.0, dot1);
 		z.x -= t * -SQRT_3_F;
 		z.y = fabs(z.y - t);
 
@@ -131,7 +131,7 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			z.y = z.z;
 			z.z = temp;
 		}
-		z -= gap * (REAL4){SQRT_3_4_F, 1.5f, 1.5f, 0.0f};
+		z -= gap * (REAL4){SQRT_3_4_F, 1.5, 1.5, 0.0};
 		// z was pos, now some points neg (ie neg shift)
 		if (z.z > z.x)
 		{
@@ -139,10 +139,10 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			z.z = z.x;
 			z.x = temp;
 		}
-		if (z.x > 0.0f)
+		if (z.x > 0.0)
 		{
-			z.y = max(0.0f, z.y);
-			z.z = max(0.0f, z.z);
+			z.y = max(0.0, z.y);
+			z.z = max(0.0, z.z);
 		}
 	}
 
@@ -157,19 +157,19 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		REAL tempXZ = z.x * SQRT_2_3_F - z.z * SQRT_1_3_F;
 		z = (REAL4){(tempXZ - z.y) * SQRT_1_2_F, (tempXZ + z.y) * SQRT_1_2_F,
-			z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, 0.0f};
+			z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, 0.0};
 
 		REAL4 tempZ = z;
 		REAL tempL = length(tempZ);
 		z = fabs(z) * fractal->transformCommon.scale3D222;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
-		aux->DE = aux->DE * avgScale + 1.0f;
+		aux->DE = aux->DE * avgScale + 1.0;
 
 		tempXZ = (z.y + z.x) * SQRT_1_2_F;
 
 		z = (REAL4){z.z * SQRT_1_3_F + tempXZ * SQRT_2_3_F, (z.y - z.x) * SQRT_1_2_F,
-			z.z * SQRT_2_3_F - tempXZ * SQRT_1_3_F, 0.0f};
+			z.z * SQRT_2_3_F - tempXZ * SQRT_1_3_F, 0.0};
 		z = z - fractal->transformCommon.offset200;
 	}
 
@@ -179,14 +179,14 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		REAL tempXZ = z.x * SQRT_2_3_F - z.z * SQRT_1_3_F;
 		z = (REAL4){(tempXZ - z.y) * SQRT_1_2_F, (tempXZ + z.y) * SQRT_1_2_F,
-			z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, 0.0f};
+			z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, 0.0};
 
 		REAL4 temp = z;
 		REAL tempL = length(temp);
 		z = fabs(z) * fractal->transformCommon.scale3D333;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
-		aux->DE = aux->DE * avgScale + 1.0f;
+		aux->DE = aux->DE * avgScale + 1.0;
 
 		oldZ = z;
 		z = (fabs(z + fractal->transformCommon.additionConstant111)
@@ -201,17 +201,17 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		tempXZ = (z.y + z.x) * SQRT_1_2_F;
 
 		z = (REAL4){z.z * SQRT_1_3_F + tempXZ * SQRT_2_3_F, (z.y - z.x) * SQRT_1_2_F,
-			z.z * SQRT_2_3_F - tempXZ * SQRT_1_3_F, 0.0f};
+			z.z * SQRT_2_3_F - tempXZ * SQRT_1_3_F, 0.0};
 	}
 
-	REAL k = 1.0f;
+	REAL k = 1.0;
 	// Pseudo kleinian
 	REAL4 cSize = fractal->transformCommon.additionConstant0777;
 	if (fractal->transformCommon.functionEnabledAy
 			&& aux->i >= fractal->transformCommon.startIterationsC
 			&& aux->i < fractal->transformCommon.stopIterationsC)
 	{
-		REAL4 tempZ = z; //  correct c++ version. non conditional mult 2.0f
+		REAL4 tempZ = z; //  correct c++ version. non conditional mult 2.0
 
 		if (z.x > cSize.x) tempZ.x = cSize.x;
 		if (z.x < -cSize.x) tempZ.x = -cSize.x;
@@ -220,8 +220,8 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		if (z.z > cSize.z) tempZ.z = cSize.z;
 		if (z.z < -cSize.z) tempZ.z = -cSize.z;
 
-		z = tempZ * 2.0f - z;
-		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0f);
+		z = tempZ * 2.0 - z;
+		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0);
 		z *= k;
 		aux->DE *= k + fractal->analyticDE.tweak005;
 
@@ -232,15 +232,15 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			&& aux->i >= fractal->transformCommon.startIterationsB
 			&& aux->i < fractal->transformCommon.stopIterationsB)
 	{
-		//  variation from openCL conditional mult 2.0f
-		if (z.x > cSize.x) z.x = cSize.x * 2.0f - z.x;
-		if (z.x < -cSize.x) z.x = -cSize.x * 2.0f - z.x;
-		if (z.y > cSize.y) z.y = cSize.y * 2.0f - z.y;
-		if (z.y < -cSize.y) z.y = -cSize.y * 2.0f - z.y;
-		if (z.z > cSize.z) z.z = cSize.z * 2.0f - z.z;
-		if (z.z < -cSize.z) z.z = -cSize.z * 2.0f - z.z;
+		//  variation from openCL conditional mult 2.0
+		if (z.x > cSize.x) z.x = cSize.x * 2.0 - z.x;
+		if (z.x < -cSize.x) z.x = -cSize.x * 2.0 - z.x;
+		if (z.y > cSize.y) z.y = cSize.y * 2.0 - z.y;
+		if (z.y < -cSize.y) z.y = -cSize.y * 2.0 - z.y;
+		if (z.z > cSize.z) z.z = cSize.z * 2.0 - z.z;
+		if (z.z < -cSize.z) z.z = -cSize.z * 2.0 - z.z;
 
-		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0f);
+		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0);
 		z *= k;
 		aux->DE *= k + fractal->analyticDE.tweak005;
 		aux->pseudoKleinianDE = fractal->analyticDE.scale1; // pK DE
@@ -262,9 +262,9 @@ REAL4 PseudoKleinianMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 				&& aux->i < fractal->transformCommon.stopIterationsA)
 		{
 			REAL4 limit = fractal->transformCommon.offsetA000;
-			REAL4 length = 2.0f * limit;
-			REAL4 tgladS = 1.0f / length;
-			REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+			REAL4 length = 2.0 * limit;
+			REAL4 tgladS = 1.0 / length;
+			REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 
 			if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 			if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;

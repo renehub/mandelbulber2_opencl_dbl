@@ -27,12 +27,12 @@ REAL4 MandelbulbKaliIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	REAL ph0 = atan(z.y / z.x) + fractal->bulb.alphaAngleOffset;
 	th0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleA1;
 	REAL sinth = native_sin(th0);
-	z = aux->r * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0f};
+	z = aux->r * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0};
 
-	if (z.x * z.x + z.y * z.y == 0.0f)
+	if (z.x * z.x + z.y * z.y == 0.0)
 	{
 		z.y = z.z * z.z;
-		z.z = 0.0f;
+		z.z = 0.0;
 	}
 
 	th0 =
@@ -41,7 +41,7 @@ REAL4 MandelbulbKaliIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	ph0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleB1;
 	REAL zp = pow(aux->r, fractal->transformCommon.pwr8);
 	sinth = native_sin(th0);
-	z = zp * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0f};
+	z = zp * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0};
 
 	if (fractal->analyticDE.enabledFalse)
 	{ // analytic log DE adjustment
@@ -49,11 +49,11 @@ REAL4 MandelbulbKaliIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 								* fractal->transformCommon.pwr8 * fractal->analyticDE.scale1
 							+ fractal->analyticDE.offset2;
 	}
-	else // default, i.e. scale1 & offset1 & offset2 = 1.0f
+	else // default, i.e. scale1 & offset1 & offset2 = 1.0
 	{
 		aux->DE =
-			pow(aux->r, fractal->transformCommon.pwr8 - 1.0f) * fractal->transformCommon.pwr8 * aux->DE
-			+ 1.0f;
+			pow(aux->r, fractal->transformCommon.pwr8 - 1.0) * fractal->transformCommon.pwr8 * aux->DE
+			+ 1.0;
 	}
 	return z;
 }

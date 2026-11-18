@@ -17,7 +17,7 @@
 REAL4 TransfDIFSOctahedronV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 q = z;
-	REAL addCol = 0.0f;
+	REAL addCol = 0.0;
 	if (fractal->transformCommon.functionEnabledFFalse)
 	{
 		REAL4 h = fractal->transformCommon.offsetF000;
@@ -28,7 +28,7 @@ REAL4 TransfDIFSOctahedronV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 	}
 
 	REAL4 oldZ = z;
-	REAL t = 0.0f;
+	REAL t = 0.0;
 	z *= fractal->transformCommon.scaleA1;
 	aux->DE *= fractal->transformCommon.scaleA1;
 
@@ -40,7 +40,7 @@ REAL4 TransfDIFSOctahedronV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 	}
 
 	z = fabs(z);
-	REAL m = 0.0f;
+	REAL m = 0.0;
 	if (!fractal->transformCommon.functionEnabledAFalse)
 	{
 		m = (z.x + z.y + z.z - fractal->transformCommon.offset1) * FRAC_1_3_F;
@@ -52,23 +52,23 @@ REAL4 TransfDIFSOctahedronV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 		m = m * m * fractal->transformCommon.scale1;
 	}
 
-	q = z - (REAL4){m, m, m, 0.0f};
+	q = z - (REAL4){m, m, m, 0.0};
 	REAL4 k = z;
-	k.x = min(q.x, 0.0f);
-	k.y = min(q.y, 0.0f);
-	k.z = min(q.z, 0.0f);
-	t = (k.x + k.y + k.z) * 0.5f;
+	k.x = min(q.x, 0.0);
+	k.y = min(q.y, 0.0);
+	k.z = min(q.z, 0.0);
+	t = (k.x + k.y + k.z) * 0.5;
 	if (fractal->transformCommon.functionEnabledBFalse) q = fabs(z);
-	q = q + (REAL4){t, t, t, 0.0f}; // - k * fractal->transformCommon.scale015;
+	q = q + (REAL4){t, t, t, 0.0}; // - k * fractal->transformCommon.scale015;
 
 	if (!fractal->transformCommon.functionEnabledAFalse)
 		t = fractal->transformCommon.offset1;
 	else
 		t = fractal->transformCommon.offsetA1;
 	REAL4 p = q;
-	q.x = clamp(q.x, 0.0f, t);
-	q.y = clamp(q.y, 0.0f, t);
-	q.z = clamp(q.z, 0.0f, t);
+	q.x = clamp(q.x, 0.0, t);
+	q.y = clamp(q.y, 0.0, t);
+	q.z = clamp(q.z, 0.0, t);
 	REAL4 o = q;
 	q = z - q;
 	t = dot(q, q);
@@ -81,10 +81,10 @@ REAL4 TransfDIFSOctahedronV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 	{
 		REAL4 zc = aux->const_c;
 		zc = fabs(zc) - fractal->transformCommon.additionConstant0555;
-		zc.x = max(zc.x, 0.0f);
-		zc.y = max(zc.y, 0.0f);
-		zc.z = max(zc.z, 0.0f);
-		REAL zcb = length(zc) + min(max(max(zc.x, zc.y), zc.z), 0.0f);
+		zc.x = max(zc.x, 0.0);
+		zc.y = max(zc.y, 0.0);
+		zc.z = max(zc.z, 0.0);
+		REAL zcb = length(zc) + min(max(max(zc.x, zc.y), zc.z), 0.0);
 
 		if (!fractal->transformCommon.functionEnabledJFalse)
 		{
@@ -137,13 +137,13 @@ REAL4 TransfDIFSOctahedronV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 		if (fractal->foldColor.auxColorEnabledAFalse)
 		{
 			t = oldZ.x * oldZ.y;
-			if ((t > 0.0f && oldZ.z > 0.0f) || (t < 0.0f && oldZ.z < 0.0f))
+			if ((t > 0.0 && oldZ.z > 0.0) || (t < 0.0 && oldZ.z < 0.0))
 				addCol += fractal->foldColor.difs0000.y;
-			if (t > 0.0f) addCol += fractal->foldColor.difs0000.z;
-			if (fractal->foldColor.difs0000.w != 0.0f)
+			if (t > 0.0) addCol += fractal->foldColor.difs0000.z;
+			if (fractal->foldColor.difs0000.w != 0.0)
 			{
 				p -= o;
-				if (dot(p, p) > 0.0f) addCol += fractal->foldColor.difs0000.w;
+				if (dot(p, p) > 0.0) addCol += fractal->foldColor.difs0000.w;
 			}
 		}
 		if (!fractal->foldColor.auxColorEnabledBFalse)

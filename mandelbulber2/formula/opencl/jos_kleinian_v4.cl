@@ -18,7 +18,7 @@
 
 REAL4 JosKleinianV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL rr = 0.0f;
+	REAL rr = 0.0;
 	// sphere inversion position
 	if (!fractal->transformCommon.functionEnabledIFalse)
 	{
@@ -59,7 +59,7 @@ REAL4 JosKleinianV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		if (fractal->transformCommon.functionEnabledCx)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8X;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -68,7 +68,7 @@ REAL4 JosKleinianV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		if (fractal->transformCommon.functionEnabledCyFalse)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8Y;
-			psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.y * z.y + z.z * z.z);
 			z.y = native_cos(psi) * len;
 			z.z = native_sin(psi) * len;
@@ -77,7 +77,7 @@ REAL4 JosKleinianV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		if (fractal->transformCommon.functionEnabledCzFalse)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8Z;
-			psi = fabs(fmod(atan2(z.x, z.z) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.x, z.z) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.z * z.z + z.x * z.x);
 			z.z = native_cos(psi) * len;
 			z.x = native_sin(psi) * len;
@@ -139,16 +139,16 @@ REAL4 JosKleinianV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		{
 			z.x += box_size.x;
 			z.y += box_size.y;
-			z.x = z.x - 2.0f * box_size.x * floor(z.x / 2.0f * box_size.x) - box_size.x;
-			z.y = z.y - 2.0f * box_size.y * floor(z.y / 2.0f * box_size.y) - box_size.y;
+			z.x = z.x - 2.0 * box_size.x * floor(z.x / 2.0 * box_size.x) - box_size.x;
+			z.y = z.y - 2.0 * box_size.y * floor(z.y / 2.0 * box_size.y) - box_size.y;
 		}
-		z.z += box_size.z - 1.0f;
+		z.z += box_size.z - 1.0;
 		z.z = z.z - a * box_size.z * floor(z.z / a * box_size.z);
-		z.z -= (box_size.z - 1.0f);
+		z.z -= (box_size.z - 1.0);
 		if (z.z >= a
-								 * (0.5f
+								 * (0.5
 										+ fractal->transformCommon.offset02
-												* native_sin(f * M_PI_F * (z.x + b * 0.5f) / box_size.x)))
+												* native_sin(f * M_PI_F * (z.x + b * 0.5) / box_size.x)))
 		{
 			z.x = -z.x - b;
 			z.z = -z.z + a;
@@ -158,10 +158,10 @@ REAL4 JosKleinianV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		z *= useScale;
 		aux->DE = aux->DE * fabs(useScale);
 		if (fractal->transformCommon.functionEnabledKFalse) // update actualScaleA
-			aux->actualScaleA = fractal->transformCommon.scaleVary0 * (fabs(aux->actualScaleA) + 1.0f);
+			aux->actualScaleA = fractal->transformCommon.scaleVary0 * (fabs(aux->actualScaleA) + 1.0);
 
 		rr = dot(z, z);
-		REAL iR = 1.0f / rr;
+		REAL iR = 1.0 / rr;
 		aux->DE *= iR;
 		z *= -iR; // invert and mirror
 		z.x = -z.x - b;
@@ -197,11 +197,11 @@ REAL4 JosKleinianV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->transformCommon.startIterationsN
 			&& aux->i < fractal->transformCommon.stopIterationsN)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		colorAdd += fractal->foldColor.difs0000.x * dot(z, z);
 		colorAdd += fractal->foldColor.difs0000.y * max(max(fabs(z.x), fabs(z.y)), fabs(z.z));
 		colorAdd += fractal->foldColor.difs0000.z * z.z;
-		if (-z.x * z.y > 0.0f) colorAdd += fractal->foldColor.difs0000.w;
+		if (-z.x * z.y > 0.0) colorAdd += fractal->foldColor.difs0000.w;
 		// colorAdd += fractal->foldColor.difs1;
 
 		if (!fractal->transformCommon.functionEnabledJFalse)

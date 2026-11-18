@@ -38,7 +38,7 @@ REAL4 FoldCutCubeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 			zc.x = zc.y;
 			zc.y = temp;
 		} // hmmmm unnecessary or mistake?
-		aux->dist = 1.0f - zc.x;
+		aux->dist = 1.0 - zc.x;
 	}
 
 	z *= fractal->transformCommon.scale015;
@@ -68,7 +68,7 @@ REAL4 FoldCutCubeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -136,7 +136,7 @@ REAL4 FoldCutCubeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 
 	if (!fractal->transformCommon.functionEnabledDFalse)
 	{
-		REAL divT = 1.0f + aux->i;
+		REAL divT = 1.0 + aux->i;
 		divT = fractal->transformCommon.offset05 / divT;
 		aux->dist = fabs(min(divT - aux->dist, z.x / aux->DE));
 	}

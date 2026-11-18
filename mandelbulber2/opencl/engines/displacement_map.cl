@@ -35,10 +35,10 @@
 #ifdef USE_TEXTURES
 #ifdef USE_DISPLACEMENT_TEXTURE
 
-float DisplacementMap(
-	float oldDistance, float3 point, int objectId, sRenderData *renderData, float reduce)
+REAL DisplacementMap(
+	REAL oldDistance, REAL3 point, int objectId, sRenderData *renderData, REAL reduce)
 {
-	float distance = oldDistance;
+	REAL distance = oldDistance;
 
 	__global sObjectDataCl *objectData = &renderData->objectsData[objectId];
 	__global sMaterialCl *mat = renderData->materials[objectData->materialId];
@@ -46,9 +46,9 @@ float DisplacementMap(
 
 	if (textureIndex >= 0)
 	{
-		float2 texturePoint = TextureMapping(point, (float3){0.0f, 0.0f, 1.0f}, objectData, mat, 0, 0);
+		REAL2 texturePoint = TextureMapping(point, (REAL3){0.0, 0.0, 1.0}, objectData, mat, 0, 0);
 
-		texturePoint += (float2){0.5f, 0.5f};
+		texturePoint += (REAL2){0.5, 0.5};
 
 		if (!isfinite(texturePoint.x) || !isfinite(texturePoint.y))
 		{
@@ -58,12 +58,14 @@ float DisplacementMap(
 		int2 textureSize = renderData->textureSizes[textureIndex];
 		__global uchar4 *texture = renderData->textures[textureIndex];
 
-		float pixel = BicubicInterpolationGrey16(
-			texturePoint.x, texturePoint.y, texture, textureSize.x, textureSize.y);
+		// Texture sampling stays single precision; only the resulting displacement
+		// contribution is promoted to REAL for distance calculations.
+		REAL pixel = BicubicInterpolationGrey16(
+			(float)texturePoint.x, (float)texturePoint.y, texture, textureSize.x, textureSize.y);
 
-		float bump = pixel;
+		REAL bump = pixel;
 		distance -= bump * mat->displacementTextureHeight / reduce;
-		if (distance < 0.0f) distance = 0.0f;
+		if (distance < 0.0) distance = 0.0;
 	}
 
 	return distance;
@@ -72,8 +74,8 @@ float DisplacementMap(
 #endif // USE_TEXTURES
 
 #ifdef FRACTALIZE_TEXTURE
-float3 FractalizeTexture(float3 point, __constant sClInConstants *consts, sClCalcParams *calcParams,
-	sRenderData *renderData, int objectId, int sequenceIndex, float *reduceDisplacement)
+REAL3 FractalizeTexture(REAL3 point, __constant sClInConstants *consts, sClCalcParams *calcParams,
+	sRenderData *renderData, int objectId, int sequenceIndex, REAL *reduceDisplacement)
 {
 	int forcedFormulaIndex = objectId;
 	if (objectId < 0) objectId = 0;
@@ -81,7 +83,7 @@ float3 FractalizeTexture(float3 point, __constant sClInConstants *consts, sClCal
 	__global sObjectDataCl *objectData = &renderData->objectsData[objectId];
 	__global sMaterialCl *mat = renderData->materials[objectData->materialId];
 
-	float3 pointFractalized = point;
+	REAL3 pointFractalized = point;
 
 	// texture fractalize requires a valid fractal sequence; primitives (sequenceIndex < 0)
 	// have no fractal iteration, so the option is silently ignored for them
@@ -91,7 +93,7 @@ float3 FractalizeTexture(float3 point, __constant sClInConstants *consts, sClCal
 		outF = Fractal(consts, point, calcParams, calcModeCubeOrbitTrap, mat, -1, renderData,
 			sequenceIndex, point, false);
 		pointFractalized = outF.z.xyz;
-		*reduceDisplacement = pow(2.0f, outF.iters);
+		*reduceDisplacement = pow(2.0, outF.iters);
 	}
 
 	return pointFractalized;

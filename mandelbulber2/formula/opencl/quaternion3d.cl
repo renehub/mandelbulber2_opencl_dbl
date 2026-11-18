@@ -17,13 +17,13 @@
 
 REAL4 Quaternion3dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 	z = (REAL4){z.x * z.x - z.y * z.y - z.z * z.z, z.x * z.y, z.x * z.z, z.w};
 
 	REAL tempL = length(z);
 	z *= fractal->transformCommon.constantMultiplier122;
-	// if (tempL < 1e-21f) tempL = 1e-21f;
-	REAL4 tempAvgScale = (REAL4){z.x, z.y / 2.0f, z.z / 2.0f, z.w};
+	// if (tempL < 1e-21) tempL = 1e-21;
+	REAL4 tempAvgScale = (REAL4){z.x, z.y / 2.0, z.z / 2.0, z.w};
 	REAL avgScale = length(tempAvgScale) / tempL;
 	REAL tempAux = aux->DE * avgScale;
 	aux->DE = aux->DE + (tempAux - aux->DE) * fractal->transformCommon.scaleA1;

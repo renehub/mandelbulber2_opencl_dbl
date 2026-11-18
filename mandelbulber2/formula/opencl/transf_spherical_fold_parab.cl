@@ -18,9 +18,9 @@
 
 REAL4 TransfSphericalFoldParabIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL m = 1.0f;
+	REAL m = 1.0;
 	REAL rr;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	// spherical fold
 	if (fractal->transformCommon.functionEnabledSFalse
 			&& aux->i >= fractal->transformCommon.startIterationsS
@@ -29,7 +29,7 @@ REAL4 TransfSphericalFoldParabIteration(REAL4 z, __global sFractalCl *fractal, s
 		rr = dot(z, z);
 		REAL tempM = rr;
 		m = fractal->transformCommon.maxMinR2factor;
-		// if (r2 < 1e-21f) r2 = 1e-21f;
+		// if (r2 < 1e-21) r2 = 1e-21;
 		if (rr < fractal->transformCommon.minR2p25)
 		{
 			if (fractal->transformCommon.functionEnabledAyFalse && m > tempM) m = tempM + (tempM - m);
@@ -52,12 +52,12 @@ REAL4 TransfSphericalFoldParabIteration(REAL4 z, __global sFractalCl *fractal, s
 		rr = dot(z, z);
 		z += fractal->mandelbox.offset;
 		z *= fractal->transformCommon.scale;
-		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0f;
+		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0;
 		REAL maxScale = fractal->transformCommon.scale4;
-		REAL midPoint = (maxScale - 1.0f) * 0.5f;
+		REAL midPoint = (maxScale - 1.0) * 0.5;
 		rr += fractal->transformCommon.offset0;
 		REAL maxR2 = fractal->transformCommon.scale1;
-		REAL halfMax = maxR2 * 0.5f;
+		REAL halfMax = maxR2 * 0.5;
 		REAL factor = midPoint / (halfMax * halfMax);
 
 		REAL tempM = rr + fractal->transformCommon.offsetA0;
@@ -66,7 +66,7 @@ REAL4 TransfSphericalFoldParabIteration(REAL4 z, __global sFractalCl *fractal, s
 			if (!fractal->transformCommon.functionEnabledOFalse)
 				m = maxScale - (rr * rr) * factor;
 			else
-				m = 1.0f + (maxR2 - rr) * (maxR2 - rr) * factor;
+				m = 1.0 + (maxR2 - rr) * (maxR2 - rr) * factor;
 			if (fractal->transformCommon.functionEnabledAxFalse && m > tempM) m = tempM + (tempM - m);
 			z *= m;
 			aux->DE = aux->DE * m;
@@ -74,7 +74,7 @@ REAL4 TransfSphericalFoldParabIteration(REAL4 z, __global sFractalCl *fractal, s
 		}
 		else if (rr < maxR2)
 		{
-			m = 1.0f + (maxR2 - rr) * (maxR2 - rr) * factor;
+			m = 1.0 + (maxR2 - rr) * (maxR2 - rr) * factor;
 			if (fractal->transformCommon.functionEnabledAxFalse && m > tempM) m = tempM + (tempM - m);
 			z *= m;
 			aux->DE = aux->DE * m;

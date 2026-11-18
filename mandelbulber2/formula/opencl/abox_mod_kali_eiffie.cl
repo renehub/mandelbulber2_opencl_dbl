@@ -18,7 +18,7 @@
 REAL4 AboxModKaliEiffieIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	z.x = fabs(z.x + fractal->transformCommon.additionConstant111.x)
 				- fabs(z.x - fractal->transformCommon.additionConstant111.x) - z.x;
@@ -63,14 +63,14 @@ REAL4 AboxModKaliEiffieIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	}
 	else
 	{
-		if (rr < 1.0f)
+		if (rr < 1.0)
 		{
 			m = m / rr;
 			colorAdd += fractal->mandelbox.color.factorSp2;
 		}
 	}
 	z = z * m;
-	aux->DE = aux->DE * fabs(m) + 1.0f;
+	aux->DE = aux->DE * fabs(m) + 1.0;
 
 	z += fractal->transformCommon.additionConstant000;
 

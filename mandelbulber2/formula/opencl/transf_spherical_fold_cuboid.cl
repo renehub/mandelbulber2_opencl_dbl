@@ -82,6 +82,6 @@ REAL4 TransfSphericalFoldCuboidIteration(REAL4 z, __global sFractalCl *fractal, 
 
 	// scale
 	z *= m;
-	aux->DE = aux->DE * fabs(m) + 1.0f;
+	aux->DE = aux->DE * fabs(m) + 1.0;
 	return z;
 }

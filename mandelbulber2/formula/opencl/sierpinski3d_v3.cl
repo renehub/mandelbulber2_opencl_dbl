@@ -25,19 +25,19 @@ REAL4 Sierpinski3dV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix2, z);
 	}
 
-	if (z.x - z.y < 0.0f)
+	if (z.x - z.y < 0.0)
 	{
 		REAL temp = z.y;
 		z.y = z.x;
 		z.x = temp;
 	}
-	if (z.x - z.z < 0.0f)
+	if (z.x - z.z < 0.0)
 	{
 		REAL temp = z.z;
 		z.z = z.x;
 		z.x = temp;
 	}
-	if (z.y - z.z < 0.0f)
+	if (z.y - z.z < 0.0)
 	{
 		REAL temp = z.z;
 		z.z = z.y;
@@ -60,19 +60,19 @@ REAL4 Sierpinski3dV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i < fractal->transformCommon.stopIterationsC)
 	{
 		REAL4 temp = z;
-		if (z.x + z.y < 0.0f)
+		if (z.x + z.y < 0.0)
 		{
 			temp.x = -z.y;
 			z.y = -z.x;
 			z.x = temp.x;
 		}
-		if (z.x + z.z < 0.0f)
+		if (z.x + z.z < 0.0)
 		{
 			temp.x = -z.z;
 			z.z = -z.x;
 			z.x = temp.x;
 		}
-		if (z.y + z.z < 0.0f)
+		if (z.y + z.z < 0.0)
 		{
 			temp.y = -z.z;
 			z.z = -z.y;

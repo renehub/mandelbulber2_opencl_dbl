@@ -18,8 +18,8 @@
 
 REAL4 MengerCrossMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 Col = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
-	REAL t = 0.0f;
+	REAL4 Col = (REAL4){0.0, 0.0, 0.0, 0.0};
+	REAL t = 0.0;
 	REAL4 gap = fractal->transformCommon.constantMultiplier000;
 
 	if (fractal->transformCommon.functionEnabledx
@@ -29,9 +29,9 @@ REAL4 MengerCrossMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		z.y = fabs(z.y);
 		z.z = fabs(z.z);
 		if (fractal->transformCommon.functionEnabledFFalse) z.x = fabs(z.x);
-		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-		t = max(0.0f, dot1);
-		z.x -= t * -SQRT_3_F - (0.5f * SQRT_3_4_F);
+		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+		t = max(0.0, dot1);
+		z.x -= t * -SQRT_3_F - (0.5 * SQRT_3_4_F);
 
 		z.y = fabs(z.y - t);
 
@@ -41,22 +41,22 @@ REAL4 MengerCrossMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			z.y = z.z;
 			z.z = t;
 		}
-		z.y -= 1.5f;
-		z -= gap * (REAL4){SQRT_3_4_F, -1.5f, 1.5f, 0.0f};
+		z.y -= 1.5;
+		z -= gap * (REAL4){SQRT_3_4_F, -1.5, 1.5, 0.0};
 
 		if (z.z > z.x)
 		{
 			t = z.z;
 			z.z = z.x;
 			z.x = t;
-			Col.x = 1.0f;
+			Col.x = 1.0;
 		}
 		if (fractal->transformCommon.functionEnabledyFalse)
 		{
-			if (z.x >= 0.0f)
+			if (z.x >= 0.0)
 			{
-				z.y = max(0.0f, z.y) * fractal->transformCommon.scaleA1;
-				z.z = max(0.0f, z.z) * fractal->transformCommon.scaleB1;
+				z.y = max(0.0, z.y) * fractal->transformCommon.scaleA1;
+				z.z = max(0.0, z.z) * fractal->transformCommon.scaleB1;
 			}
 		}
 		z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
@@ -71,8 +71,8 @@ REAL4 MengerCrossMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		z.z = fabs(z.z);
 		if (fractal->transformCommon.functionEnabledzFalse) z.x = fabs(z.x);
 
-		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f);
-		REAL t2 = 1.0f * max(0.0f, dot1);
+		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5);
+		REAL t2 = 1.0 * max(0.0, dot1);
 		z.x -= t2 * -SQRT_3_F;
 		if (fractal->transformCommon.functionEnabledXFalse)
 			z.y = fabs(z.y) - t2;
@@ -83,23 +83,23 @@ REAL4 MengerCrossMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		z.x -= SQRT_3_4_F;
 
 		// Choose nearest corner/edge to get translation symmetry (all y & z code)
-		REAL dy = 0.0f;
-		REAL dz = 0.0f;
-		if (z.y > 0.5f && z.z > 0.5f) // if both y & z > 0.5f then =1.5
+		REAL dy = 0.0;
+		REAL dz = 0.0;
+		if (z.y > 0.5 && z.z > 0.5) // if both y & z > 0.5 then =1.5
 		{
-			dy = 1.5f;
-			dz = 1.5f;
-			Col.y = 1.0f;
+			dy = 1.5;
+			dz = 1.5;
+			Col.y = 1.0;
 		}
 		else if (z.z < z.y)
 		{
-			dy = 1.5f; // and dz is unchanged
-			Col.z = 1.0f;
+			dy = 1.5; // and dz is unchanged
+			Col.z = 1.0;
 		}
 		else
 		{
-			dz = 1.5f; // and dy is unchanged
-			Col.w = 1.0f;
+			dz = 1.5; // and dy is unchanged
+			Col.w = 1.0;
 		}
 
 		z.y -= dy;

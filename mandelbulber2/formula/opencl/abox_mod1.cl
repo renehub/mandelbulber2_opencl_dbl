@@ -28,7 +28,7 @@
 REAL4 AboxMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	aux->actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 
 	REAL4 c = aux->const_c;
 	REAL4 oldZ = z;
@@ -75,7 +75,7 @@ REAL4 AboxMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 		aux->color += fractal->mandelbox.color.factorSp2;
 	}
 	z *= aux->actualScale;
-	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0f;
+	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0;
 
 	if (fractal->transformCommon.addCpixelEnabledFalse
 			&& aux->i >= fractal->transformCommon.startIterationsE

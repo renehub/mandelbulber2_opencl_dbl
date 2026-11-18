@@ -33,9 +33,9 @@ REAL4 BenesiT1PineTreeIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 			REAL tempL = length(z);
 			z = fabs(z) * fractal->transformCommon.scale3D222;
-			// if (tempL < 1e-21f) tempL = 1e-21f;
+			// if (tempL < 1e-21) tempL = 1e-21;
 			REAL avgScale = length(z) / tempL;
-			aux->DE = aux->DE * avgScale + 1.0f;
+			aux->DE = aux->DE * avgScale + 1.0;
 
 			if (fractal->transformCommon.rotationEnabled)
 			{ // rotation inside T1
@@ -56,14 +56,14 @@ REAL4 BenesiT1PineTreeIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	{
 		REAL4 zz = z * z;
 		aux->r = native_sqrt(zz.x + zz.y + zz.z);
-		aux->DE = aux->r * aux->DE * 2.0f + 1.0f;
+		aux->DE = aux->r * aux->DE * 2.0 + 1.0;
 
-		REAL t = 1.0f;
+		REAL t = 1.0;
 		REAL temp = zz.y + zz.z;
-		if (temp > 0.0f) t = 2.0f * z.x / native_sqrt(temp);
+		if (temp > 0.0) t = 2.0 * z.x / native_sqrt(temp);
 		temp = z.z;
 		z.x = (zz.x - zz.y - zz.z);
-		z.y = (2.0f * t * z.y * temp);
+		z.y = (2.0 * t * z.y * temp);
 		z.z = (t * (zz.y - zz.z));
 
 		// swap c.yz then add cPixel

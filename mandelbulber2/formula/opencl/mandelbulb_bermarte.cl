@@ -30,19 +30,19 @@ REAL4 MandelbulbBermarteIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
-		th0 = acos(z.z / aux->r) + fractal->bulb.betaAngleOffset + 1e-030f; // MUST keep exception catch
+		th0 = acos(z.z / aux->r) + fractal->bulb.betaAngleOffset + 1e-030; // MUST keep exception catch
 		ph0 = atan(z.y / z.x) + fractal->bulb.alphaAngleOffset;
 		th0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleA1;
 		sinth = native_sin(th0);
-		z = aux->r * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0f};
+		z = aux->r * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0};
 	}
 	else
 	{
-		th0 = asin(z.z / aux->r) + fractal->bulb.betaAngleOffset + 1e-030f; // MUST keep exception catch
+		th0 = asin(z.z / aux->r) + fractal->bulb.betaAngleOffset + 1e-030; // MUST keep exception catch
 		ph0 = atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset;
 		th0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleA1;
 		costh = native_cos(th0);
-		z = aux->r * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0f};
+		z = aux->r * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0};
 	}
 	if (fractal->transformCommon.functionEnabledAx) z.x = fabs(z.x);
 	if (fractal->transformCommon.functionEnabledAy) z.y = fabs(z.y);
@@ -51,22 +51,22 @@ REAL4 MandelbulbBermarteIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->transformCommon.functionEnabledxFalse)
 	{
 		th0 = acos(z.z / aux->r) + fractal->transformCommon.betaAngleOffset
-					+ 1e-030f; // MUST keep exception catch ??;
+					+ 1e-030; // MUST keep exception catch ??;
 		ph0 = atan(z.y / z.x);
 		ph0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleB1;
 		zp = pow(aux->r, fractal->transformCommon.pwr8);
 		sinth = native_sin(th0);
-		z = zp * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0f};
+		z = zp * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0};
 	}
 	else
 	{
 		th0 = asin(z.z / aux->r) + fractal->transformCommon.betaAngleOffset
-					+ 1e-030f; // MUST keep exception catch ??;
+					+ 1e-030; // MUST keep exception catch ??;
 		ph0 = atan2(z.y, z.x);
 		ph0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleB1;
 		zp = pow(aux->r, fractal->transformCommon.pwr8);
 		costh = native_cos(th0);
-		z = zp * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0f};
+		z = zp * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0};
 	}
 
 	if (fractal->transformCommon.functionEnabledBxFalse) z.x = fabs(z.x);
@@ -78,11 +78,11 @@ REAL4 MandelbulbBermarteIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 								* fractal->transformCommon.pwr8 * fractal->analyticDE.scale1
 							+ fractal->analyticDE.offset2;
 	}
-	else // default, i.e. scale1 & offset1 & offset2 = 1.0f
+	else // default, i.e. scale1 & offset1 & offset2 = 1.0
 	{
 		aux->DE =
-			pow(aux->r, fractal->transformCommon.pwr8 - 1.0f) * fractal->transformCommon.pwr8 * aux->DE
-			+ 1.0f;
+			pow(aux->r, fractal->transformCommon.pwr8 - 1.0) * fractal->transformCommon.pwr8 * aux->DE
+			+ 1.0;
 	}
 	return z;
 }

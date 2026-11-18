@@ -52,7 +52,7 @@ REAL4 AexionOctopusModIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 	if (fractal->analyticDE.enabledFalse)
 	{
-		aux->DE = aux->DE * fractal->analyticDE.scale1 * 2.0f * length(z) / aux->r
+		aux->DE = aux->DE * fractal->analyticDE.scale1 * 2.0 * length(z) / aux->r
 							+ fractal->analyticDE.offset1;
 	}
 	return z;

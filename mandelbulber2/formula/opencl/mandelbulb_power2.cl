@@ -18,14 +18,14 @@ REAL4 MandelbulbPower2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 {
 	(void)fractal;
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 	REAL x2 = z.x * z.x;
 	REAL y2 = z.y * z.y;
 	REAL z2 = z.z * z.z;
-	REAL temp = 1.0f - z2 / (x2 + y2);
+	REAL temp = 1.0 - z2 / (x2 + y2);
 	REAL newx = (x2 - y2) * temp;
-	REAL newy = 2.0f * z.x * z.y * temp;
-	REAL newz = -2.0f * z.z * native_sqrt(x2 + y2);
+	REAL newy = 2.0 * z.x * z.y * temp;
+	REAL newz = -2.0 * z.z * native_sqrt(x2 + y2);
 	z.x = newx;
 	z.y = newy;
 	z.z = newz;

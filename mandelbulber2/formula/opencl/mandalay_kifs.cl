@@ -16,8 +16,8 @@
 
 REAL4 MandalayKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 
 	// tglad fold
 	if (fractal->transformCommon.functionEnabledAFalse
@@ -76,7 +76,7 @@ REAL4 MandalayKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	}
 
 	// ABoxKali-like abs folding:
-	REAL fx = -2.0f * fo + z.x;
+	REAL fx = -2.0 * fo + z.x;
 	// Edges:
 	p.x = (fo - fabs(-fo + z.x));
 	p.y = (fo - fabs(-fo + z.y));
@@ -87,7 +87,7 @@ REAL4 MandalayKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		p.z = zT - fabs(-fo + z.z);
 
 	REAL gy = g + z.y;
-	if (fx > 0.0f && fx > z.y)
+	if (fx > 0.0 && fx > z.y)
 	{
 		if (fx > gy)
 		{
@@ -99,13 +99,13 @@ REAL4 MandalayKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		{
 			// edges:
 			p.x = -z.y;
-			p.y = (fo - fabs(-3.0f * fo + z.x));
+			p.y = (fo - fabs(-3.0 * fo + z.x));
 		}
 	}
 	z = p;
 
 	// spherical fold
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
@@ -128,7 +128,7 @@ REAL4 MandalayKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	// scale
 	useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 	z *= useScale;
-	aux->DE = aux->DE * fabs(useScale) + 1.0f;
+	aux->DE = aux->DE * fabs(useScale) + 1.0;
 
 	if (fractal->transformCommon.functionEnabledKFalse
 			&& aux->i >= fractal->transformCommon.startIterationsK

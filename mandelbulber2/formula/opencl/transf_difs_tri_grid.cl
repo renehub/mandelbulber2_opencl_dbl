@@ -31,7 +31,7 @@ REAL4 TransfDIFSTriGridIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	{
 		z.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int6;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -47,15 +47,15 @@ REAL4 TransfDIFSTriGridIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	REAL4 off = fractal->transformCommon.offset111;
 	REAL a;
 	if (!fractal->transformCommon.functionEnabledEFalse)
-		a = fabs(zc.x - off.x * floor(zc.x / off.x + 0.5f));
+		a = fabs(zc.x - off.x * floor(zc.x / off.x + 0.5));
 	else
-		a = 1000.0f;
-	zc.x = zc.x * 0.5f;
-	zc.y = zc.y * SQRT_3_F * 0.5f;
+		a = 1000.0;
+	zc.x = zc.x * 0.5;
+	zc.y = zc.y * SQRT_3_F * 0.5;
 	REAL b = zc.x + zc.y;
-	b = fabs(b - off.y * floor(b / off.y + 0.5f));
+	b = fabs(b - off.y * floor(b / off.y + 0.5));
 	REAL c = zc.x - zc.y;
-	c = fabs(c - off.z * floor(c / off.z + 0.5f));
+	c = fabs(c - off.z * floor(c / off.z + 0.5));
 	REAL tp = min(min(a, b), c) - fractal->transformCommon.offset0;
 
 	if (!fractal->transformCommon.functionEnabledJFalse)
@@ -76,7 +76,7 @@ REAL4 TransfDIFSTriGridIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	{
 		REAL e = fractal->transformCommon.offset4;
 		REAL4 f = fabs(aux->const_c);
-		f -= (REAL4){e, e, e, 0.0f};
+		f -= (REAL4){e, e, e, 0.0};
 		e = max(f.x, max(f.y, f.z));
 		tp = max(tp, e);
 	}

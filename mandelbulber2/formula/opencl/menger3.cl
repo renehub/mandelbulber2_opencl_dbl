@@ -22,7 +22,7 @@ REAL4 Menger3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 
 	REAL temp;
-	REAL col = 0.0f;
+	REAL col = 0.0;
 	if (z.x < z.y)
 	{
 		temp = z.y;
@@ -53,7 +53,7 @@ REAL4 Menger3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix2, z);
 
 	z.z = fabs(z.z - FRAC_1_3_F * Offset.z) + FRAC_1_3_F * Offset.z;
-	z = z * Scale - Offset * (Scale - 1.0f);
+	z = z * Scale - Offset * (Scale - 1.0);
 	aux->DE = aux->DE * Scale;
 
 	// Analytic DE tweak

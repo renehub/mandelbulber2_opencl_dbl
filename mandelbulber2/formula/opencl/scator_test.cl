@@ -22,13 +22,13 @@ REAL4 ScatorTestIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	(void)fractal;
 	(void)aux;
 
-	REAL x2 = z.x * z.x; //+ 1e-030f
+	REAL x2 = z.x * z.x; //+ 1e-030
 	REAL y2 = z.y * z.y * fractal->transformCommon.scaleB1;
 	REAL z2 = z.z * z.z * fractal->transformCommon.scaleC1;
 
 	REAL newx = x2 + y2 + z2 + (y2 * z2) * fractal->transformCommon.scaleA1 / x2;
-	REAL newy = 2.0f * z.x * z.y * (1.0f + z2 / x2);
-	REAL newz = 2.0f * z.x * z.z * (1.0f + y2 / x2);
+	REAL newy = 2.0 * z.x * z.y * (1.0 + z2 / x2);
+	REAL newz = 2.0 * z.x * z.z * (1.0 + y2 / x2);
 
 	z.x = newx;
 	z.y = newy;

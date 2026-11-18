@@ -19,7 +19,7 @@
 REAL4 MandelboxMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	if (fractal->mandelbox.rotationsEnabled)
 	{
 		REAL4 zRot;
@@ -113,7 +113,7 @@ REAL4 MandelboxMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		z = z * fractal->mandelbox.scale;
-		aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0f;
+		aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0;
 	}
 
 	if (fractal->transformCommon.addCpixelEnabledFalse)
@@ -177,9 +177,9 @@ REAL4 MandelboxMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 				z.y = temp;
 			}
 			z *= fractal->transformCommon.scale3;
-			z.x -= 2.0f * fractal->transformCommon.constantMultiplierA111.x;
-			z.y -= 2.0f * fractal->transformCommon.constantMultiplierA111.y;
-			if (z.z > 1.0f) z.z -= 2.0f * fractal->transformCommon.constantMultiplierA111.z;
+			z.x -= 2.0 * fractal->transformCommon.constantMultiplierA111.x;
+			z.y -= 2.0 * fractal->transformCommon.constantMultiplierA111.y;
+			if (z.z > 1.0) z.z -= 2.0 * fractal->transformCommon.constantMultiplierA111.z;
 			aux->DE *= fabs(fractal->transformCommon.scale3 * fractal->transformCommon.scaleA1);
 
 			z += fractal->transformCommon.additionConstantA000;

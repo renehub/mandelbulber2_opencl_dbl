@@ -15,7 +15,7 @@
 
 REAL4 TransfScaleVaryVCLIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL para = 0.0f;
+	REAL para = 0.0;
 
 	if (fractal->Cpara.enabledLinear)
 	{
@@ -47,13 +47,13 @@ REAL4 TransfScaleVaryVCLIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		// Curvi part on "true"
 		if (fractal->Cpara.enabledCurves)
 		{
-			REAL paraAdd = 0.0f;
+			REAL paraAdd = 0.0;
 			REAL paraIt;
-			if (lengthAB > 2.0f * fractal->Cpara.iterA) // stop  error, todo fix.
+			if (lengthAB > 2.0 * fractal->Cpara.iterA) // stop  error, todo fix.
 			{
-				REAL curve1 = (grade2 - grade1) / (4.0f * fractal->Cpara.iterA);
+				REAL curve1 = (grade2 - grade1) / (4.0 * fractal->Cpara.iterA);
 				REAL tempL = lengthAB - fractal->Cpara.iterA;
-				REAL curve2 = (grade3 - grade2) / (4.0f * tempL);
+				REAL curve2 = (grade3 - grade2) / (4.0 * tempL);
 				if (aux->i < 2 * fractal->Cpara.iterA)
 				{
 					paraIt = tempA - fabs(tempA - aux->i);
@@ -69,15 +69,15 @@ REAL4 TransfScaleVaryVCLIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		}
 	}
 	// Parabolic
-	REAL paraAddP0 = 0.0f;
+	REAL paraAddP0 = 0.0;
 	if (fractal->Cpara.enabledParabFalse)
 	{ // parabolic = paraOffset + iter *slope + (iter *iter *scale)
 		paraAddP0 = fractal->Cpara.parabOffset + (aux->i * fractal->Cpara.parabSlope)
-								+ (aux->i * aux->i * 0.001f * fractal->Cpara.parabScale);
+								+ (aux->i * aux->i * 0.001 * fractal->Cpara.parabScale);
 	}
 	para += paraAddP0;
 
 	z *= para; // using the parameter
-	aux->DE = aux->DE * fabs(para) + 1.0f;
+	aux->DE = aux->DE * fabs(para) + 1.0;
 	return z;
 }

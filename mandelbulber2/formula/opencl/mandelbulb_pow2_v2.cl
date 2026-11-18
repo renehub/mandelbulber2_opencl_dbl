@@ -17,7 +17,7 @@
 
 REAL4 MandelbulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * aux->r * 2.0f;
+	aux->DE = aux->DE * aux->r * 2.0;
 	REAL4 c = aux->const_c;
 	//  pre-abs
 	if (fractal->transformCommon.functionEnabledAxFalse
@@ -57,7 +57,7 @@ REAL4 MandelbulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				&& aux->i >= fractal->transformCommon.startIterationsD
 				&& aux->i < fractal->transformCommon.stopIterationsD)
 			zz *= fractal->transformCommon.constantMultiplierA111;
-		REAL4 Scale2 = (REAL4){2.0f, 2.0f, 2.0f, 1.0f};
+		REAL4 Scale2 = (REAL4){2.0, 2.0, 2.0, 1.0};
 		if (fractal->transformCommon.functionEnabledEFalse
 				&& aux->i >= fractal->transformCommon.startIterationsE
 				&& aux->i < fractal->transformCommon.stopIterationsE)
@@ -69,9 +69,9 @@ REAL4 MandelbulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			case multi_combo4Cl_type1:
 			default:
 				if (fractal->transformCommon.functionEnabledXFalse)
-					v4.x = fabs(zz.x - zz.y - zz.z) * -Scale2.x * 0.5f;
+					v4.x = fabs(zz.x - zz.y - zz.z) * -Scale2.x * 0.5;
 				else
-					v4.x = (zz.x - zz.y - zz.z) * -Scale2.x * 0.5f;
+					v4.x = (zz.x - zz.y - zz.z) * -Scale2.x * 0.5;
 				oldZ = fabs(oldZ);
 				v4.y = oldZ.x * oldZ.y * -Scale2.y;
 				v4.z = oldZ.x * oldZ.z * -Scale2.z;
@@ -87,12 +87,12 @@ REAL4 MandelbulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				v4.x = zz.x + Scale2.x * oldZ.y * oldZ.z;
 				v4.y = -zz.y - Scale2.y * oldZ.x * oldZ.z;
 				v4.z = -zz.z + Scale2.z * oldZ.x * oldZ.y;
-				aux->DE += 1.0f;
+				aux->DE += 1.0;
 				break;
 			// buffalo V2
 			case multi_combo4Cl_type4:
 				oldZ = fabs(oldZ);
-				v4.x = (zz.x - zz.y - zz.z) * Scale2.x * 0.5f - oldZ.x;
+				v4.x = (zz.x - zz.y - zz.z) * Scale2.x * 0.5 - oldZ.x;
 				v4.y = oldZ.x * oldZ.y * Scale2.y - oldZ.y;
 				v4.z = oldZ.x * oldZ.z * Scale2.z - oldZ.z;
 				break;

@@ -16,11 +16,11 @@
 
 REAL4 TransfDIFSDiamondIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 normalTopA = (REAL4){0.0f, 0.81373347121f, 0.5812382f, 0.0f};
-	REAL4 normalTopB = (REAL4){0.0f, SQRT_1_2_F, SQRT_1_2_F, 0.0f};
-	REAL4 normalTopC = (REAL4){0.0f, 0.4472135955f, 0.8944272f, 0.0f};
-	REAL4 normalBottomA = (REAL4){0.0f, SQRT_1_2_F, -SQRT_1_2_F, 0.0f};
-	REAL4 normalBottomB = (REAL4){0.0f, 0.848f, -0.53f, 0.0f};
+	REAL4 normalTopA = (REAL4){0.0, 0.81373347121, 0.5812382, 0.0};
+	REAL4 normalTopB = (REAL4){0.0, SQRT_1_2_F, SQRT_1_2_F, 0.0};
+	REAL4 normalTopC = (REAL4){0.0, 0.4472135955, 0.8944272, 0.0};
+	REAL4 normalBottomA = (REAL4){0.0, SQRT_1_2_F, -SQRT_1_2_F, 0.0};
+	REAL4 normalBottomB = (REAL4){0.0, 0.848, -0.53, 0.0};
 
 	if (fractal->transformCommon.functionEnabledPFalse
 			&& aux->i >= fractal->transformCommon.startIterationsP
@@ -34,7 +34,7 @@ REAL4 TransfDIFSDiamondIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		if (fractal->transformCommon.functionEnabledCx)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8X;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -43,7 +43,7 @@ REAL4 TransfDIFSDiamondIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		if (fractal->transformCommon.functionEnabledCyFalse)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8Y;
-			psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.y * z.y + z.z * z.z);
 			z.y = native_cos(psi) * len;
 			z.z = native_sin(psi) * len;
@@ -64,7 +64,7 @@ REAL4 TransfDIFSDiamondIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	aux->DE *= fractal->transformCommon.scale1;
 	REAL topCut = zc.z - fractal->transformCommon.offset1;
 	REAL angleStep = M_PI_F / fractal->transformCommon.int16;
-	REAL angle = angleStep * (0.5f + floor(atan2(zc.x, zc.y) / angleStep));
+	REAL angle = angleStep * (0.5 + floor(atan2(zc.x, zc.y) / angleStep));
 	REAL co = native_cos(angle);
 	REAL si = native_sin(angle);
 	REAL4 q = zc;
@@ -73,8 +73,8 @@ REAL4 TransfDIFSDiamondIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	q.y = (co * zc.y + si * zc.x);
 	REAL topA = dot(q, normalTopA) - fractal->transformCommon.offset2;
 	REAL topC = dot(q, normalTopC) - fractal->transformCommon.offset105;
-	REAL bottomA = dot(q, normalBottomA) - fractal->transformCommon.offsetA2 + 0.3f;
-	angle = -angleStep * 0.5f;
+	REAL bottomA = dot(q, normalBottomA) - fractal->transformCommon.offsetA2 + 0.3;
+	angle = -angleStep * 0.5;
 	co = native_cos(angle);
 	si = native_sin(angle);
 	q.x = (co * zc.x - si * zc.y);
@@ -84,8 +84,8 @@ REAL4 TransfDIFSDiamondIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	si = native_sin(angle);
 	q.x = (co * zc.x - si * zc.y);
 	q.y = (co * zc.y + si * zc.x);
-	REAL topB = dot(q, normalTopB) - fractal->transformCommon.offsetE2 + 0.15f;
-	REAL bottomB = dot(q, normalBottomB) - fractal->transformCommon.offsetF2 + 0.1f;
+	REAL topB = dot(q, normalTopB) - fractal->transformCommon.offsetE2 + 0.15;
+	REAL bottomB = dot(q, normalBottomB) - fractal->transformCommon.offsetF2 + 0.1;
 
 	aux->DE0 = max(topCut, max(topA, max(topB, max(topC, max(bottomA, bottomB)))));
 	REAL colDist = aux->dist;

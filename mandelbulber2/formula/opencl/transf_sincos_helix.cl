@@ -54,7 +54,7 @@ REAL4 TransfSincosHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			if (fractal->transformCommon.functionEnabledCxFalse)
 			{
 				ang = M_PI_F / fractal->transformCommon.int8X;
-				ang = fabs(fmod(atan2(z.y, z.x) + ang, 2.0f * ang) - ang);
+				ang = fabs(fmod(atan2(z.y, z.x) + ang, 2.0 * ang) - ang);
 				temp = native_sqrt(z.x * z.x + z.y * z.y);
 				z.x = native_cos(ang) * temp;
 				z.y = native_sin(ang) * temp;
@@ -62,7 +62,7 @@ REAL4 TransfSincosHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			if (fractal->transformCommon.functionEnabledCyFalse)
 			{
 				ang = M_PI_F / fractal->transformCommon.int8Y;
-				ang = fabs(fmod(atan2(z.z, z.y) + ang, 2.0f * ang) - ang);
+				ang = fabs(fmod(atan2(z.z, z.y) + ang, 2.0 * ang) - ang);
 				temp = native_sqrt(z.y * z.y + z.z * z.z);
 				z.y = native_cos(ang) * temp;
 				z.z = native_sin(ang) * temp;
@@ -70,7 +70,7 @@ REAL4 TransfSincosHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			if (fractal->transformCommon.functionEnabledCzFalse)
 			{
 				ang = M_PI_F / fractal->transformCommon.int8Z;
-				ang = fabs(fmod(atan2(z.x, z.z) + ang, 2.0f * ang) - ang);
+				ang = fabs(fmod(atan2(z.x, z.z) + ang, 2.0 * ang) - ang);
 				temp = native_sqrt(z.z * z.z + z.x * z.x);
 				z.z = native_cos(ang) * temp;
 				z.x = native_sin(ang) * temp;
@@ -125,8 +125,8 @@ REAL4 TransfSincosHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	if (fractal->transformCommon.functionEnabledAx)
 	{
 		REAL Voff = fractal->transformCommon.offset4;
-		temp = z.z - Voff * ang * fractal->transformCommon.int1 + Voff * 0.5f;
-		z.z = temp - Voff * floor(temp / (Voff)) - Voff * 0.5f;
+		temp = z.z - Voff * ang * fractal->transformCommon.int1 + Voff * 0.5;
+		z.z = temp - Voff * floor(temp / (Voff)) - Voff * 0.5;
 	}
 
 	// stretch
@@ -137,7 +137,7 @@ REAL4 TransfSincosHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		else
 		{
 			temp = fractal->transformCommon.scale16 * ang + fractal->transformCommon.offsetR1;
-			z.x = temp - 2.0f * floor(temp * 0.5f) - 1.0f;
+			z.x = temp - 2.0 * floor(temp * 0.5) - 1.0;
 		}
 	}
 	if (fractal->transformCommon.functionEnabledAzFalse)
@@ -169,8 +169,8 @@ REAL4 TransfSincosHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			&& aux->i >= fractal->transformCommon.startIterationsTM
 			&& aux->i < fractal->transformCommon.stopIterationsTM1)
 	{
-		if ((z.z < (fractal->transformCommon.scaleA1 + 0.5f) * fractal->transformCommon.offset2)
-				&& (z.z > (fractal->transformCommon.offsetT1 + 0.5f) * -fractal->transformCommon.offset2))
+		if ((z.z < (fractal->transformCommon.scaleA1 + 0.5) * fractal->transformCommon.offset2)
+				&& (z.z > (fractal->transformCommon.offsetT1 + 0.5) * -fractal->transformCommon.offset2))
 		{
 			z.z -= round(z.z / fractal->transformCommon.offset2) * fractal->transformCommon.offset2;
 			z.z = clamp(fabs(z.z), -fractal->transformCommon.offset1, fractal->transformCommon.offset1);
@@ -199,8 +199,8 @@ REAL4 TransfSincosHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		if (!fractal->transformCommon.functionEnabledGFalse)
 		{
 			REAL angCol =
-				(M_PI_F - 2.0f * fabs(atan(fractal->foldColor.difs1 * z.y / z.z))) * 4.0f * M_PI_2x_INV_F;
-			if (fmod(angCol, 2.0f) < 1.0f)
+				(M_PI_F - 2.0 * fabs(atan(fractal->foldColor.difs1 * z.y / z.z))) * 4.0 * M_PI_2x_INV_F;
+			if (fmod(angCol, 2.0) < 1.0)
 				aux->color += fractal->foldColor.difs0000.z;
 			else
 				aux->color += fractal->foldColor.difs0000.y;

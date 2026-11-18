@@ -20,7 +20,7 @@ REAL4 AboxModKaliIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	if (fractal->mandelbox.mainRotationEnabled)
 	{
 		REAL4 tempVC = (REAL4){fractal->mandelbox.rotationMain.x, fractal->mandelbox.rotationMain.y,
-			fractal->mandelbox.rotationMain.z, 0.0f}; // constant to be varied
+			fractal->mandelbox.rotationMain.z, 0.0}; // constant to be varied
 		if (fractal->transformCommon.functionEnabledPFalse)
 		{
 			if (aux->i >= fractal->transformCommon.startIterations
@@ -42,18 +42,18 @@ REAL4 AboxModKaliIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 
 		tempVC *= M_PI_180_F;
 
-		if (tempVC.x != 0.0f) z = RotateAroundVectorByAngle4(z, (REAL3){1.0f, 0.0f, 0.0f}, tempVC.x);
-		if (tempVC.y != 0.0f) z = RotateAroundVectorByAngle4(z, (REAL3){0.0f, 1.0f, 0.0f}, tempVC.y);
-		if (tempVC.z != 0.0f) z = RotateAroundVectorByAngle4(z, (REAL3){0.0f, 0.0f, 1.0f}, tempVC.z);
+		if (tempVC.x != 0.0) z = RotateAroundVectorByAngle4(z, (REAL3){1.0, 0.0, 0.0}, tempVC.x);
+		if (tempVC.y != 0.0) z = RotateAroundVectorByAngle4(z, (REAL3){0.0, 1.0, 0.0}, tempVC.y);
+		if (tempVC.z != 0.0) z = RotateAroundVectorByAngle4(z, (REAL3){0.0, 0.0, 1.0}, tempVC.z);
 	}
 
 	z = fractal->transformCommon.additionConstant0555 - fabs(z);
 	REAL rr = dot(z, z);
 	REAL MinR = fractal->transformCommon.minR06;
-	REAL dividend = rr < MinR ? MinR : min(rr, 1.0f);
+	REAL dividend = rr < MinR ? MinR : min(rr, 1.0);
 	REAL m = fractal->transformCommon.scale015 / dividend;
 	z = z * m;
-	aux->DE = aux->DE * fabs(m) + 1.0f;
+	aux->DE = aux->DE * fabs(m) + 1.0;
 
 	// color added v2.32
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA

@@ -24,7 +24,7 @@ REAL4 TransfSphericalFoldCHSIteration(REAL4 z, __global sFractalCl *fractal, sEx
 			&& aux->i < fractal->transformCommon.stopIterations)
 	{
 		rr = z.x * z.x + z.y * z.y;
-		if (tempZ > 0.0f) rr = rr + (tempZ * tempZ * fractal->transformCommon.scale1);
+		if (tempZ > 0.0) rr = rr + (tempZ * tempZ * fractal->transformCommon.scale1);
 	}
 	else
 	{
@@ -33,7 +33,7 @@ REAL4 TransfSphericalFoldCHSIteration(REAL4 z, __global sFractalCl *fractal, sEx
 
 	z += fractal->mandelbox.offset;
 	z *= fractal->transformCommon.scale;
-	aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0f;
+	aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0;
 
 	// Spherical Fold
 	if (rr < fractal->transformCommon.minR2p25)

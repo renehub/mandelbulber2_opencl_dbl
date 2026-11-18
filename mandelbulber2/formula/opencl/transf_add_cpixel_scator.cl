@@ -40,15 +40,15 @@ REAL4 TransfAddCpixelScatorIteration(REAL4 z, __global sFractalCl *fractal, sExt
 	// scator algebra
 	if (cc.x < limitA)
 	{
-		REAL temp = 1.0f / cc.x - 1.0f;
+		REAL temp = 1.0 / cc.x - 1.0;
 		cc.x = temp;
 	}
 
 	if (!fractal->transformCommon.functionEnabledFalse)
 	{																	// real
 		newC.x += (cc.y * cc.z) / cc.x; // all pos
-		newC.y *= (1.0f + cc.z / cc.x);
-		newC.z *= (1.0f + cc.y / cc.x);
+		newC.y *= (1.0 + cc.z / cc.x);
+		newC.z *= (1.0 + cc.y / cc.x);
 		newC *= fractal->transformCommon.constantMultiplier111;
 		if (fractal->transformCommon.functionEnabledSwFalse)
 		{
@@ -71,8 +71,8 @@ REAL4 TransfAddCpixelScatorIteration(REAL4 z, __global sFractalCl *fractal, sExt
 	else
 	{																	// imaginary
 		newC.x += (cc.y * cc.z) / cc.x; // pos
-		newC.y *= (1.0f - cc.z / cc.x); // pos  neg
-		newC.z *= (1.0f - cc.y / cc.x); // pos  neg
+		newC.y *= (1.0 - cc.z / cc.x); // pos  neg
+		newC.z *= (1.0 - cc.y / cc.x); // pos  neg
 		newC *= fractal->transformCommon.constantMultiplier111;
 		if (fractal->transformCommon.functionEnabledy) newC.y = fabs(newC.y);
 		if (fractal->transformCommon.functionEnabledz) newC.z = fabs(newC.z);

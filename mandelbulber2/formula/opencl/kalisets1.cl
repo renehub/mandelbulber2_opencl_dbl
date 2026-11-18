@@ -25,17 +25,17 @@ REAL4 Kalisets1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	REAL4 c = aux->const_c;
 
 	z = fabs(z);
-	REAL sqs = (z.x * z.x + z.y * z.y + z.z * z.z + 1e-21f); // sph inv
+	REAL sqs = (z.x * z.x + z.y * z.y + z.z * z.z + 1e-21); // sph inv
 	REAL m;
 	REAL minR = fractal->transformCommon.minR0; //  KaliDucks
 
 	if (sqs < minR)
-		m = 1.0f / native_sqrt(minR);
+		m = 1.0 / native_sqrt(minR);
 	else
 		m = fractal->transformCommon.scale / sqs; // kalisets
 
 	z = z * m;
-	aux->DE = aux->DE * fabs(m) + 1.0f;
+	aux->DE = aux->DE * fabs(m) + 1.0;
 
 	if (fractal->transformCommon.addCpixelEnabledFalse)
 		z += c * fractal->transformCommon.constantMultiplier111;

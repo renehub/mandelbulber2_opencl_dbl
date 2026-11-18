@@ -21,10 +21,10 @@ REAL4 TransfParabFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	REAL4 lengthAdd = fractal->transformCommon.additionConstant000;
 	REAL4 factorP;
 
-	factorP.x = -slope2.x / (lengthAdd.x * 2.0f);
-	factorP.y = -slope2.y / (lengthAdd.y * 2.0f);
-	factorP.z = -slope2.z / (lengthAdd.z * 2.0f);
-	factorP.w = 0.0f;
+	factorP.x = -slope2.x / (lengthAdd.x * 2.0);
+	factorP.y = -slope2.y / (lengthAdd.y * 2.0);
+	factorP.z = -slope2.z / (lengthAdd.z * 2.0);
+	factorP.w = 0.0;
 
 	if (temp.x > 0)
 	{
@@ -34,7 +34,7 @@ REAL4 TransfParabFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 		else
 		{
-			z.x = (z.x - lengthAdd.x / 2.0f) * slope2.x;
+			z.x = (z.x - lengthAdd.x / 2.0) * slope2.x;
 		}
 	}
 	if (temp.y > 0)
@@ -45,7 +45,7 @@ REAL4 TransfParabFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 		else
 		{
-			z.y = (z.y - lengthAdd.y / 2.0f) * slope2.y;
+			z.y = (z.y - lengthAdd.y / 2.0) * slope2.y;
 		}
 	}
 	if (temp.z > 0)
@@ -56,7 +56,7 @@ REAL4 TransfParabFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 		else
 		{
-			z.z = (z.z - lengthAdd.z / 2.0f) * slope2.z;
+			z.z = (z.z - lengthAdd.z / 2.0) * slope2.z;
 		}
 	}
 
@@ -68,7 +68,7 @@ REAL4 TransfParabFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 		else
 		{
-			z.x = (z.x + lengthAdd.x / 2.0f) * slope2.x;
+			z.x = (z.x + lengthAdd.x / 2.0) * slope2.x;
 		}
 	}
 	if (temp.y < 0)
@@ -79,7 +79,7 @@ REAL4 TransfParabFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 		else
 		{
-			z.y = (z.y + lengthAdd.y / 2.0f) * slope2.y;
+			z.y = (z.y + lengthAdd.y / 2.0) * slope2.y;
 		}
 	}
 
@@ -92,7 +92,7 @@ REAL4 TransfParabFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 		else
 		{
-			z.z = (z.z + lengthAdd.z / 2.0f) * slope2.z;
+			z.z = (z.z + lengthAdd.z / 2.0) * slope2.z;
 		}
 	}
 

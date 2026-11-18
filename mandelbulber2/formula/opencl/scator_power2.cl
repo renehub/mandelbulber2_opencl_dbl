@@ -47,8 +47,8 @@ REAL4 ScatorPower2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		newZ *= fractal->transformCommon.constantMultiplier122;
 		// temp1 = length(newZ);
 		newZ.x += (zz.y * zz.z) / zz.x;
-		newZ.y *= (1.0f + zz.z / zz.x);
-		newZ.z *= (1.0f + zz.y / zz.x);
+		newZ.y *= (1.0 + zz.z / zz.x);
+		newZ.z *= (1.0 + zz.y / zz.x);
 		// r = native_sqrt(zz.x - zz.y - zz.z + (zz.y * zz.z) / zz.x);
 	}
 	else
@@ -59,17 +59,17 @@ REAL4 ScatorPower2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		newZ *= fractal->transformCommon.constantMultiplier122;
 		// temp1 = length(newZ);
 		newZ.x += (zz.y * zz.z) / zz.x;
-		newZ.y *= (1.0f - zz.z / zz.x);
-		newZ.z *= (1.0f - zz.y / zz.x);
+		newZ.y *= (1.0 - zz.z / zz.x);
+		newZ.z *= (1.0 - zz.y / zz.x);
 		// r = native_sqrt(zz.x + zz.y + zz.z + (zz.y * zz.z) / zz.x);
 	}
 	z = newZ;
 	// REAL temp2 = length(newZ);
 	// temp2 = temp1 / temp2;
-	/* aux->DE = aux->DE * 2.0f * aux->r;
+	/* aux->DE = aux->DE * 2.0 * aux->r;
 	REAL newx = z.x * z.x - z.y * z.y - z.z * z.z;
-	REAL newy = 2.0f * z.x * z.y;
-	REAL newz = 2.0f * z.x * z.z;
+	REAL newy = 2.0 * z.x * z.y;
+	REAL newz = 2.0 * z.x * z.z;
 	z.x = newx;
 	z.y = newy;
 	z.z = newz; */
@@ -117,7 +117,7 @@ REAL4 ScatorPower2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	{
 		if (!fractal->analyticDE.enabledFalse)
 		{
-			aux->DE = 2.0f * r * aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
+			aux->DE = 2.0 * r * aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 		}
 		else
 		{ // vec3
@@ -138,15 +138,15 @@ REAL4 ScatorPower2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 			}
 			REAL vecDE = fractal->transformCommon.scaleA1 * rd / r;
 			aux->DE =
-				max(r * 2.0f, vecDE) * aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
+				max(r * 2.0, vecDE) * aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 		}
-		aux->dist = 0.5f * r * log(r) / aux->DE;
+		aux->dist = 0.5 * r * log(r) / aux->DE;
 	}
 	// force bailout
 	// REAL tp = fractal->transformCommon.scale1;
 	// REAL tpz = fabs(z.z);
-	// if (tpz < -tp && tpz > tp) tpz = (tpz > 0) ? z.z += 100000.0f : z.z -= 100000.0f;
-	if (r > fractal->transformCommon.scale2) z.z += 100000.0f;
+	// if (tpz < -tp && tpz > tp) tpz = (tpz > 0) ? z.z += 100000.0 : z.z -= 100000.0;
+	if (r > fractal->transformCommon.scale2) z.z += 100000.0;
 	aux->DE0 = r; // temp for testing
 	return z;
 }

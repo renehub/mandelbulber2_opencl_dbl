@@ -19,11 +19,11 @@ REAL4 CollatzIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 {
 	(void)fractal;
 
-	REAL4 xV = (REAL4){1.0f, 1.0f, 1.0f, 0.0f};
-	REAL4 temp = xV + z * 2.0f;
+	REAL4 xV = (REAL4){1.0, 1.0, 1.0, 0.0};
+	REAL4 temp = xV + z * 2.0;
 	temp *= RotateAroundVectorByAngle4(z, xV.xyz, M_PI_F);
-	z = xV + z * 4.0f - temp;
-	z /= 4.0f;
-	aux->DE = aux->DE * 4.0f + 1.0f;
+	z = xV + z * 4.0 - temp;
+	z /= 4.0;
+	aux->DE = aux->DE * 4.0 + 1.0;
 	return z;
 }

@@ -33,16 +33,16 @@
  * see also src/projection_3d.[hpp|cpp]
  */
 
-inline float3 CalculateViewVector(float2 normalizedPoint, float fov)
+inline REAL3 CalculateViewVector(REAL2 normalizedPoint, REAL fov)
 {
-	float3 viewVector;
+	REAL3 viewVector;
 
 #if defined(PERSP_FISH_EYE) || defined(PERSP_FISH_EYE_CUT)
-	float2 v = normalizedPoint;
-	float r = length(v);
-	if (r == 0.0f)
+	REAL2 v = normalizedPoint;
+	REAL r = length(v);
+	if (r == 0.0)
 	{
-		viewVector = 0.0f;
+		viewVector = 0.0;
 	}
 	else
 	{
@@ -54,7 +54,7 @@ inline float3 CalculateViewVector(float2 normalizedPoint, float fov)
 #endif
 
 #ifdef PERSP_EQUIRECTANGULAR
-	float2 v = normalizedPoint * 0.5f;
+	REAL2 v = normalizedPoint * 0.5;
 	viewVector.x = sin(fov * v.x) * cos(fov * v.y);
 	viewVector.z = sin(fov * v.y);
 	viewVector.y = cos(fov * v.x) * cos(fov * v.y);
@@ -63,7 +63,7 @@ inline float3 CalculateViewVector(float2 normalizedPoint, float fov)
 
 #ifdef PERSP_THREE_POINT
 	viewVector.x = normalizedPoint.x * fov;
-	viewVector.y = 1.0f;
+	viewVector.y = 1.0;
 	viewVector.z = normalizedPoint.y * fov;
 	viewVector = normalize(viewVector);
 #endif

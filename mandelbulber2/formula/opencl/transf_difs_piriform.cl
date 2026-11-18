@@ -23,7 +23,7 @@ REAL4 TransfDIFSPiriformIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		z.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int2;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -63,9 +63,9 @@ REAL4 TransfDIFSPiriformIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 	REAL u = pow(zc.x, fractal->transformCommon.scale2);
 	REAL r = u * zc.x + zc.y * zc.y + zc.z * zc.z + fractal->transformCommon.offsetB0;
-	r = (r < 0.0f) ? 0.0f : native_sqrt(r);
+	r = (r < 0.0) ? 0.0 : native_sqrt(r);
 	REAL t = u + fractal->transformCommon.offsetC0;
-	t = (t < 0.0f) ? 0.0f : native_sqrt(t);
+	t = (t < 0.0) ? 0.0 : native_sqrt(t);
 	t = r - t;
 
 	if (fractal->transformCommon.functionEnabledKFalse)
@@ -75,7 +75,7 @@ REAL4 TransfDIFSPiriformIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			t = native_sqrt(t * t + zc.z * zc.z);
 		else
 			t = max(fabs(t), fabs(zc.z));
-		// aux->DE += 1.0f;
+		// aux->DE += 1.0;
 	}
 
 	// z.x clip

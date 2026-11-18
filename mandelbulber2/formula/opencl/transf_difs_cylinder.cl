@@ -17,7 +17,7 @@
 REAL4 TransfDIFSCylinderIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 zc = z;
-	REAL temp = 0.0f;
+	REAL temp = 0.0;
 	// swap axis
 	if (fractal->transformCommon.functionEnabledSFalse)
 	{
@@ -46,10 +46,10 @@ REAL4 TransfDIFSCylinderIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 	REAL cylH = fabs(zc.z) - fractal->transformCommon.offsetA1 + fractal->transformCommon.offsetB0;
 
-	cylR = max(cylR, 0.0f);
-	cylH = max(cylH, 0.0f);
+	cylR = max(cylR, 0.0);
+	cylH = max(cylH, 0.0);
 	REAL cylD = native_sqrt(cylR * cylR + cylH * cylH);
-	cylD = min(max(cylR, cylH), 0.0f) + cylD;
+	cylD = min(max(cylR, cylH), 0.0) + cylD;
 
 	REAL colDist = aux->dist;
 	aux->dist = min(
@@ -64,7 +64,7 @@ REAL4 TransfDIFSCylinderIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		if (fractal->foldColor.auxColorEnabledAFalse)
 		{
 			temp = fractal->transformCommon.offsetA1 + fractal->transformCommon.offsetB0;
-			if (fractal->foldColor.difs0000.x != 0.0f) temp = temp - fractal->foldColor.difs0000.x;
+			if (fractal->foldColor.difs0000.x != 0.0) temp = temp - fractal->foldColor.difs0000.x;
 
 			if (xyR < -fractal->transformCommon.offset0 - fractal->transformCommon.offsetB0
 					&& temp > fabs(zc.z))

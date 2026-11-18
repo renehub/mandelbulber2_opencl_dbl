@@ -17,24 +17,24 @@
 
 REAL4 Testing4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 
 	// parabolic.w = paraOffset + iter *slope + (iter *iter *scale)
-	REAL paraAddP0 = 0.0f;
+	REAL paraAddP0 = 0.0;
 	if (fractal->Cpara.enabledParabFalse)
 	{
-		REAL parabScale = 0.0f;
-		if (fractal->Cpara.parabScale != 0.0f)
-			parabScale = aux->i * aux->i * 0.001f * fractal->Cpara.parabScale;
+		REAL parabScale = 0.0;
+		if (fractal->Cpara.parabScale != 0.0)
+			parabScale = aux->i * aux->i * 0.001 * fractal->Cpara.parabScale;
 		paraAddP0 = fractal->Cpara.parabOffset0 + (aux->i * fractal->Cpara.parabSlope) + (parabScale);
 		z.w += paraAddP0;
 	}
 
 	// sinusoidal w
-	REAL sinAdd = 0.0f;
+	REAL sinAdd = 0.0;
 	if (fractal->transformCommon.functionEnabledDFalse)
 	{
 		sinAdd =
@@ -46,12 +46,12 @@ REAL4 Testing4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	/*	REAL4 temp = fractal->transformCommon.offset0000;
 		REAL4 temp2 = temp * temp;
 
-		z.x += ((8.0f * temp.x * temp2.x) / ((z.x * z.x) + (4.0f * temp2.x)) - 2.0f * temp.x) *
-		sign(z.x) * fractal->transformCommon.scale1; z.y += ((8.0f * temp.y * temp2.y) / ((z.y * z.y) +
-		(4.0f * temp2.y)) - 2.0f * temp.y) * sign(z.y) * fractal->transformCommon.scale1; z.z += ((8.0f
-		* temp.z * temp2.z) / ((z.z * z.z) + (4.0f * temp2.z)) - 2.0f * temp.z) * sign(z.z) *
+		z.x += ((8.0 * temp.x * temp2.x) / ((z.x * z.x) + (4.0 * temp2.x)) - 2.0 * temp.x) *
+		sign(z.x) * fractal->transformCommon.scale1; z.y += ((8.0 * temp.y * temp2.y) / ((z.y * z.y) +
+		(4.0 * temp2.y)) - 2.0 * temp.y) * sign(z.y) * fractal->transformCommon.scale1; z.z += ((8.0
+		* temp.z * temp2.z) / ((z.z * z.z) + (4.0 * temp2.z)) - 2.0 * temp.z) * sign(z.z) *
 		fractal->transformCommon.scale1;
-		z.w += ((8.0f * temp.w * temp2.w) / ((z.w * z.w) + (4.0f * temp2.w)) - 2.0f * temp.w) *
+		z.w += ((8.0 * temp.w * temp2.w) / ((z.w * z.w) + (4.0 * temp2.w)) - 2.0 * temp.w) *
 		sign(z.w) * fractal->transformCommon.scale1*/
 
 	if (aux->i >= fractal->transformCommon.startIterationsB
@@ -70,15 +70,15 @@ REAL4 Testing4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	}
 	REAL4 temp = fractal->transformCommon.offset0000;
 	REAL4 temp2 = temp * temp;
-	// if (z.w < 1e-016f) z.w = 1e-016f;
-	if (z.w < 1e-21f && z.w > -1e-21f) z.w = (z.w > 0) ? 1e-21f : -1e-21f;
-	z.x += ((8.0f * temp.x * temp2.x) / ((z.x * z.x) + (4.0f * temp2.x)) - 2.0f * temp.x) * sign(z.x)
+	// if (z.w < 1e-016) z.w = 1e-016;
+	if (z.w < 1e-21 && z.w > -1e-21) z.w = (z.w > 0) ? 1e-21 : -1e-21;
+	z.x += ((8.0 * temp.x * temp2.x) / ((z.x * z.x) + (4.0 * temp2.x)) - 2.0 * temp.x) * sign(z.x)
 				 * fractal->transformCommon.scale1;
-	z.y += ((8.0f * temp.y * temp2.y) / ((z.y * z.y) + (4.0f * temp2.y)) - 2.0f * temp.y) * sign(z.y)
+	z.y += ((8.0 * temp.y * temp2.y) / ((z.y * z.y) + (4.0 * temp2.y)) - 2.0 * temp.y) * sign(z.y)
 				 * fractal->transformCommon.scale1;
-	z.z += ((8.0f * temp.z * temp2.z) / ((z.z * z.z) + (4.0f * temp2.z)) - 2.0f * temp.z) * sign(z.z)
+	z.z += ((8.0 * temp.z * temp2.z) / ((z.z * z.z) + (4.0 * temp2.z)) - 2.0 * temp.z) * sign(z.z)
 				 * fractal->transformCommon.scale1;
-	z.w += ((8.0f * temp.w * temp2.w) / ((z.w * z.w) + (4.0f * temp2.w)) - 2.0f * temp.w) * sign(z.w)
+	z.w += ((8.0 * temp.w * temp2.w) / ((z.w * z.w) + (4.0 * temp2.w)) - 2.0 * temp.w) * sign(z.w)
 				 * fractal->transformCommon.scale1;
 
 	// r power
@@ -87,7 +87,7 @@ REAL4 Testing4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	{
 		REAL rr = dot(z, z);
 		rrCol = rr;
-		if (fractal->mandelboxVary4D.rPower != 1.0f) rr = pow(rr, fractal->mandelboxVary4D.rPower);
+		if (fractal->mandelboxVary4D.rPower != 1.0) rr = pow(rr, fractal->mandelboxVary4D.rPower);
 
 		// spherical fold
 		// z += fractal->transformCommon.offset0000;
@@ -111,7 +111,7 @@ REAL4 Testing4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	}
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsC
 			&& aux->i < fractal->transformCommon.stopIterationsC)
 	{
@@ -188,34 +188,34 @@ REAL4 Testing4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	/*REAL4 temp = fractal->transformCommon.offset0000;
 	REAL4 temp2 = temp * temp;
 
-	z.x += ((8.0f * temp.x * temp2.x) / ((z.x * z.x) + (4.0f * temp2.x)) - 2.0f * temp.x) * sign(z.x)
+	z.x += ((8.0 * temp.x * temp2.x) / ((z.x * z.x) + (4.0 * temp2.x)) - 2.0 * temp.x) * sign(z.x)
 				 * fractal->transformCommon.scale1;
-	z.y += ((8.0f * temp.y * temp2.y) / ((z.y * z.y) + (4.0f * temp2.y)) - 2.0f * temp.y) * sign(z.y)
+	z.y += ((8.0 * temp.y * temp2.y) / ((z.y * z.y) + (4.0 * temp2.y)) - 2.0 * temp.y) * sign(z.y)
 				 * fractal->transformCommon.scale1;
-	z.z += ((8.0f * temp.z * temp2.z) / ((z.z * z.z) + (4.0f * temp2.z)) - 2.0f * temp.z) * sign(z.z)
+	z.z += ((8.0 * temp.z * temp2.z) / ((z.z * z.z) + (4.0 * temp2.z)) - 2.0 * temp.z) * sign(z.z)
 				 * fractal->transformCommon.scale1;
-	z.w += ((8.0f * temp.w * temp2.w) / ((z.w * z.w) + (4.0f * temp2.w)) - 2.0f * temp.w) * sign(z.w)
+	z.w += ((8.0 * temp.w * temp2.w) / ((z.w * z.w) + (4.0 * temp2.w)) - 2.0 * temp.w) * sign(z.w)
 				 * fractal->transformCommon.scale1;*/
 
 	if (aux->i >= fractal->transformCommon.startIterationsA
 			&& aux->i < fractal->transformCommon.stopIterationsA)
 	{
 		aux->r = length(z);
-		aux->DE = aux->r * aux->DE * 16.0f * fractal->analyticDE.scale1
-								* native_sqrt(fractal->foldingIntPow.zFactor * fractal->foldingIntPow.zFactor + 2.0f
+		aux->DE = aux->r * aux->DE * 16.0 * fractal->analyticDE.scale1
+								* native_sqrt(fractal->foldingIntPow.zFactor * fractal->foldingIntPow.zFactor + 2.0
 															+ fractal->analyticDE.offset2)
 								/ SQRT_3_F
 							+ fractal->analyticDE.offset1;
 
-		z = z * 2.0f;
+		z = z * 2.0;
 		REAL x2 = z.x * z.x;
 		REAL y2 = z.y * z.y;
 		REAL z2 = z.z * z.z;
-		REAL factor = 1.0f - z2 / (x2 + y2);
+		REAL factor = 1.0 - z2 / (x2 + y2);
 		REAL4 zTemp;
 		zTemp.x = (x2 - y2) * factor;
-		zTemp.y = 2.0f * z.x * z.y * factor;
-		zTemp.z = -2.0f * z.z * native_sqrt(x2 + y2);
+		zTemp.y = 2.0 * z.x * z.y * factor;
+		zTemp.z = -2.0 * z.z * native_sqrt(x2 + y2);
 		zTemp.w = z.w;
 		z = zTemp;
 		z.z *= fractal->foldingIntPow.zFactor;

@@ -40,13 +40,13 @@ REAL4 TransfDIFSBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	}
 
 	REAL4 q = fabs(zc) - boxSize;
-	zc.x = max(q.x, 0.0f);
-	zc.y = max(q.y, 0.0f);
-	zc.z = max(q.z, 0.0f);
+	zc.x = max(q.x, 0.0);
+	zc.y = max(q.y, 0.0);
+	zc.z = max(q.z, 0.0);
 	REAL zcd = length(zc);
 
 	REAL colDist = aux->dist;
-	aux->dist = min(aux->dist, zcd / (aux->DE + 1.0f));
+	aux->dist = min(aux->dist, zcd / (aux->DE + 1.0));
 
 	if (fractal->foldColor.auxColorEnabledFalse && colDist != aux->dist
 			&& aux->i >= fractal->foldColor.startIterationsA
@@ -56,17 +56,17 @@ REAL4 TransfDIFSBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 
 		if (fractal->foldColor.auxColorEnabledAFalse)
 		{
-			if (fractal->foldColor.difs0000.y != 0.0f && zc.x == fabs(q.x))
+			if (fractal->foldColor.difs0000.y != 0.0 && zc.x == fabs(q.x))
 				addCol += fractal->foldColor.difs0000.y;
-			if (fractal->foldColor.difs0000.z != 0.0f && zc.y == fabs(q.y))
+			if (fractal->foldColor.difs0000.z != 0.0 && zc.y == fabs(q.y))
 				addCol += fractal->foldColor.difs0000.z;
-			if (fractal->foldColor.difs0000.w != 0.0f && zc.z == fabs(q.z))
+			if (fractal->foldColor.difs0000.w != 0.0 && zc.z == fabs(q.z))
 				addCol += fractal->foldColor.difs0000.w;
 
-			if (fractal->transformCommon.offset0 != 0.0f)
+			if (fractal->transformCommon.offset0 != 0.0)
 			{
 				REAL t = z.x * z.y;
-				if ((t > 0.0f && z.z > 0.0f) || (t < 0.0f && z.z < 0.0f))
+				if ((t > 0.0 && z.z > 0.0) || (t < 0.0 && z.z < 0.0))
 					addCol += fractal->transformCommon.offset0;
 			}
 		}

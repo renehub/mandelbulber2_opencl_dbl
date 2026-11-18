@@ -34,18 +34,18 @@
 
 #ifdef VOLUMETRIC_FOG
 
-float DistanceFogOpacity(float step, float distance, float volFogDistanceFromSurface,
-	float volFogDistanceFactor, float volFogDensity, float *distanceShifted)
+REAL DistanceFogOpacity(REAL step, REAL distance, REAL volFogDistanceFromSurface,
+	REAL volFogDistanceFactor, REAL volFogDensity, REAL *distanceShifted)
 {
-	*distanceShifted = fabs(distance - volFogDistanceFromSurface) + 0.1f * volFogDistanceFromSurface;
-	float densityTemp =
+	*distanceShifted = fabs(distance - volFogDistanceFromSurface) + 0.1 * volFogDistanceFromSurface;
+	REAL densityTemp =
 		step * volFogDistanceFactor
 		/ (*distanceShifted * *distanceShifted + volFogDistanceFactor * volFogDistanceFactor);
 
-	float distFogOpacity =
-		0.3f * volFogDensity * densityTemp / (1.0f + volFogDensity * densityTemp) - 0.001f;
+	REAL distFogOpacity =
+		0.3 * volFogDensity * densityTemp / (1.0 + volFogDensity * densityTemp) - 0.001;
 
-	distFogOpacity = clamp(distFogOpacity, 0.0f, 1.0f);
+	distFogOpacity = clamp(distFogOpacity, 0.0, 1.0);
 
 	return distFogOpacity;
 }

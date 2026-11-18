@@ -33,17 +33,17 @@ REAL4 TransfAddCpixelSinOrCosIteration(REAL4 z, __global sFractalCl *fractal, sE
 	{
 		// mode2
 		if (fractal->transformCommon.functionEnabledAx)
-			trigC.x = (1.0f + native_sin(trigC0.x)) * sign(trigC.x) / 2.0f;
+			trigC.x = (1.0 + native_sin(trigC0.x)) * sign(trigC.x) / 2.0;
 		if (fractal->transformCommon.functionEnabledAxFalse)
-			trigC.x = (1.0f + native_cos(trigC0.x)) * sign(trigC.x) / 2.0f;
+			trigC.x = (1.0 + native_cos(trigC0.x)) * sign(trigC.x) / 2.0;
 		if (fractal->transformCommon.functionEnabledAy)
-			trigC.y = (1.0f + native_sin(trigC0.y)) * sign(trigC.y) / 2.0f;
+			trigC.y = (1.0 + native_sin(trigC0.y)) * sign(trigC.y) / 2.0;
 		if (fractal->transformCommon.functionEnabledAyFalse)
-			trigC.y = (1.0f + native_cos(trigC0.y)) * sign(trigC.y) / 2.0f;
+			trigC.y = (1.0 + native_cos(trigC0.y)) * sign(trigC.y) / 2.0;
 		if (fractal->transformCommon.functionEnabledAz)
-			trigC.z = (1.0f + native_sin(trigC0.z)) * sign(trigC.z) / 2.0f;
+			trigC.z = (1.0 + native_sin(trigC0.z)) * sign(trigC.z) / 2.0;
 		if (fractal->transformCommon.functionEnabledAzFalse)
-			trigC.z = (1.0f + native_cos(trigC0.z)) * sign(trigC.z) / 2.0f;
+			trigC.z = (1.0 + native_cos(trigC0.z)) * sign(trigC.z) / 2.0;
 		// mode3
 		if (fractal->transformCommon.functionEnabledByFalse) trigC *= trigC0;
 	}

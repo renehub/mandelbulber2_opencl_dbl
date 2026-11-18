@@ -25,7 +25,7 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		z.x = fabs(z.x);
 		z.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int8X;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -108,7 +108,7 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			z.z = fabs(z.z + fractal->transformCommon.additionConstant0777.z)
 						- fabs(z.z - fractal->transformCommon.additionConstant0777.z) - z.z;
 	}
-	REAL pNorm = 1.0f;
+	REAL pNorm = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsG
 			&& aux->i < fractal->transformCommon.stopIterationsG)
 	{
@@ -117,14 +117,14 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		lpN.x = pow(lpN.x, pr);
 		lpN.y = pow(lpN.y, pr);
 		lpN.z = pow(lpN.z, pr);
-		pNorm = pow((lpN.x + lpN.y + lpN.z), 1.0f / pr);
+		pNorm = pow((lpN.x + lpN.y + lpN.z), 1.0 / pr);
 
 		pNorm = pow(pNorm, fractal->transformCommon.scaleA2);
 		pNorm = max(pNorm, fractal->transformCommon.offset02);
 
 		REAL useScale = fractal->transformCommon.scale1p1 - aux->actualScaleA;
 		if (fractal->transformCommon.functionEnabledKFalse) // update actualScaleA
-			aux->actualScaleA = fractal->transformCommon.scaleVary0 * (fabs(aux->actualScaleA) + 1.0f);
+			aux->actualScaleA = fractal->transformCommon.scaleVary0 * (fabs(aux->actualScaleA) + 1.0);
 		pNorm = useScale / pNorm;
 		z *= pNorm;
 		aux->DE *= fabs(pNorm);
@@ -161,8 +161,8 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		t = z.x;
 		z.x = z.x + z.y;
 		z.y = t - z.y;
-		z.x *= 0.5f;
-		z.y *= 0.5f;
+		z.x *= 0.5;
+		z.y *= 0.5;
 		if (fractal->transformCommon.functionEnabledAx
 				&& aux->i >= fractal->transformCommon.startIterationsR
 				&& aux->i < fractal->transformCommon.stopIterationsR)
@@ -175,7 +175,7 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 	// the flag pair guarantees assignment on every path; initializer silences the
 	// conservative GCC analysis (-O3)
-	REAL len = 0.0f;
+	REAL len = 0.0;
 	if (!fractal->transformCommon.functionEnabledSwFalse) len = length(z);
 
 	if (fractal->transformCommon.functionEnabledCFalse
@@ -189,7 +189,7 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 	if (fractal->transformCommon.functionEnabledSwFalse) len = length(z);
 
-	aux->DE *= 1.0f + fractal->analyticDE.tweak005;
+	aux->DE *= 1.0 + fractal->analyticDE.tweak005;
 
 	// DE options
 	if (fractal->transformCommon.functionEnabledBFalse)
@@ -215,9 +215,9 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 	if (fractal->foldColor.auxColorEnabledFalse)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		colorAdd += fractal->foldColor.difs0000.x * fabs(z.x);
-		colorAdd += fractal->foldColor.difs0000.y * aux->DE * 0.001f;
+		colorAdd += fractal->foldColor.difs0000.y * aux->DE * 0.001;
 		colorAdd += fractal->foldColor.difs0000.z * fabs(z.z);
 		colorAdd += fractal->foldColor.difs0000.w * pNorm;
 		aux->color += colorAdd;

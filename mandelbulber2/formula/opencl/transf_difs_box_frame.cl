@@ -23,7 +23,7 @@ REAL4 TransfDIFSBoxFrameIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		z.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int8X;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -35,7 +35,7 @@ REAL4 TransfDIFSBoxFrameIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		z.z = fabs(z.z);
 		REAL psi = M_PI_F / fractal->transformCommon.int8Y;
-		psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.y * z.y + z.z * z.z);
 		z.y = native_cos(psi) * len;
 		z.z = native_sin(psi) * len;
@@ -47,7 +47,7 @@ REAL4 TransfDIFSBoxFrameIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		z.x = fabs(z.x);
 		REAL psi = M_PI_F / fractal->transformCommon.int8Z;
-		psi = fabs(fmod(atan2(z.x, z.z) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.x, z.z) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.z * z.z + z.x * z.x);
 		z.z = native_cos(psi) * len;
 		z.x = native_sin(psi) * len;
@@ -85,7 +85,7 @@ REAL4 TransfDIFSBoxFrameIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	zc = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix2, zc);
 	zc = fabs(zc) - fractal->transformCommon.offsetC111;
 	REAL4 q = (REAL4){fractal->transformCommon.offsetp01, fractal->transformCommon.offsetAp01,
-		fractal->transformCommon.offsetBp01, 0.0f};
+		fractal->transformCommon.offsetBp01, 0.0};
 
 	if (!fractal->transformCommon.functionEnabledSwFalse)
 		q = fabs(zc + q) - q;
@@ -93,25 +93,25 @@ REAL4 TransfDIFSBoxFrameIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		q = fabs(zc) - q;
 
 	REAL4 len = zc;
-	len.x = min(max(zc.x, max(q.y, q.z)), 0.0f);
-	len.y = min(max(q.x, max(zc.y, q.z)), 0.0f);
-	len.z = min(max(q.x, max(q.y, zc.z)), 0.0f);
+	len.x = min(max(zc.x, max(q.y, q.z)), 0.0);
+	len.y = min(max(q.x, max(zc.y, q.z)), 0.0);
+	len.z = min(max(q.x, max(q.y, zc.z)), 0.0);
 
 	REAL4 mz = zc;
-	mz.x = max(zc.x, 0.0f);
-	mz.y = max(zc.y, 0.0f);
-	mz.z = max(zc.z, 0.0f);
+	mz.x = max(zc.x, 0.0);
+	mz.y = max(zc.y, 0.0);
+	mz.z = max(zc.z, 0.0);
 
 	REAL4 mq = q;
-	mq.x = max(q.x, 0.0f);
-	mq.y = max(q.y, 0.0f);
-	mq.z = max(q.z, 0.0f);
+	mq.x = max(q.x, 0.0);
+	mq.y = max(q.y, 0.0);
+	mq.z = max(q.z, 0.0);
 
-	REAL4 tv = ((REAL4){mz.x, mq.y, mq.z, 0.0f});
+	REAL4 tv = ((REAL4){mz.x, mq.y, mq.z, 0.0});
 	len.x += length(tv);
-	tv = ((REAL4){mq.x, mz.y, mq.z, 0.0f});
+	tv = ((REAL4){mq.x, mz.y, mq.z, 0.0});
 	len.y += length(tv);
-	tv = ((REAL4){mq.x, mq.y, mz.z, 0.0f});
+	tv = ((REAL4){mq.x, mq.y, mz.z, 0.0});
 	len.z += length(tv);
 
 	REAL D = min(min(len.x, len.y), len.z) / (aux->DE + fractal->analyticDE.offset0);

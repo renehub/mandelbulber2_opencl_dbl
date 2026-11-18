@@ -33,20 +33,20 @@
  */
 
 #ifdef ITER_FOG
-float IterOpacity(
-	const float step, float iters, float maxN, float trim, float trimHigh, float opacitySp)
+REAL IterOpacity(
+	const REAL step, REAL iters, REAL maxN, REAL trim, REAL trimHigh, REAL opacitySp)
 {
-	float opacity = (iters - trim) / maxN;
+	REAL opacity = (iters - trim) / maxN;
 	if (iters > trimHigh)
 	{
-		float trim2 = trimHigh + 1.0f - iters;
-		trim2 = max(trim2, 0.0f);
+		REAL trim2 = trimHigh + 1.0 - iters;
+		trim2 = max(trim2, 0.0);
 		opacity *= trim2;
 	}
-	if (opacity < 0.0f) opacity = 0.0f;
+	if (opacity < 0.0) opacity = 0.0;
 	opacity *= opacity;
 	opacity *= step * opacitySp;
-	if (opacity > 1.0f) opacity = 1.0f;
+	if (opacity > 1.0) opacity = 1.0;
 	return opacity;
 }
 #endif // ITER_FOG

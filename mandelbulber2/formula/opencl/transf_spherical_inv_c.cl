@@ -25,8 +25,8 @@ REAL4 TransfSphericalInvCIteration(REAL4 z, __global sFractalCl *fractal, sExten
 		tempC = aux->const_c;
 		tempC *= fractal->transformCommon.constantMultiplier111;
 		rSqrL = dot(tempC, tempC);
-		// if (rSqrL < 1e-21f) rSqrL = 1e-21f;
-		rSqrL = 1.0f / rSqrL;
+		// if (rSqrL < 1e-21) rSqrL = 1e-21;
+		rSqrL = 1.0 / rSqrL;
 		tempC *= rSqrL;
 	}
 	else
@@ -36,16 +36,16 @@ REAL4 TransfSphericalInvCIteration(REAL4 z, __global sFractalCl *fractal, sExten
 		{
 			tempC *= fractal->transformCommon.constantMultiplier111;
 			rSqrL = dot(tempC, tempC);
-			// if (rSqrL < 1e-21f) rSqrL = 1e-21f;
-			rSqrL = 1.0f / rSqrL;
+			// if (rSqrL < 1e-21) rSqrL = 1e-21;
+			rSqrL = 1.0 / rSqrL;
 			tempC *= rSqrL;
 			aux->c = tempC;
 		}
 		else
 		{
 			rSqrL = dot(tempC, tempC);
-			// if (rSqrL < 1e-21f) rSqrL = 1e-21f;
-			rSqrL = 1.0f / rSqrL;
+			// if (rSqrL < 1e-21) rSqrL = 1e-21;
+			rSqrL = 1.0 / rSqrL;
 			tempC *= rSqrL;
 			aux->c = tempC;
 			tempC *= fractal->transformCommon.constantMultiplier111;
@@ -55,8 +55,8 @@ REAL4 TransfSphericalInvCIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	if (fractal->transformCommon.functionEnabledAwFalse)
 	{
 		rSqrL = dot(z, z);
-		// if (rSqrL < 1e-21f) rSqrL = 1e-21f;
-		rSqrL = 1.0f / rSqrL;
+		// if (rSqrL < 1e-21) rSqrL = 1e-21;
+		rSqrL = 1.0 / rSqrL;
 		z *= rSqrL;
 		aux->DE *= rSqrL;
 		z += tempC;

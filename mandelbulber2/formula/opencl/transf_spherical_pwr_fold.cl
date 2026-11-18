@@ -16,15 +16,15 @@
 
 REAL4 TransfSphericalPwrFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	// if (z.x > -1e-21f && z.x < 1e-21f) z.x = (z.x > 0) ? 1e-21f : -1e-21f;
-	// if (z.y > -1e-21f && z.y < 1e-21f) z.y = (z.y > 0) ? 1e-21f : -1e-21f;
-	// if (z.z > -1e-21f && z.z < 1e-21f) z.z = (z.z > 0) ? 1e-21f : -1e-21f;
+	// if (z.x > -1e-21 && z.x < 1e-21) z.x = (z.x > 0) ? 1e-21 : -1e-21;
+	// if (z.y > -1e-21 && z.y < 1e-21) z.y = (z.y > 0) ? 1e-21 : -1e-21;
+	// if (z.z > -1e-21 && z.z < 1e-21) z.z = (z.z > 0) ? 1e-21 : -1e-21;
 	REAL rr = pow(pow(z.x, fractal->transformCommon.pwr4) + pow(z.y, fractal->transformCommon.pwr4)
 									+ pow(z.z, fractal->transformCommon.pwr4),
 		fractal->transformCommon.pwr05);
 
-	// if (rr < 1e-21f && rr > -1e-21f)
-	//	rr = (rr > 0) ? 1e-21f : -1e-21f;
+	// if (rr < 1e-21 && rr > -1e-21)
+	//	rr = (rr > 0) ? 1e-21 : -1e-21;
 	if (rr < fractal->mandelbox.mR2)
 	{
 		z *= fractal->mandelbox.mboxFactor1;

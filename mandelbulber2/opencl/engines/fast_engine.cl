@@ -53,10 +53,10 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 	const int cl_offsetY = get_global_offset(1);
 	const int buffIndex = (imageX - cl_offsetX) + (imageY - cl_offsetY) * get_global_size(0);
 
-	float2 screenPoint = (float2){convert_float(imageX), convert_float(imageY)};
-	float width = convert_float(consts->params.imageWidth);
-	float height = convert_float(consts->params.imageHeight);
-	float resolution = 1.0f / height;
+	REAL2 screenPoint = (REAL2){convert_float(imageX), convert_float(imageY)};
+	REAL width = convert_float(consts->params.imageWidth);
+	REAL height = convert_float(consts->params.imageHeight);
+	REAL resolution = 1.0 / height;
 
 	//-------- decode data file ----------------
 	int primitivesMainOffset = GetInteger(3 * sizeof(int), inBuff);
@@ -111,9 +111,9 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 	//			//			cl_int primitiveIdx;
 	//			//			cl_int level;
 	//			//			cl_int hybridSequenceIndex;
-	//			//			cl_float3 repeat;
-	//			//			cl_float scale;
-	//			//			cl_float absScale;
+	//			//			REAL3 repeat;
+	//			//			REAL scale;
+	//			//			REAL absScale;
 	//			//			cl_int material;
 	//			//			matrix33 rotationMatrix;
 	//			//			matrix44 inverseTransformMatrix;
@@ -191,43 +191,43 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 	sClPixel pixel;
 
 #ifdef STEREO_REYCYAN
-	float3 pixelLeftColor = 0.0f;
-	float3 pixelRightColor = 0.0f;
+	REAL3 pixelLeftColor = 0.0;
+	REAL3 pixelRightColor = 0.0;
 	for (int eye = 0; eye < 2; eye++)
 	{
 #endif
 
 		// auxiliary vectors
-		const float3 one = (float3){1.0f, 0.0f, 0.0f};
-		const float3 ones = 1.0f;
+		const REAL3 one = (REAL3){1.0, 0.0, 0.0};
+		const REAL3 ones = 1.0;
 
 		// main rotation matrix
 		matrix33 rot;
-		rot.m1 = (float3){1.0f, 0.0f, 0.0f};
-		rot.m2 = (float3){0.0f, 1.0f, 0.0f};
-		rot.m3 = (float3){0.0f, 0.0f, 1.0f};
+		rot.m1 = (REAL3){1.0, 0.0, 0.0};
+		rot.m2 = (REAL3){0.0, 1.0, 0.0};
+		rot.m3 = (REAL3){0.0, 0.0, 1.0};
 
 		rot = RotateZ(rot, consts->params.viewAngle.x);
 		rot = RotateX(rot, consts->params.viewAngle.y);
 		rot = RotateY(rot, consts->params.viewAngle.z);
 
-		float lightAlpha = -45.0f / 180.0f * M_PI_F;
-		float lightBeta = 45.0f / 180.0f * M_PI_F;
-		float3 lightVector = (float3){cos(lightAlpha - 0.5f * M_PI_F) * cos(lightBeta),
-			sin(lightAlpha - 0.5f * M_PI_F) * cos(lightBeta), sin(lightBeta)};
+		REAL lightAlpha = -45.0 / 180.0 * M_PI_F;
+		REAL lightBeta = 45.0 / 180.0 * M_PI_F;
+		REAL3 lightVector = (REAL3){cos(lightAlpha - 0.5 * M_PI_F) * cos(lightBeta),
+			sin(lightAlpha - 0.5 * M_PI_F) * cos(lightBeta), sin(lightBeta)};
 		lightVector = Matrix33MulFloat3(rot, lightVector);
 
 		rot = RotateZ(rot, -consts->params.sweetSpotHAngle);
 		rot = RotateX(rot, consts->params.sweetSpotVAngle);
 
 		// starting point for ray-marching
-		float3 start = consts->params.camera;
+		REAL3 start = consts->params.camera;
 
 // view vector
 #ifdef PERSP_EQUIRECTANGULAR
-		float aspectRatio = 2.0f;
+		REAL aspectRatio = 2.0;
 #else
-	float aspectRatio = width / height;
+	REAL aspectRatio = width / height;
 #endif
 
 #ifdef STEREOSCOPIC
@@ -238,10 +238,10 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 #endif
 #endif
 
-		float2 normalizedScreenPoint;
-		normalizedScreenPoint.x = (screenPoint.x / width - 0.5f);
-		normalizedScreenPoint.y = -(screenPoint.y / height - 0.5f);
-		if (consts->params.legacyCoordinateSystem) normalizedScreenPoint.y *= -1.0f;
+		REAL2 normalizedScreenPoint;
+		normalizedScreenPoint.x = (screenPoint.x / width - 0.5);
+		normalizedScreenPoint.y = -(screenPoint.y / height - 0.5);
+		if (consts->params.legacyCoordinateSystem) normalizedScreenPoint.y *= -1.0;
 
 #ifdef STEREOSCOPIC
 #ifndef STEREO_REYCYAN
@@ -251,16 +251,16 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 #endif
 		normalizedScreenPoint.x *= aspectRatio;
 
-		float3 viewVectorNotRotated = CalculateViewVector(normalizedScreenPoint, consts->params.fov);
-		float3 viewVector = Matrix33MulFloat3(rot, viewVectorNotRotated);
+		REAL3 viewVectorNotRotated = CalculateViewVector(normalizedScreenPoint, consts->params.fov);
+		REAL3 viewVector = Matrix33MulFloat3(rot, viewVectorNotRotated);
 
 #ifdef STEREOSCOPIC
 #ifndef PERSP_FISH_EYE_CUT
 
 #ifdef PERSP_EQUIRECTANGULAR // reduce of stereo effect on poles
-		float stereoIntensity = 1.0f - pow(normalizedScreenPoint.y * 2.0f, 10.0f);
+		REAL stereoIntensity = 1.0 - pow(normalizedScreenPoint.y * 2.0, 10.0);
 #else
-		float stereoIntensity = 1.0f;
+		REAL stereoIntensity = 1.0;
 #endif
 
 		start = StereoCalcEyePosition(start, viewVector, consts->params.topVector,
@@ -270,20 +270,20 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 		StereoViewVectorCorrection(consts->params.stereoInfiniteCorrection * stereoIntensity, &rot,
 			&rotInv, eye, consts->params.stereoSwapEyes, &viewVector);
 #else // PERSP_FISH_EYE_CUT
-		float3 eyePosition = 0.0f;
-		float3 sideVector = normalize(cross(viewVector, consts->params.topVector));
-		float3 rightVector =
+		REAL3 eyePosition = 0.0;
+		REAL3 sideVector = normalize(cross(viewVector, consts->params.topVector));
+		REAL3 rightVector =
 			normalize(cross(consts->params.target - consts->params.camera, consts->params.topVector));
-		float eyeDistance = consts->params.stereoEyeDistance;
-		if (consts->params.stereoSwapEyes) eyeDistance *= -1.0f;
+		REAL eyeDistance = consts->params.stereoEyeDistance;
+		if (consts->params.stereoSwapEyes) eyeDistance *= -1.0;
 
 		if (eye == 0)
 		{
-			eyePosition = start + 0.5f * (rightVector * eyeDistance + sideVector * eyeDistance);
+			eyePosition = start + 0.5 * (rightVector * eyeDistance + sideVector * eyeDistance);
 		}
 		else
 		{
-			eyePosition = start - 0.5f * (rightVector * eyeDistance + sideVector * eyeDistance);
+			eyePosition = start - 0.5 * (rightVector * eyeDistance + sideVector * eyeDistance);
 		}
 		start = eyePosition;
 #endif
@@ -292,19 +292,19 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 		bool found = false;
 		int count;
 
-		float3 point;
-		float scan, distThresh, distance;
+		REAL3 point;
+		REAL scan, distThresh, distance;
 
-		scan = 1e-10f;
+		scan = 1e-10;
 
 		sClCalcParams calcParam;
 		calcParam.N = consts->params.N;
 		calcParam.normalCalculationMode = false;
 		calcParam.iterThreshMode = consts->params.iterThreshMode;
-		distThresh = 1e-6f;
+		distThresh = 1e-6;
 
 		formulaOut outF;
-		float step = 0.0f;
+		REAL step = 0.0;
 
 		// ray-marching
 		for (count = 0; count < MAX_RAYMARCHING && scan < consts->params.viewDistanceMax; count++)
@@ -322,13 +322,13 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 				distThresh *= renderData.objectsData[outF.objectId].detailLevelMultiplier;
 			}
 
-			if (distance < distThresh * 0.95f)
+			if (distance < distThresh * 0.95)
 			{
 				found = true;
 				break;
 			}
 
-			step = (distance - 0.5f * distThresh) * consts->params.DEFactor;
+			step = (distance - 0.5 * distThresh) * consts->params.DEFactor;
 
 #ifdef ADVANCED_QUALITY
 			step = clamp(step, consts->params.absMinMarchingStep, consts->params.absMaxMarchingStep);
@@ -344,10 +344,10 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 		// final binary searching
 		if (found)
 		{
-			step *= 0.5f;
+			step *= 0.5;
 			for (int i = 0; i < 5; i++)
 			{
-				if (distance < distThresh && distance > distThresh * 0.95f)
+				if (distance < distThresh && distance > distThresh * 0.95)
 				{
 					break;
 				}
@@ -357,59 +357,59 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 					{
 						point += viewVector * step;
 					}
-					else if (distance < distThresh * 0.95f)
+					else if (distance < distThresh * 0.95)
 					{
 						point -= viewVector * step;
 					}
 				}
 				outF = CalculateDistance(consts, point, &calcParam, &renderData);
 				distance = outF.distance;
-				step *= 0.5f;
+				step *= 0.5;
 			}
 		}
 		else
 		{
-			scan = 1e20f;
+			scan = 1e20;
 		}
 
-		float3 colour = 0.7f;
-		float alpha = 0.0f;
-		float3 surfaceColour = 1.0f;
+		REAL3 colour = 0.7;
+		REAL alpha = 0.0;
+		REAL3 surfaceColour = 1.0;
 		if (found)
 		{
 			distThresh = CalcDistThresh(point, consts);
 
-			float3 normal =
+			REAL3 normal =
 				NormalVector(consts, &renderData, point, distance, distThresh, false, &calcParam);
 
-			float shade = dot(lightVector, normal);
-			if (shade < 0.0f) shade = 0.0f;
+			REAL shade = dot(lightVector, normal);
+			if (shade < 0.0) shade = 0.0;
 
-			float3 halfVector = lightVector - viewVector;
+			REAL3 halfVector = lightVector - viewVector;
 			halfVector = fast_normalize(halfVector);
-			float specular = dot(normal, halfVector);
-			if (specular < 0.0f) specular = 0.0f;
-			specular = pown(specular, 30.0f);
-			if (specular > 15.0f) specular = 15.0f;
+			REAL specular = dot(normal, halfVector);
+			if (specular < 0.0) specular = 0.0;
+			specular = pown(specular, 30.0);
+			if (specular > 15.0) specular = 15.0;
 
 			colour = colour * (shade + specular);
-			alpha = 1.0f;
+			alpha = 1.0;
 		}
 		else
 		{
 #ifdef STEREOSCOPIC
-			float grid = 0.5f
-									 + 0.5f * sin(10.0f * sin(atan2(viewVector.y, viewVector.x) * 10.0f))
-											 * sin(10.0f * sin(atan2(viewVector.z, length(viewVector.xy)) * 10.0f));
+			REAL grid = 0.5
+									 + 0.5 * sin(10.0 * sin(atan2(viewVector.y, viewVector.x) * 10.0))
+											 * sin(10.0 * sin(atan2(viewVector.z, length(viewVector.xy)) * 10.0));
 			grid *= grid;
 			colour = grid;
 #else	 // not STEREOSCOPIC
-		colour = (float3){0.0f, 0.0f, screenPoint.y / height};
-		alpha = 0.0f;
+		colour = (REAL3){0.0, 0.0, screenPoint.y / height};
+		alpha = 0.0;
 #endif // STEREOSCOPIC
 		}
 
-		float glow = count / 500.0f * consts->params.DEFactor;
+		REAL glow = count / 500.0 * consts->params.DEFactor;
 
 #ifdef STEREO_REYCYAN
 		if (eye == 0)
@@ -440,7 +440,7 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 #else	 // no STEREO_REYCYAN
 
 	pixel.image.s0 = colour.s0 + glow;
-	pixel.image.s1 = colour.s1 * glow * 10.0f;
+	pixel.image.s1 = colour.s1 * glow * 10.0;
 	pixel.image.s2 = colour.s2;
 	pixel.zBuffer = scan;
 	pixel.color = 128;

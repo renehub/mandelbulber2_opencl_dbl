@@ -21,7 +21,7 @@ REAL4 TransfSphericalCoordInvsIteration(REAL4 z, __global sFractalCl *fractal, s
 	(void)aux;
 
 	REAL4 t = z;
-	REAL sn = 0.0f;
+	REAL sn = 0.0;
 	if (fractal->transformCommon.functionEnabled) // M3D version
 	{
 		sn = z.x * native_sin(z.y);

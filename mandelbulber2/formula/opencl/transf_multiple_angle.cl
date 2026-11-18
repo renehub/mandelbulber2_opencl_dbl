@@ -20,6 +20,6 @@ REAL4 TransfMultipleAngleIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	REAL th = th0 * fractal->transformCommon.multiplication;
 	REAL ph = ph0 * fractal->transformCommon.multiplication;
 	REAL cth = native_cos(th);
-	z = (REAL4){cth * native_cos(ph), cth * native_sin(ph), native_sin(th), 0.0f} * aux->r;
+	z = (REAL4){cth * native_cos(ph), cth * native_sin(ph), native_sin(th), 0.0} * aux->r;
 	return z;
 }

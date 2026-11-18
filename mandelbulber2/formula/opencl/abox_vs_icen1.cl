@@ -20,7 +20,7 @@
 REAL4 AboxVSIcen1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	aux->actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 	REAL4 c = aux->const_c;
 	REAL4 oldZ = z;
 	z.x = fabs(z.x + fractal->transformCommon.additionConstant111.x)
@@ -43,8 +43,8 @@ REAL4 AboxVSIcen1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	}
 
 	REAL rr = dot(z, z);
-	// if (r2 < 1e-21f && r2 > -1e-21f)
-	//	r2 = (r2 > 0) ? 1e-21f : -1e-21f;
+	// if (r2 < 1e-21 && r2 > -1e-21)
+	//	r2 = (r2 > 0) ? 1e-21 : -1e-21;
 	if (rr < fractal->mandelbox.mR2)
 	{
 		z *= fractal->mandelbox.mboxFactor1;
@@ -60,7 +60,7 @@ REAL4 AboxVSIcen1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	}
 
 	z *= aux->actualScale; // aux->actualScale;
-	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0f;
+	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0;
 
 	if (fractal->transformCommon.rotationEnabled && aux->i >= fractal->transformCommon.startIterations
 			&& aux->i < fractal->transformCommon.stopIterations)

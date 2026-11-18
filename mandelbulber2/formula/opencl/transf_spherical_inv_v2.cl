@@ -18,7 +18,7 @@
 
 REAL4 TransfSphericalInvV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL rr = 0.0f;
+	REAL rr = 0.0;
 	// unconditional mode
 	if (fractal->transformCommon.functionEnabledCz)
 	{
@@ -27,7 +27,7 @@ REAL4 TransfSphericalInvV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		{
 			z += fractal->transformCommon.offset000;
 			rr = dot(z, z);
-			REAL inv = 1.0f / rr;
+			REAL inv = 1.0 / rr;
 			z *= fractal->transformCommon.maxR2d1 * inv;
 			z += fractal->transformCommon.additionConstant000 - fractal->transformCommon.offset000;
 
@@ -53,16 +53,16 @@ REAL4 TransfSphericalInvV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 
 		if (rr < fractal->mandelbox.foldingSphericalFixed)
 		{
-			mode = 0.0f;
+			mode = 0.0;
 			if (fractal->transformCommon.functionEnabledFalse) // Mode 1 minR0
 			{
 				if (rr < fractal->transformCommon.minR0) mode = fractal->transformCommon.minR0;
 			}
 			if (fractal->transformCommon.functionEnabledxFalse) // Mode 2
 			{
-				if (rr < fractal->transformCommon.minR0) mode = 2.0f * fractal->transformCommon.minR0 - rr;
+				if (rr < fractal->transformCommon.minR0) mode = 2.0 * fractal->transformCommon.minR0 - rr;
 			}
-			mode = 1.0f / mode;
+			mode = 1.0 / mode;
 			z *= mode;
 			aux->DE *= fabs(mode);
 		}
@@ -80,7 +80,7 @@ REAL4 TransfSphericalInvV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		{
 			REAL lengthAB = fractal->transformCommon.scaleE1 - fractal->transformCommon.offsetC0;
 
-			if (fractal->transformCommon.functionEnabledyFalse) // Mode 3a, linear addition 0.0f at Max,
+			if (fractal->transformCommon.functionEnabledyFalse) // Mode 3a, linear addition 0.0 at Max,
 			{
 				if (rr < fractal->transformCommon.offsetC0)
 					mode += rr * (fractal->transformCommon.offset0 / fractal->transformCommon.offsetC0);
@@ -102,10 +102,10 @@ REAL4 TransfSphericalInvV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 			if (fractal->transformCommon.functionEnabledwFalse) // Mode 3c, basic parabolic curve
 			{
 
-				REAL halfLen = fractal->transformCommon.scaleE1 / 2.0f;
-				REAL slope = 2.0f / fractal->transformCommon.scaleE1;
+				REAL halfLen = fractal->transformCommon.scaleE1 / 2.0;
+				REAL slope = 2.0 / fractal->transformCommon.scaleE1;
 				REAL factor = slope / fractal->transformCommon.scaleE1;
-				REAL parab = 0.0f;
+				REAL parab = 0.0;
 
 				if (rr < halfLen)
 				{
@@ -129,7 +129,7 @@ REAL4 TransfSphericalInvV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 									* (fractal->mandelbox.foldingSphericalFixed - fractal->transformCommon.minR0))
 							/ fractal->transformCommon.minR0;
 			}*/
-			mode = 1.0f / mode;
+			mode = 1.0 / mode;
 			z *= mode;
 			aux->DE *= fabs(mode);
 		}

@@ -15,20 +15,20 @@
 
 REAL4 Mandelbulb4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
-	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0f;
+	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
+	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 
 	REAL angZ = atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset;
 	REAL angY = atan2(z.z, z.x) + fractal->bulb.betaAngleOffset;
 	REAL angX = atan2(z.z, z.y) + fractal->bulb.gammaAngleOffset;
 
 	matrix33 rotM;
-	rotM.m1 = (float3){1.0f, 0.0f, 0.0f};
-	rotM.m2 = (float3){0.0f, 1.0f, 0.0f};
-	rotM.m3 = (float3){0.0f, 0.0f, 1.0f};
-	rotM = RotateX(rotM, angX * (fractal->bulb.power - 1.0f));
-	rotM = RotateY(rotM, angY * (fractal->bulb.power - 1.0f));
-	rotM = RotateZ(rotM, angZ * (fractal->bulb.power - 1.0f));
+	rotM.m1 = (REAL3){1.0, 0.0, 0.0};
+	rotM.m2 = (REAL3){0.0, 1.0, 0.0};
+	rotM.m3 = (REAL3){0.0, 0.0, 1.0};
+	rotM = RotateX(rotM, angX * (fractal->bulb.power - 1.0));
+	rotM = RotateY(rotM, angY * (fractal->bulb.power - 1.0));
+	rotM = RotateZ(rotM, angZ * (fractal->bulb.power - 1.0));
 
 	z = Matrix33MulFloat4(rotM, z) * rp;
 	return z;

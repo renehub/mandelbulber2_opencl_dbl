@@ -21,40 +21,40 @@ REAL4 RiemannSphereHoboldPow4Iteration(REAL4 z, __global sFractalCl *fractal, sE
 			 / aux->r; // normalize vector to unit length => project onto sphere
 
 	// find X-related iso-plane: polar projection onto unit circle
-	REAL Kx = 2.0f * z.x * (1.0f - z.y) / ((z.y - 2.0f) * z.y + z.x * z.x + 1.0f);
-	REAL Ky = 1.0f - 2.0f * ((z.y - 2.0f) * z.y + 1.0f) / ((z.y - 2.0f) * z.y + z.x * z.x + 1.0f);
+	REAL Kx = 2.0 * z.x * (1.0 - z.y) / ((z.y - 2.0) * z.y + z.x * z.x + 1.0);
+	REAL Ky = 1.0 - 2.0 * ((z.y - 2.0) * z.y + 1.0) / ((z.y - 2.0) * z.y + z.x * z.x + 1.0);
 
 	// REALd point
-	REAL K2x = -2.0f * Kx * Ky;
+	REAL K2x = -2.0 * Kx * Ky;
 	REAL K2y = -(Ky * Ky - Kx * Kx);
 
 	// one more doublings (for total power four)
-	Kx = -2.0f * K2x * K2y;
+	Kx = -2.0 * K2x * K2y;
 	Ky = -(K2y * K2y - K2x * K2x);
-	// K2x = -2.0f * Kx * Ky;
+	// K2x = -2.0 * Kx * Ky;
 	// K2y = -(Ky * Ky - Kx * Kx);
 
 	// (relevant) normal vector coordinates of REALd point plane
-	REAL n1x = Ky - 1.0f;
+	REAL n1x = Ky - 1.0;
 	REAL n1y = -Kx;
 
 	n1x += fractal->transformCommon.offsetA0; // offset tweak
 
 	// find Z-related iso-plane: polar projection onto unit circle
-	REAL Kz = 2.0f * z.z * (1.0f - z.y) / ((z.y - 2.0f) * z.y + z.z * z.z + 1.0f);
-	Ky = 1.0f - 2.0f * ((z.y - 2.0f) * z.y + 1.0f) / ((z.y - 2.0f) * z.y + z.z * z.z + 1.0f);
+	REAL Kz = 2.0 * z.z * (1.0 - z.y) / ((z.y - 2.0) * z.y + z.z * z.z + 1.0);
+	Ky = 1.0 - 2.0 * ((z.y - 2.0) * z.y + 1.0) / ((z.y - 2.0) * z.y + z.z * z.z + 1.0);
 
 	// REALd point
-	REAL K2z = -2.0f * Kz * Ky;
+	REAL K2z = -2.0 * Kz * Ky;
 	K2y = -(Ky * Ky - Kz * Kz);
 
 	// one more doublings (for total power four)
-	Kz = -2.0f * K2z * K2y;
+	Kz = -2.0 * K2z * K2y;
 	Ky = -(K2y * K2y - K2z * K2z);
 
 	// (relevant) normal vector coordinates of REALd point plane
 	REAL n2y = -Kz;
-	REAL n2z = Ky - 1.0f;
+	REAL n2z = Ky - 1.0;
 
 	n2z += fractal->transformCommon.offsetB0; // offset tweak
 
@@ -71,12 +71,12 @@ REAL4 RiemannSphereHoboldPow4Iteration(REAL4 z, __global sFractalCl *fractal, sE
 	// compute position of REALd point as intersection of planes and sphere
 	// solved ray parameter
 	REAL nt =
-		2.0f * (n1x * n1x * n2z * n2z) / ((n1x * n1x + n1y * n1y) * n2z * n2z + n1x * n1x * n2y * n2y);
+		2.0 * (n1x * n1x * n2z * n2z) / ((n1x * n1x + n1y * n1y) * n2z * n2z + n1x * n1x * n2y * n2y);
 
 	// REALd point position
-	z.y = 1.0f - nt;
-	z.x = n1y * (1.0f - z.y) / n1x;
-	z.z = n2y * (1.0f - z.y) / n2z;
+	z.y = 1.0 - nt;
+	z.x = n1y * (1.0 - z.y) / n1x;
+	z.z = n2y * (1.0 - z.y) / n2z;
 
 	// raise original length to the power, then add constant
 	z *= aux->r * aux->r; // for 4th power
@@ -89,7 +89,7 @@ REAL4 RiemannSphereHoboldPow4Iteration(REAL4 z, __global sFractalCl *fractal, sE
 	{
 		aux->DE =
 			fractal->analyticDE.offset1 + aux->DE * fabs(fractal->transformCommon.scale08) / aux->r;
-		aux->DE *= 4.0f * fractal->analyticDE.scale1 * length(z) / aux->r;
+		aux->DE *= 4.0 * fractal->analyticDE.scale1 * length(z) / aux->r;
 	}
 	return z;
 }

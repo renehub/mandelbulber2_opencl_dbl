@@ -43,7 +43,7 @@ REAL4 TransfDIFSTorusV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 		}
 	}
-	if (fractal->transformCommon.angleDegA != 0.0f)
+	if (fractal->transformCommon.angleDegA != 0.0)
 	{
 		REAL s = fractal->transformCommon.sinA;
 		REAL c = fractal->transformCommon.cosA;
@@ -86,7 +86,7 @@ REAL4 TransfDIFSTorusV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 	if (fractal->transformCommon.functionEnabledCFalse)
 	{
-		T1 = max(fabs(T1) - fractal->transformCommon.offset0005, 0.0f);
+		T1 = max(fabs(T1) - fractal->transformCommon.offset0005, 0.0);
 	}
 	REAL torD = max(T1, -z.y);
 

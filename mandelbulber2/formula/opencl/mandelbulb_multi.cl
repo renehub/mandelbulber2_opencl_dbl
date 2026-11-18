@@ -37,10 +37,10 @@ REAL4 MandelbulbMultiIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		case multi_OrderOfXYZCl_zxy: v = (REAL4){z.z, z.x, z.y, z.w}; break;
 		case multi_OrderOfXYZCl_zyx: v = (REAL4){z.z, z.y, z.x, z.w}; break;
 	}
-	// if (aux->r < 1e-21f)
-	//	aux->r = 1e-21f;
-	// if (v3 < 1e-21f && v3 > -1e-21f)
-	//	v3 = (v3 > 0) ? 1e-21f : -1e-21f;
+	// if (aux->r < 1e-21)
+	//	aux->r = 1e-21;
+	// if (v3 < 1e-21 && v3 > -1e-21)
+	//	v3 = (v3 > 0) ? 1e-21 : -1e-21;
 
 	if (fractal->mandelbulbMulti.acosOrAsin == multi_acosOrAsinCl_acos)
 		th0 += acos(v.x / aux->r);
@@ -52,11 +52,11 @@ REAL4 MandelbulbMultiIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	else
 		ph0 += atan2(v.y, v.z);
 
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
+	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
 	REAL th = th0 * fractal->bulb.power * fractal->transformCommon.scaleA1;
 	REAL ph = ph0 * fractal->bulb.power * fractal->transformCommon.scaleB1;
 
-	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0f;
+	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 	rp *= aux->r;
 
 	if (fractal->transformCommon.functionEnabledxFalse)
@@ -64,14 +64,14 @@ REAL4 MandelbulbMultiIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		REAL sinth = th;
 		if (fractal->transformCommon.functionEnabledyFalse) sinth = th0;
 		sinth = native_sin(sinth);
-		z = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0f};
+		z = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0};
 	}
 	else
 	{ // sine mode ( default = V2.07))
 		REAL costh = th;
 		if (fractal->transformCommon.functionEnabledzFalse) costh = th0;
 		costh = native_cos(costh);
-		z = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0f};
+		z = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0};
 	}
 
 	if (fractal->transformCommon.addCpixelEnabledFalse)

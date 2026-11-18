@@ -26,13 +26,13 @@ REAL4 MandelbulbTailsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	}
 	else
 	{
-		th = acos(th) * (1.0f - fractal->transformCommon.scale1)
+		th = acos(th) * (1.0 - fractal->transformCommon.scale1)
 				 + asin(th) * fractal->transformCommon.scale1;
 	}
 	th = (th + fractal->bulb.betaAngleOffset) * fractal->bulb.power;
 	REAL ph = (atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset) * fractal->bulb.power;
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
-	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0f;
+	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
+	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 	rp *= aux->r;
 	REAL cth = native_cos(th);
 	z.x = cth * native_cos(ph) * rp;
@@ -51,15 +51,15 @@ REAL4 MandelbulbTailsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	REAL4 t = z;
 	REAL temp;
 	if (!fractal->transformCommon.functionEnabledFalse)
-		temp = 1.0f / dot(t, t);
+		temp = 1.0 / dot(t, t);
 	else
-		temp = 1.0f / length(t);
+		temp = 1.0 / length(t);
 	t.x = -t.x;
 	//	t.y = t.y;
 	t.z = -t.z;
 	REAL4 g = fractal->transformCommon.scale3D111;
 	t *= g * temp;
-	aux->DE += 1.0f / aux->DE;
+	aux->DE += 1.0 / aux->DE;
 	// puting z, 1/z and C together.
 	z = (z + t) * fractal->transformCommon.scaleB1;
 	aux->DE *= fractal->transformCommon.scaleB1;
@@ -72,10 +72,10 @@ REAL4 MandelbulbTailsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	if (fractal->transformCommon.functionEnabledCFalse)
 	{
 		aux->DE0 = length(z);
-		if (aux->DE0 > 1.0f)
-			aux->DE0 = 0.5f * log(aux->DE0) * aux->DE0 / aux->DE;
+		if (aux->DE0 > 1.0)
+			aux->DE0 = 0.5 * log(aux->DE0) * aux->DE0 / aux->DE;
 		else
-			aux->DE0 = 0.01f; // 0.0f artifacts in openCL
+			aux->DE0 = 0.01; // 0.0 artifacts in openCL
 
 		if (aux->i >= fractal->transformCommon.startIterationsO
 				&& aux->i < fractal->transformCommon.stopIterationsO)

@@ -27,7 +27,7 @@ REAL4 KnotV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	REAL4 zc = z;
 	zc.z *= fractal->transformCommon.scaleA1;
 	REAL mobius =
-		(1.0f * fractal->transformCommon.intA1 + fractal->transformCommon.intB1 / polyfoldOrder)
+		(1.0 * fractal->transformCommon.intA1 + fractal->transformCommon.intB1 / polyfoldOrder)
 		* atan2(zc.y, zc.x);
 
 	zc.x = native_sqrt(zc.x * zc.x + zc.y * zc.y) - fractal->transformCommon.offsetA2;
@@ -37,8 +37,8 @@ REAL4 KnotV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	zc.x = c * zc.x + s * zc.z;
 	zc.z = -s * temp + c * zc.z;
 
-	REAL m = 1.0f * polyfoldOrder * M_PI_2x_INV_F;
-	REAL angle1 = floor(0.5f + m * (M_PI_2_F - atan2(zc.x, zc.z))) / m;
+	REAL m = 1.0 * polyfoldOrder * M_PI_2x_INV_F;
+	REAL angle1 = floor(0.5 + m * (M_PI_2_F - atan2(zc.x, zc.z))) / m;
 
 	temp = zc.x;
 	c = native_cos(angle1);
@@ -66,10 +66,10 @@ REAL4 KnotV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	// aux->color
 	if (fractal->foldColor.auxColorEnabled)
 	{
-		REAL colorAdd = 0.0f;
-		REAL ang = (M_PI_F - 2.0f * fabs(atan(zc.x / zc.z))) * 2.0f / M_PI_F;
+		REAL colorAdd = 0.0;
+		REAL ang = (M_PI_F - 2.0 * fabs(atan(zc.x / zc.z))) * 2.0 / M_PI_F;
 
-		if (fmod(ang, 2.0f) < 1.0f) colorAdd += fractal->foldColor.difs0000.x;
+		if (fmod(ang, 2.0) < 1.0) colorAdd += fractal->foldColor.difs0000.x;
 		colorAdd += fractal->foldColor.difs0000.y * fabs(ang);
 		colorAdd += fractal->foldColor.difs0000.z * fabs(ang * zc.x);
 		colorAdd += fractal->foldColor.difs0000.w * angle1;

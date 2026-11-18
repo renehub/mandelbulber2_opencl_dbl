@@ -34,25 +34,25 @@
 
 #ifdef USE_FRACTAL_COLORING
 
-cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float colorMin,
+REAL CalculateColorIndex(bool isHybrid, REAL r, REAL4 z, REAL colorMin,
 	const sExtendedAuxCl *extendedAux, __global sFractalColoringCl *fractalColoring,
 	cl_int coloringFunction, __global sFractalCl *defaultFractal)
 {
-	float colorIndex = 0.0f;
+	REAL colorIndex = 0.0;
 	// color by numbers
 
 	if (fractalColoring->extraColorEnabledFalse)
 	{
 #ifdef USE_EXTRA_COLORING
-		float colorValue = 0.0f;
+		REAL colorValue = 0.0;
 		// initial color value
 		colorValue = fractalColoring->initialColorValue;
 
 		// colorValue initial condition components
 		if (fractalColoring->initCondFalse)
 		{
-			float initColorValue = 0.0f;
-			float3 xyzC = (float3){extendedAux->c.x, extendedAux->c.y, extendedAux->c.z};
+			REAL initColorValue = 0.0;
+			REAL3 xyzC = (REAL3){extendedAux->c.x, extendedAux->c.y, extendedAux->c.z};
 			if (fractalColoring->icRadFalse) initColorValue = length(xyzC) * fractalColoring->icRadWeight;
 
 			if (fractalColoring->icXYZFalse)
@@ -86,8 +86,8 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 		// radius components (historic)
 		if (fractalColoring->radFalse)
 		{
-			float rad = r;
-			if (fractalColoring->radDiv1e13False) rad /= 1e13f;
+			REAL rad = r;
+			if (fractalColoring->radDiv1e13False) rad /= 1e13;
 			if (fractalColoring->radSquaredFalse) rad *= rad;
 			colorValue += rad * fractalColoring->radWeight;
 		}
@@ -95,8 +95,8 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 		// radius / DE components (historic)
 		if (fractalColoring->radDivDeFalse)
 		{
-			float distEst = extendedAux->DE;
-			float radDE = r;
+			REAL distEst = extendedAux->DE;
+			REAL radDE = r;
 			if (fractalColoring->radDivDE1e13False) radDE /= 1e13;
 			if (fractalColoring->radDivDeSquaredFalse) radDE *= radDE;
 			radDE /= distEst;
@@ -104,13 +104,13 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 			colorValue += radDE * fractalColoring->radDivDeWeight;
 		}
 
-		float addValue = 0.0f;
+		REAL addValue = 0.0;
 		// XYZ bias (example of a basic input)
-		float xyzValue = 0.0f;
+		REAL xyzValue = 0.0;
 		if (fractalColoring->xyzBiasEnabledFalse)
 		{
-			float3 xyzAxis = (float3){z.x, z.y, z.z};
-			if (fractalColoring->xyzDiv1e13False) xyzAxis /= 1e13f; // mult rounding error ?
+			REAL3 xyzAxis = (REAL3){z.x, z.y, z.z};
+			if (fractalColoring->xyzDiv1e13False) xyzAxis /= 1e13; // mult rounding error ?
 
 			if (fractalColoring->xyzFabsFalse)
 			{
@@ -125,7 +125,7 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 			if (fractalColoring->xyzZSqrdFalse) xyzAxis.z *= xyzAxis.z;
 
 			xyzValue = (xyzAxis.x + xyzAxis.y + xyzAxis.z)
-								 * (1.0f + (fractalColoring->xyzIterScale * extendedAux->i));
+								 * (1.0 + (fractalColoring->xyzIterScale * extendedAux->i));
 		}
 
 		addValue += xyzValue; // addValue accumulates outputs
@@ -145,7 +145,7 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 			if (fractalColoring->iterScaleFalse && extendedAux->i >= fractalColoring->iStartValue)
 			{
 				int iUse = extendedAux->i - fractalColoring->iStartValue;
-				colorValue *= (iUse * fractalColoring->iterScale) + 1.0f;
+				colorValue *= (iUse * fractalColoring->iterScale) + 1.0;
 			}
 		}
 
@@ -158,9 +158,9 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 				if (colorValue > fractalColoring->addStartValue)
 				{
 					colorValue +=
-						(1.0f
-							- 1.0f
-									/ (1.0f
+						(1.0
+							- 1.0
+									/ (1.0
 										 + (colorValue - fractalColoring->addStartValue) / fractalColoring->addSpread))
 						* fractalColoring->addMax;
 				}
@@ -171,7 +171,7 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 			{
 				if (colorValue > fractalColoring->parabStartValue)
 				{
-					float parab = colorValue - fractalColoring->cosStartValue;
+					REAL parab = colorValue - fractalColoring->cosStartValue;
 					parab = parab * parab * fractalColoring->parabScale;
 					colorValue += parab;
 				}
@@ -182,10 +182,10 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 			{
 				if (colorValue > fractalColoring->cosStartValue)
 				{
-					float trig = (0.5f
-												 - 0.5f
+					REAL trig = (0.5
+												 - 0.5
 														 * cos((colorValue - fractalColoring->cosStartValue) * M_PI_F
-																	 / (fractalColoring->cosPeriod * 2.0f)))
+																	 / (fractalColoring->cosPeriod * 2.0)))
 											 * fractalColoring->cosAdd;
 					colorValue += trig;
 				}
@@ -194,19 +194,19 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 			// round function
 			if (fractalColoring->roundEnabledFalse)
 			{
-				float roundScale = fractalColoring->roundScale;
+				REAL roundScale = fractalColoring->roundScale;
 				colorValue /= roundScale;
 				colorValue = round(colorValue) * roundScale;
 			}
 		}
 
 		// palette max min controls
-		float minCV = fractalColoring->minColorValue;
-		float maxCV = fractalColoring->maxColorValue;
+		REAL minCV = fractalColoring->minColorValue;
+		REAL maxCV = fractalColoring->maxColorValue;
 		if (colorValue < minCV) colorValue = minCV;
 		if (colorValue > maxCV) colorValue = maxCV;
 
-		colorIndex = colorValue * 256.0f; // convert to colorValue units
+		colorIndex = colorValue * 256.0; // convert to colorValue units
 
 #endif
 	}
@@ -215,25 +215,25 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 	else if (isHybrid)
 	{
 		// orbit trap
-		colorMin = min(100.0f, colorMin);
+		colorMin = min(100.0, colorMin);
 
 		// aux.color
-		float mboxColor = extendedAux->color;
-		// float mboxColor = min(extendedAux->color, 1000.0f);
+		REAL mboxColor = extendedAux->color;
+		// REAL mboxColor = min(extendedAux->color, 1000.0);
 
 		// rad/DE
-		float r2 = min(r / fabs(extendedAux->DE), 20.0f);
+		REAL r2 = min(r / fabs(extendedAux->DE), 20.0);
 
 		// summation
 		if (!fractalColoring->extraColorOptionsEnabledFalse)
 		{
-			colorIndex = (colorMin * 1000.0f + mboxColor * 100.0f + r2 * 5000.0f);
+			colorIndex = (colorMin * 1000.0 + mboxColor * 100.0 + r2 * 5000.0);
 		}
 		else
 		{
-			colorIndex = (colorMin * 1000.0f * fractalColoring->hybridOrbitTrapScale1
-										+ mboxColor * 100.0f * fractalColoring->hybridAuxColorScale1
-										+ r2 * 5000.0f * fractalColoring->hybridRadDivDeScale1);
+			colorIndex = (colorMin * 1000.0 * fractalColoring->hybridOrbitTrapScale1
+										+ mboxColor * 100.0 * fractalColoring->hybridAuxColorScale1
+										+ r2 * 5000.0 * fractalColoring->hybridRadDivDeScale1);
 		}
 	}
 
@@ -246,19 +246,19 @@ cl_float CalculateColorIndex(bool isHybrid, cl_float r, cl_float4 z, cl_float co
 			case clColoringFunctionABox:
 			{
 				colorIndex =
-					extendedAux->color * 100.0f													 // folds part
+					extendedAux->color * 100.0													 // folds part
 					+ r * defaultFractal->mandelbox.color.factorR / 1e13 // abs z part
-					+ ((fractalColoring->coloringAlgorithm != fractalColoringCl_Standard) ? colorMin * 1000.0f
-																																								: 0.0f);
+					+ ((fractalColoring->coloringAlgorithm != fractalColoringCl_Standard) ? colorMin * 1000.0
+																																								: 0.0);
 				break;
 			}
-			case clColoringFunctionIFS: colorIndex = colorMin * 1000.0f; break;
-			case clColoringFunctionAmazingSurf: colorIndex = colorMin * 200.0f; break;
+			case clColoringFunctionIFS: colorIndex = colorMin * 1000.0; break;
+			case clColoringFunctionAmazingSurf: colorIndex = colorMin * 200.0; break;
 			case clColoringFunctionDonut:
-				colorIndex = extendedAux->color * 2000.0f / extendedAux->i;
+				colorIndex = extendedAux->color * 2000.0 / extendedAux->i;
 				break;
-			case clColoringFunctionDefault: colorIndex = colorMin * 5000.0f; break;
-			case clColoringFunctionUndefined: colorIndex = 0.0f; break;
+			case clColoringFunctionDefault: colorIndex = colorMin * 5000.0; break;
+			case clColoringFunctionUndefined: colorIndex = 0.0; break;
 		}
 	}
 

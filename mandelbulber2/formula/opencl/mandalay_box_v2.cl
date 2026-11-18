@@ -16,8 +16,8 @@
 
 REAL4 MandalayBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 
 	// tglad fold
 	if (fractal->transformCommon.functionEnabledAFalse
@@ -65,8 +65,8 @@ REAL4 MandalayBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		p.y = p.z;
 		p.z = temp;
 	}
-	t1 = p.x - 2.0f * fo.x;
-	t2 = p.y - 4.0f * fo.x;
+	t1 = p.x - 2.0 * fo.x;
+	t2 = p.y - 4.0 * fo.x;
 	v = max(fabs(t1 + fo.x) - fo.x, t2);
 	v1 = max(t1 - g.x, p.y);
 	v = min(v, v1);
@@ -83,8 +83,8 @@ REAL4 MandalayBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		p.z = p.x;
 		p.x = temp;
 	}
-	t1 = p.y - 2.0f * fo.y;
-	t2 = p.z - 4.0f * fo.y;
+	t1 = p.y - 2.0 * fo.y;
+	t2 = p.z - 4.0 * fo.y;
 	v = max(fabs(t1 + fo.y) - fo.y, t2);
 	v1 = max(t1 - g.y, p.z);
 	v = min(v, v1);
@@ -101,8 +101,8 @@ REAL4 MandalayBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		p.x = p.y;
 		p.y = temp;
 	}
-	t1 = p.z - 2.0f * fo.z;
-	t2 = p.x - 4.0f * fo.z;
+	t1 = p.z - 2.0 * fo.z;
+	t2 = p.x - 4.0 * fo.z;
 	v = max(fabs(t1 + fo.z) - fo.z, t2);
 	v1 = max(t1 - g.z, p.x);
 	v = min(v, v1);
@@ -115,7 +115,7 @@ REAL4 MandalayBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	z.z *= signZ;
 
 	// spherical fold
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
@@ -139,7 +139,7 @@ REAL4 MandalayBoxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	// scale
 	useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 	z *= useScale;
-	aux->DE = aux->DE * fabs(useScale) + 1.0f;
+	aux->DE = aux->DE * fabs(useScale) + 1.0;
 
 	if (fractal->transformCommon.functionEnabledKFalse
 			&& aux->i >= fractal->transformCommon.startIterationsK

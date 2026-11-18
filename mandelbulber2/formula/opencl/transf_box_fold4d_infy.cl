@@ -25,22 +25,22 @@ REAL4 TransfBoxFold4dInfyIteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 	if (!fractal->transformCommon.functionEnabledFalse)
 	{
-		if (fractal->transformCommon.functionEnabledx && size.x != 0.0f)
+		if (fractal->transformCommon.functionEnabledx && size.x != 0.0)
 		{
 			z.x -= round(z.x / m.x) * m.x;
 			z.x = fabs(z.x + size.x) - fabs(z.x - size.x) - z.x;
 		}
-		if (fractal->transformCommon.functionEnabledyFalse && size.y != 0.0f)
+		if (fractal->transformCommon.functionEnabledyFalse && size.y != 0.0)
 		{
 			z.y -= round(z.y / m.y) * m.y;
 			z.y = fabs(z.y + size.y) - fabs(z.y - size.y) - z.y;
 		}
-		if (fractal->transformCommon.functionEnabledzFalse && size.z != 0.0f)
+		if (fractal->transformCommon.functionEnabledzFalse && size.z != 0.0)
 		{
 			z.z -= round(z.z / m.z) * m.z;
 			z.z = fabs(z.z + size.z) - fabs(z.z - size.z) - z.z;
 		}
-		if (fractal->transformCommon.functionEnabledwFalse && size.w != 0.0f)
+		if (fractal->transformCommon.functionEnabledwFalse && size.w != 0.0)
 		{
 			z.w -= round(z.w / m.w) * m.w;
 			z.w = fabs(z.w + size.w) - fabs(z.w - size.w) - z.w;
@@ -48,32 +48,32 @@ REAL4 TransfBoxFold4dInfyIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	}
 	else
 	{
-		REAL4 repeatPos = fractal->transformCommon.offsetA1111 * 0.5f;
-		REAL4 repeatNeg = fractal->transformCommon.offsetB1111 * 0.5f;
+		REAL4 repeatPos = fractal->transformCommon.offsetA1111 * 0.5;
+		REAL4 repeatNeg = fractal->transformCommon.offsetB1111 * 0.5;
 
-		if (fractal->transformCommon.functionEnabledx && (z.x < (repeatPos.x + 0.5f) * m.x - size.x)
-				&& (z.x > (repeatNeg.x + 0.5f) * -m.x + size.x) && (size.x != 0.0f))
+		if (fractal->transformCommon.functionEnabledx && (z.x < (repeatPos.x + 0.5) * m.x - size.x)
+				&& (z.x > (repeatNeg.x + 0.5) * -m.x + size.x) && (size.x != 0.0))
 		{
 			z.x -= round(z.x / m.x) * m.x;
 			z.x = fabs(z.x + size.x) - fabs(z.x - size.x) - z.x;
 		}
 		if (fractal->transformCommon.functionEnabledyFalse
-				&& (z.y < (repeatPos.y + 0.5f) * m.y - size.y)
-				&& (z.y > (repeatNeg.y + 0.5f) * -m.y + size.y) && (size.y != 0.0f))
+				&& (z.y < (repeatPos.y + 0.5) * m.y - size.y)
+				&& (z.y > (repeatNeg.y + 0.5) * -m.y + size.y) && (size.y != 0.0))
 		{
 			z.y -= round(z.y / m.y) * m.y;
 			z.y = fabs(z.y + size.y) - fabs(z.y - size.y) - z.y;
 		}
 		if (fractal->transformCommon.functionEnabledzFalse
-				&& (z.z < (repeatPos.z + 0.5f) * m.z - size.z)
-				&& (z.z > (repeatNeg.z + 0.5f) * -m.z + size.z) && (size.z != 0.0f))
+				&& (z.z < (repeatPos.z + 0.5) * m.z - size.z)
+				&& (z.z > (repeatNeg.z + 0.5) * -m.z + size.z) && (size.z != 0.0))
 		{
 			z.z -= round(z.z / m.z) * m.z;
 			z.z = fabs(z.z + size.z) - fabs(z.z - size.z) - z.z;
 		}
 		if (fractal->transformCommon.functionEnabledwFalse
-				&& (z.w < (repeatPos.w + 0.5f) * m.w - size.w)
-				&& (z.w > (repeatNeg.w + 0.5f) * -m.w + size.w) && size.w != 0.0f)
+				&& (z.w < (repeatPos.w + 0.5) * m.w - size.w)
+				&& (z.w > (repeatNeg.w + 0.5) * -m.w + size.w) && size.w != 0.0)
 		{
 			z.w -= round(z.w / m.w) * m.w;
 			z.w = fabs(z.w + size.w) - fabs(z.w - size.w) - z.w;

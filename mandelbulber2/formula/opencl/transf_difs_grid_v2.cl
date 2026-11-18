@@ -19,7 +19,7 @@ REAL4 TransfDIFSGridV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	REAL4 zc = z;
 
 	REAL size = fractal->transformCommon.scale1;
-	REAL grid = 0.0f;
+	REAL grid = 0.0;
 
 	zc.z /= fractal->transformCommon.scaleF1;
 
@@ -66,8 +66,8 @@ REAL4 TransfDIFSGridV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		zc = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, zc);
 	}
 
-	REAL xFloor = fabs(zc.x - size * floor(zc.x / size + 0.5f));
-	REAL yFloor = fabs(zc.y - size * floor(zc.y / size + 0.5f));
+	REAL xFloor = fabs(zc.x - size * floor(zc.x / size + 0.5));
+	REAL yFloor = fabs(zc.y - size * floor(zc.y / size + 0.5));
 	REAL gridXY = min(xFloor, yFloor);
 
 	if (!fractal->transformCommon.functionEnabledJFalse)
@@ -76,7 +76,7 @@ REAL4 TransfDIFSGridV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		grid = max(fabs(gridXY), fabs(zc.z));
 
 	REAL colDist = aux->dist;
-	aux->dist = min(aux->dist, (grid - fractal->transformCommon.offset0005) / (aux->DE + 1.0f));
+	aux->dist = min(aux->dist, (grid - fractal->transformCommon.offset0005) / (aux->DE + 1.0));
 
 	if (fractal->foldColor.auxColorEnabledFalse && colDist != aux->dist
 			&& aux->i >= fractal->foldColor.startIterationsA

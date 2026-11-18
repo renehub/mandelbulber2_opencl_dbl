@@ -18,7 +18,7 @@ REAL4 MengerMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 {
 	z = fabs(z);
 	REAL temp;
-	REAL col = 0.0f;
+	REAL col = 0.0;
 	if (z.x < z.y)
 	{
 		temp = z.y;
@@ -46,9 +46,9 @@ REAL4 MengerMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		aux->color += col;
 	}
 	z *= fractal->transformCommon.scale3;
-	z.x -= 2.0f * fractal->transformCommon.constantMultiplier111.x;
-	z.y -= 2.0f * fractal->transformCommon.constantMultiplier111.y;
-	if (z.z > 1.0f) z.z -= 2.0f * fractal->transformCommon.constantMultiplier111.z;
+	z.x -= 2.0 * fractal->transformCommon.constantMultiplier111.x;
+	z.y -= 2.0 * fractal->transformCommon.constantMultiplier111.y;
+	if (z.z > 1.0) z.z -= 2.0 * fractal->transformCommon.constantMultiplier111.z;
 
 	aux->DE *= fractal->transformCommon.scale3;
 
@@ -73,9 +73,9 @@ REAL4 MengerMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		if (fractal->transformCommon.functionEnabledAFalse)
 		{
 			REAL tempL = length(zCopy);
-			// if (tempL < 1e-21f) tempL = 1e-21f;
+			// if (tempL < 1e-21) tempL = 1e-21;
 			REAL avgScale = length(z) / tempL;
-			aux->DE = aux->DE * avgScale + 1.0f;
+			aux->DE = aux->DE * avgScale + 1.0;
 		}
 	}
 

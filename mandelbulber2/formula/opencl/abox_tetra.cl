@@ -23,8 +23,8 @@
 REAL4 AboxTetraIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
-	REAL m = 1.0f;
+	REAL colorAdd = 0.0;
+	REAL m = 1.0;
 
 	z += fractal->transformCommon.additionConstantA000;
 	if (fractal->transformCommon.functionEnabledx) z.x = fabs(z.x);
@@ -35,20 +35,20 @@ REAL4 AboxTetraIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			&& aux->i >= fractal->transformCommon.startIterationsE
 			&& aux->i < fractal->transformCommon.stopIterationsE)
 	{
-		REAL temp = 0.0f;
-		if (z.x + z.y < 0.0f)
+		REAL temp = 0.0;
+		if (z.x + z.y < 0.0)
 		{
 			temp = -z.y;
 			z.y = -z.x;
 			z.x = temp;
 		}
-		if (z.x + z.z < 0.0f)
+		if (z.x + z.z < 0.0)
 		{
 			temp = -z.z;
 			z.z = -z.x;
 			z.x = temp;
 		}
-		if (z.y + z.z < 0.0f)
+		if (z.y + z.z < 0.0)
 		{
 			temp = -z.z;
 			z.z = -z.y;
@@ -59,19 +59,19 @@ REAL4 AboxTetraIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			&& aux->i >= fractal->transformCommon.startIterationsF
 			&& aux->i < fractal->transformCommon.stopIterationsF)
 	{
-		if (z.x - z.y < 0.0f)
+		if (z.x - z.y < 0.0)
 		{
 			REAL temp = z.y;
 			z.y = z.x;
 			z.x = temp;
 		}
-		if (z.x - z.z < 0.0f)
+		if (z.x - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.x;
 			z.x = temp;
 		}
-		if (z.y - z.z < 0.0f)
+		if (z.y - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.y;
@@ -99,9 +99,9 @@ REAL4 AboxTetraIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 				&& aux->i < fractal->transformCommon.stopIterationsD1)
 		{
 			REAL4 limit = fractal->transformCommon.additionConstant111;
-			REAL4 length = 2.0f * limit;
-			REAL4 tgladS = 1.0f / length;
-			REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+			REAL4 length = 2.0 * limit;
+			REAL4 tgladS = 1.0 / length;
+			REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 			if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 			if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;
 			if (fabs(z.z) < limit.z) Add.z = z.z * z.z * tgladS.z;
@@ -128,7 +128,7 @@ REAL4 AboxTetraIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		if (rr < fractal->transformCommon.invert0)
 			m = fractal->transformCommon.inv0;
 		else if (rr < fractal->transformCommon.invert1)
-			m = 1.0f / rr;
+			m = 1.0 / rr;
 		else
 			m = fractal->transformCommon.inv1;
 		z *= m;
@@ -163,10 +163,10 @@ REAL4 AboxTetraIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		REAL4 offset = aux->pos_neg * fractal->transformCommon.additionConstant000;
 
 		if (fractal->transformCommon.functionEnabledByFalse)
-			offset = (REAL4){sign(z.x), sign(z.y), sign(z.z), 1.0f} * offset;
+			offset = (REAL4){sign(z.x), sign(z.y), sign(z.z), 1.0} * offset;
 
 		if (fractal->transformCommon.functionEnabledBzFalse)
-			offset = (REAL4){sign(c.x), sign(c.y), sign(c.z), 1.0f} * offset;
+			offset = (REAL4){sign(c.x), sign(c.y), sign(c.z), 1.0} * offset;
 
 		z += offset;
 		aux->pos_neg *= fractal->transformCommon.scale1; // update for next iter

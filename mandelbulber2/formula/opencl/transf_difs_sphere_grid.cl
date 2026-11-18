@@ -38,7 +38,7 @@ REAL4 TransfDIFSSphereGridIteration(REAL4 z, __global sFractalCl *fractal, sExte
 
 	zc.x = fabs(zc.x);
 	REAL psi = M_PI_F / fractal->transformCommon.int8Z;
-	psi = fabs(fmod(atan2(zc.x, zc.y) + psi, 2.0f * psi) - psi);
+	psi = fabs(fmod(atan2(zc.x, zc.y) + psi, 2.0 * psi) - psi);
 	REAL len = native_sqrt(zc.y * zc.y + zc.x * zc.x);
 	zc.y = native_cos(psi) * len;
 	zc.x = native_sin(psi) * len;
@@ -64,7 +64,7 @@ REAL4 TransfDIFSSphereGridIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	else
 		T1 = max(fabs(T1), fabs(zc.x)) - fractal->transformCommon.offsetp01;
 
-	REAL T2 = 1000.0f;
+	REAL T2 = 1000.0;
 	if (fractal->transformCommon.functionEnabledMFalse)
 	{
 		T2 = native_sqrt(zc.y * zc.y + zc.x * zc.x) - fractal->transformCommon.offsetR1;
@@ -74,7 +74,7 @@ REAL4 TransfDIFSSphereGridIteration(REAL4 z, __global sFractalCl *fractal, sExte
 			T2 = max(fabs(T2), fabs(zc.z)) - fractal->transformCommon.offsetAp01;
 	}
 
-	REAL T3 = 1000.0f;
+	REAL T3 = 1000.0;
 	if (fractal->transformCommon.functionEnabledOFalse)
 	{
 		REAL z2 = fractal->transformCommon.offset05;

@@ -33,11 +33,11 @@
  */
 
 #ifdef FAKE_LIGHTS
-float3 FakeLightsShader(__constant sClInConstants *consts, sShaderInputDataCl *input,
-	sClCalcParams *calcParams, float3 surfaceColor, sClGradientsCollection *gradients,
-	float3 *specularOut, sRenderData *renderData)
+REAL3 FakeLightsShader(__constant sClInConstants *consts, sShaderInputDataCl *input,
+	sClCalcParams *calcParams, REAL3 surfaceColor, sClGradientsCollection *gradients,
+	REAL3 *specularOut, sRenderData *renderData)
 {
-	float3 fakeLights = 0.0f;
+	REAL3 fakeLights = 0.0;
 
 	int fakeLightMaxLoop = 1;
 	if (consts->params.common.fakeLightsColor2Enabled) fakeLightMaxLoop = 2;
@@ -48,18 +48,18 @@ float3 FakeLightsShader(__constant sClInConstants *consts, sShaderInputDataCl *i
 	// makes the light ignore the object tree transform: the light stays in place when
 	// the object is moved or rotated and only the primary copy of a repeated object
 	// gets lit.
-	float3 lightPoint = GetFractalPoint(input);
+	REAL3 lightPoint = GetFractalPoint(input);
 
 	// Finite differences for the light normal are taken along the local axes, so the
 	// shading normal has to be rotated into the same space (same convention as texture
 	// mapping). The step is also converted to local units by the object scale.
-	float delta = input->distThresh * consts->params.smoothness;
-	float3 shadingNormal = input->normal;
+	REAL delta = input->distThresh * consts->params.smoothness;
+	REAL3 shadingNormal = input->normal;
 	if (input->hasTransformedPoint && input->objectId >= 0
 			&& input->objectId < renderData->numberOfObjects)
 	{
 		__global sObjectDataCl *objectData = &renderData->objectsData[input->objectId];
-		if (objectData->absScale > 0.0f) delta /= objectData->absScale;
+		if (objectData->absScale > 0.0) delta /= objectData->absScale;
 		shadingNormal = Matrix33MulFloat3(TransposeMatrix(objectData->rotationMatrix), input->normal);
 	}
 
@@ -69,56 +69,56 @@ float3 FakeLightsShader(__constant sClInConstants *consts, sShaderInputDataCl *i
 		formulaOut outF;
 		outF = Fractal(consts, lightPoint, calcParams, calcModeOrbitTrap, NULL, -1, renderData, 0,
 			input->transformedPoint, input->hasTransformedPoint);
-		float rr = outF.orbitTrapR;
-		float r = 1.0f / (rr + 1e-20f);
+		REAL rr = outF.orbitTrapR;
+		REAL r = 1.0 / (rr + 1e-20);
 
-		float fakeLight = consts->params.fakeLightsIntensity / r;
+		REAL fakeLight = consts->params.fakeLightsIntensity / r;
 
-		float3 out;
+		REAL3 out;
 		calcParams->distThresh = input->distThresh;
 		calcParams->detailSize = input->delta;
 
 		outF =
-			Fractal(consts, lightPoint + (float3){delta, 0.0f, 0.0f}, calcParams, calcModeOrbitTrap,
+			Fractal(consts, lightPoint + (REAL3){delta, 0.0, 0.0}, calcParams, calcModeOrbitTrap,
 				NULL, -1, renderData, 0, input->transformedPoint, input->hasTransformedPoint);
-		float rx = 1.0f / (outF.orbitTrapR + 1e-30f);
+		REAL rx = 1.0 / (outF.orbitTrapR + 1e-30);
 
 		outF =
-			Fractal(consts, lightPoint + (float3){0.0f, delta, 0.0f}, calcParams, calcModeOrbitTrap,
+			Fractal(consts, lightPoint + (REAL3){0.0, delta, 0.0}, calcParams, calcModeOrbitTrap,
 				NULL, -1, renderData, 0, input->transformedPoint, input->hasTransformedPoint);
-		float ry = 1.0f / (outF.orbitTrapR + 1e-30f);
+		REAL ry = 1.0 / (outF.orbitTrapR + 1e-30);
 
 		outF =
-			Fractal(consts, lightPoint + (float3){0.0f, 0.0f, delta}, calcParams, calcModeOrbitTrap,
+			Fractal(consts, lightPoint + (REAL3){0.0, 0.0, delta}, calcParams, calcModeOrbitTrap,
 				NULL, -1, renderData, 0, input->transformedPoint, input->hasTransformedPoint);
-		float rz = 1.0f / (outF.orbitTrapR + 1e-30f);
+		REAL rz = 1.0 / (outF.orbitTrapR + 1e-30);
 
-		float3 fakeLightNormal;
+		REAL3 fakeLightNormal;
 		fakeLightNormal.x = r - rx;
 		fakeLightNormal.y = r - ry;
 		fakeLightNormal.z = r - rz;
 
 		fakeLightNormal = normalize(fakeLightNormal);
 
-		float fakeLight2 = fakeLight * dot(shadingNormal, fakeLightNormal);
-		if (fakeLight2 < 0.0f) fakeLight2 = 0.0f;
+		REAL fakeLight2 = fakeLight * dot(shadingNormal, fakeLightNormal);
+		if (fakeLight2 < 0.0) fakeLight2 = 0.0;
 
-		float3 color;
+		REAL3 color;
 		switch (fakeLightLoop)
 		{
-			case 0: color = consts->params.fakeLightsColor; break;
-			case 1: color = consts->params.fakeLightsColor2; break;
-			case 2: color = consts->params.fakeLightsColor3; break;
-			default: color = consts->params.fakeLightsColor; break;
+			case 0: color = TO_REAL3(consts->params.fakeLightsColor); break;
+			case 1: color = TO_REAL3(consts->params.fakeLightsColor2); break;
+			case 2: color = TO_REAL3(consts->params.fakeLightsColor3); break;
+			default: color = TO_REAL3(consts->params.fakeLightsColor); break;
 		}
 
 		fakeLights += fakeLight2 * color;
 
-		//	float3 fakeSpec =
+		//	REAL3 fakeSpec =
 		//		SpecularHighlightCombined(input, calcParams, fakeLightNormal, surfaceColor, gradients);
 		//	fakeSpec = fakeSpec * consts->params.fakeLightsColor / r;
 	}
-	float3 fakeSpec = 0.0f; // TODO to check why in CPU code it's zero
+	REAL3 fakeSpec = 0.0; // TODO to check why in CPU code it's zero
 	*specularOut = fakeSpec;
 	return fakeLights;
 }

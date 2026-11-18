@@ -70,7 +70,7 @@ REAL4 TransfMengerFoldV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 		if (!fractal->transformCommon.functionEnabledSwFalse)
 		{
-			REAL sc1 = useScale - 1.0f;
+			REAL sc1 = useScale - 1.0;
 			REAL sc2 = sc1 / useScale;
 			z.z = z.z - fractal->transformCommon.offset1105.z * sc2;
 			z.z = -fabs(z.z) + fractal->transformCommon.offset1105.z * sc2;

@@ -17,12 +17,12 @@ REAL4 TransfDIFSBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 {
 	REAL4 q = fabs(z) - fractal->transformCommon.additionConstant111;
 	REAL4 zc = q;
-	zc.x = max(zc.x, 0.0f);
-	zc.y = max(zc.y, 0.0f);
-	zc.z = max(zc.z, 0.0f);
+	zc.x = max(zc.x, 0.0);
+	zc.y = max(zc.y, 0.0);
+	zc.z = max(zc.z, 0.0);
 	REAL zcd = length(zc);
 	REAL colDist = aux->dist;
-	aux->dist = min(aux->dist, zcd / (aux->DE + 1.0f) - fractal->transformCommon.offsetB0);
+	aux->dist = min(aux->dist, zcd / (aux->DE + 1.0) - fractal->transformCommon.offsetB0);
 
 	if (fractal->foldColor.auxColorEnabledFalse && colDist != aux->dist
 			&& aux->i >= fractal->foldColor.startIterationsA
@@ -36,10 +36,10 @@ REAL4 TransfDIFSBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			if (zc.y > max(zc.x, zc.z)) addCol += fractal->foldColor.difs0000.z;
 			if (zc.z > max(zc.y, zc.x)) addCol += fractal->foldColor.difs0000.w;
 
-			if (fractal->transformCommon.offset0 != 0.0f)
+			if (fractal->transformCommon.offset0 != 0.0)
 			{
 				REAL t = z.x * z.y;
-				if ((t > 0.0f && z.z > 0.0f) || (t < 0.0f && z.z < 0.0f))
+				if ((t > 0.0 && z.z > 0.0) || (t < 0.0 && z.z < 0.0))
 					addCol += fractal->transformCommon.offset0;
 			}
 		}

@@ -33,31 +33,31 @@
  */
 
 #if defined(MONTE_CARLO_DOF_GLOBAL_ILLUMINATION) && defined(FULL_ENGINE)
-float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderData,
+REAL3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParam, image2d_t image2dBackground,
-	float3 objectColor, bool volumetricMode)
+	REAL3 objectColor, bool volumetricMode)
 {
-	float3 out = 0.0f;
+	REAL3 out = 0.0;
 	sShaderInputDataCl inputCopy = *input;
-	float3 objectColorTemp = objectColor;
-	float totalOpacity = 0.0f;
+	REAL3 objectColorTemp = objectColor;
+	REAL totalOpacity = 0.0;
 
 	bool finished = false;
 	int maxDepth = (volumetricMode) ? 2 : consts->params.reflectionsMax;
 
-	float lastReflectance = 0.0f;
-	float3 lastReflectanceColor = 0.0f;
-	float3 lastDirection = 0.0f;
+	REAL lastReflectance = 0.0;
+	REAL3 lastReflectanceColor = 0.0;
+	REAL3 lastDirection = 0.0;
 
 	for (int rayDepth = 0; rayDepth < maxDepth; rayDepth++)
 	{
-		float3 reflectedDirection = inputCopy.normal;
-		float randomX = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0f;
-		float randomY = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0f;
-		float randomZ = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0f;
-		float3 randomVector = (float3){randomX * 1.2f, randomY * 1.2f, randomZ * 1.2f};
+		REAL3 reflectedDirection = inputCopy.normal;
+		REAL randomX = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0;
+		REAL randomY = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0;
+		REAL randomZ = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0;
+		REAL3 randomVector = (REAL3){randomX * 1.2, randomY * 1.2, randomZ * 1.2};
 
-		float3 randomizedDirection;
+		REAL3 randomizedDirection;
 		if (volumetricMode && rayDepth == 0)
 		{
 			randomizedDirection = normalize(randomVector);
@@ -65,12 +65,12 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 		else
 		{
 #if defined(USE_REFLECTANCE) && defined(MC_GI_USE_REFLECTANCE)
-			if (lastReflectance > 0.0f)
+			if (lastReflectance > 0.0)
 			{
-				if (Random(1000, &calcParam->randomSeed) / 1000.0f < lastReflectance)
+				if (Random(1000, &calcParam->randomSeed) / 1000.0 < lastReflectance)
 				{
 					randomizedDirection =
-						lastDirection - 2.0f * dot(lastDirection, inputCopy.normal) * inputCopy.normal;
+						lastDirection - 2.0 * dot(lastDirection, inputCopy.normal) * inputCopy.normal;
 				}
 				else
 				{
@@ -85,19 +85,19 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 		}
 		inputCopy.viewVector = randomizedDirection;
 
-		float dist = 0.0f;
+		REAL dist = 0.0;
 		bool found = false;
 		int objectId = 0;
 
-		float4 resultShader = 0.0f;
-		float3 newColor = objectColor;
+		REAL4 resultShader = 0.0;
+		REAL3 newColor = objectColor;
 
-		for (float scan = inputCopy.distThresh; scan < consts->params.viewDistanceMax;
+		for (REAL scan = inputCopy.distThresh; scan < consts->params.viewDistanceMax;
 			scan += dist * consts->params.DEFactor)
 		{
-			float3 point = inputCopy.point + scan * randomizedDirection;
+			REAL3 point = inputCopy.point + scan * randomizedDirection;
 
-			float distThresh = CalcDistThresh(point, consts);
+			REAL distThresh = CalcDistThresh(point, consts);
 			inputCopy.distThresh = distThresh;
 
 			calcParam->distThresh = distThresh;
@@ -114,7 +114,7 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 
 			if (dist < distThresh)
 			{
-				if (scan < distThresh * 2.0f)
+				if (scan < distThresh * 2.0)
 				{
 					return out;
 				}
@@ -124,7 +124,7 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 				inputCopy.hasTransformedPoint = outF.hasTransformedPoint;
 				inputCopy.objectId = objectId;
 
-				float3 normal = NormalVector(consts, renderData, inputCopy.point, inputCopy.lastDist,
+				REAL3 normal = NormalVector(consts, renderData, inputCopy.point, inputCopy.lastDist,
 					inputCopy.distThresh, inputCopy.invertMode, calcParam);
 				inputCopy.normal = normal;
 				inputCopy.depth = scan;
@@ -136,9 +136,9 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 
 		if (found)
 		{
-			float3 objectColor;
-			float3 specular;
-			float3 iridescence;
+			REAL3 objectColor;
+			REAL3 specular;
+			REAL3 iridescence;
 
 			__global sObjectDataCl *objectData = &renderData->objectsData[inputCopy.objectId];
 			inputCopy.material = renderData->materials[objectData->materialId];
@@ -183,18 +183,18 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 
 #if USE_TEXTURES
 #ifdef USE_COLOR_TEXTURE
-			inputCopy.texColor = TextureShader(consts, calcParam, &inputCopy, renderData, objectData,
-				inputCopy.material->colorTextureIndex, 1.0f);
+			inputCopy.texColor = TO_CL_FLOAT3(TextureShader(consts, calcParam, &inputCopy, renderData, objectData,
+				inputCopy.material->colorTextureIndex, 1.0));
 #endif
 
 #ifdef USE_DIFFUSION_TEXTURE
-			inputCopy.texDiffuse = TextureShader(consts, calcParam, &inputCopy, renderData, objectData,
-				inputCopy.material->diffusionTextureIndex, 1.0f);
+			inputCopy.texDiffuse = TO_CL_FLOAT3(TextureShader(consts, calcParam, &inputCopy, renderData, objectData,
+				inputCopy.material->diffusionTextureIndex, 1.0));
 #endif
 
 #ifdef USE_LUMINOSITY_TEXTURE
-			inputCopy.texLuminosity = TextureShader(consts, calcParam, &inputCopy, renderData, objectData,
-				inputCopy.material->luminosityTextureIndex, 0.0f);
+			inputCopy.texLuminosity = TO_CL_FLOAT3(TextureShader(consts, calcParam, &inputCopy, renderData, objectData,
+				inputCopy.material->luminosityTextureIndex, 0.0));
 #endif
 #endif
 
@@ -204,11 +204,11 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 #endif
 
 			sClGradientsCollection gradients;
-			float alpha = 1.0f;
-			float3 outShadow;
-			float3 outLuminosityEmissive = 0.0;
+			REAL alpha = 1.0;
+			REAL3 outShadow;
+			REAL3 outLuminosityEmissive = 0.0;
 
-			float3 objectShader = ObjectShader(consts, renderData, &inputCopy, calcParam, &objectColor,
+			REAL3 objectShader = ObjectShader(consts, renderData, &inputCopy, calcParam, &objectColor,
 				&specular, &iridescence, &outShadow, &outLuminosityEmissive, &alpha, &gradients);
 
 			newColor = objectColor;
@@ -225,20 +225,20 @@ float3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderD
 			inputCopy.point = inputCopy.point + consts->params.viewDistanceMax * randomizedDirection;
 			inputCopy.depth = consts->params.viewDistanceMax;
 
-			float3 backgroundShader = BackgroundShader(consts, renderData, image2dBackground, &inputCopy);
+			REAL3 backgroundShader = BackgroundShader(consts, renderData, image2dBackground, &inputCopy);
 			resultShader.xyz = backgroundShader;
 			finished = true;
 		}
 
-		float opacityOut = 0.0f;
+		REAL opacityOut = 0.0;
 
 #if defined(MC_GI_VOLUMETRIC) && !defined(MC_GI_FOG_ILLUMINATION)
 		resultShader = VolumetricShader(
 			consts, renderData, &inputCopy, calcParam, image2dBackground, resultShader, &opacityOut);
 #endif
 
-		float influence = clamp(1.0f - totalOpacity, 0.0f, 1.0f);
-		resultShader = clamp(resultShader, 0.0f, consts->params.monteCarloGIRadianceLimit);
+		REAL influence = clamp(1.0 - totalOpacity, 0.0, 1.0);
+		resultShader = clamp(resultShader, 0.0, consts->params.monteCarloGIRadianceLimit);
 		out +=
 			resultShader.xyz * (objectColorTemp + lastReflectance * lastReflectanceColor) * influence;
 

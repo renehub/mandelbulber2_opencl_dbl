@@ -21,7 +21,7 @@ REAL4 MsltoeSym3Mod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i >= fractal->transformCommon.startIterationsJ
 			&& aux->i < fractal->transformCommon.stopIterationsJ)
 	{
-		aux->DE = aux->DE * 2.0f * aux->r;
+		aux->DE = aux->DE * 2.0 * aux->r;
 
 		REAL psi = fractal->transformCommon.int8Y;
 		if (fractal->transformCommon.functionEnabledBFalse
@@ -31,18 +31,18 @@ REAL4 MsltoeSym3Mod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			psi += fractal->transformCommon.int1;
 		}
 		psi = M_PI_F / psi;
-		psi = fabs(fmod(atan2(z.x, z.y) + M_PI_F + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.x, z.y) + M_PI_F + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.y * z.y + z.x * z.x);
 		z.y = native_cos(psi) * len;
 		z.x = native_sin(psi) * len;
 
 		REAL4 z2 = z * z;
 		REAL rr = z2.z + z2.y + z2.x;
-		REAL m = 1.0f - z2.x / rr;
+		REAL m = 1.0 - z2.x / rr;
 		REAL4 temp;
 		temp.z = (z2.z - z2.y) * m * fractal->transformCommon.scaleB1;
-		temp.y = 2.0f * z.z * z.y * m * fractal->transformCommon.scale; // scaling y;
-		temp.x = 2.0f * z.x * native_sqrt(z2.z + z2.y);
+		temp.y = 2.0 * z.z * z.y * m * fractal->transformCommon.scale; // scaling y;
+		temp.x = 2.0 * z.x * native_sqrt(z2.z + z2.y);
 		temp.w = z.w;
 		z = temp - fractal->transformCommon.offset001;
 
@@ -61,8 +61,8 @@ REAL4 MsltoeSym3Mod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			z.z += sign(z.z) * tempFAB.z;
 		}
 		REAL lengthTempZ = -length(z);
-		// if (lengthTempZ > -1e-21f) lengthTempZ = -1e-21f;   //  z is neg.)
-		z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+		// if (lengthTempZ > -1e-21) lengthTempZ = -1e-21;   //  z is neg.)
+		z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 		z *= fractal->transformCommon.scale1;
 		aux->DE *= fabs(fractal->transformCommon.scale1);
 	}
@@ -73,14 +73,14 @@ REAL4 MsltoeSym3Mod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	{
 		REAL4 zz = z * z;
 		REAL leng = native_sqrt(zz.x + zz.y + zz.z); // needed when alternating pwr2s
-		aux->DE = leng * aux->DE * 2.0f + 1.0f;
+		aux->DE = leng * aux->DE * 2.0 + 1.0;
 
-		REAL t = 1.0f;
+		REAL t = 1.0;
 		REAL temp = zz.y + zz.x;
-		if (temp > 0.0f) t = 2.0f * z.z / native_sqrt(temp);
+		if (temp > 0.0) t = 2.0 * z.z / native_sqrt(temp);
 		temp = z.x;
 		z.z = (zz.z - zz.y - zz.x);
-		z.y = (2.0f * t * z.y * temp);
+		z.y = (2.0 * t * z.y * temp);
 		z.x = (t * (zz.y - zz.x));
 		// c.yz swap
 		z.z -= aux->const_c.z * fractal->transformCommon.scaleE1;
@@ -93,18 +93,18 @@ REAL4 MsltoeSym3Mod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i < fractal->transformCommon.stopIterationsA)
 	{
 		aux->r = length(z);
-		aux->DE = aux->DE * 2.0f * aux->r;
-		z = (REAL4){z.x * z.z, z.y * z.z, z.z * z.z - z.y * z.y - z.x * z.x, 0.0f};
+		aux->DE = aux->DE * 2.0 * aux->r;
+		z = (REAL4){z.x * z.z, z.y * z.z, z.z * z.z - z.y * z.y - z.x * z.x, 0.0};
 		if (!fractal->transformCommon.functionEnabledTFalse)
 		{
-			z *= (REAL4){2.0f, 2.0f, 1.0f, 1.0f};
+			z *= (REAL4){2.0, 2.0, 1.0, 1.0};
 			// z.z -= aux->const_c.z * fractal->transformCommon.scaleF1;
 			// z.z -= fractal->transformCommon.offset0;
 		}
 		else
 		{
 			REAL tempL = length(z);
-			z *= (REAL4){2.0f, 2.0f, 1.0f, 1.0f};
+			z *= (REAL4){2.0, 2.0, 1.0, 1.0};
 			REAL avgScale = length(z) / tempL;
 			aux->DE *= avgScale;
 		}
@@ -131,7 +131,7 @@ REAL4 MsltoeSym3Mod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		// last two z lengths
 		if (fractal->transformCommon.functionEnabledPFalse)
 		{
-			REAL lastVec = 0.0f;
+			REAL lastVec = 0.0;
 			REAL4 oldPt = aux->old_z;
 			REAL lastZ = length(oldPt); // aux->old_r;
 			REAL newZ = length(z);

@@ -32,7 +32,7 @@ REAL4 TransfQuaternionFoldIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
 		z *= fractal->transformCommon.constantMultiplier122;
-		aux->DE *= 2.0f;
+		aux->DE *= 2.0;
 	}
 
 	// offset
@@ -79,7 +79,7 @@ REAL4 TransfQuaternionFoldIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	if (fractal->analyticDE.enabledFalse)
 	{
 		aux->r = length(z);
-		aux->dist = 0.5f * log(aux->r) * aux->r / aux->DE;
+		aux->dist = 0.5 * log(aux->r) * aux->r / aux->DE;
 	}
 	return z;
 }

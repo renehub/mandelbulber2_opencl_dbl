@@ -34,23 +34,23 @@
 
 #ifdef AUX_LIGHTS
 
-float3 AuxLightsShader(__constant sClInConstants *consts, sRenderData *renderData,
-	sShaderInputDataCl *input, sClCalcParams *calcParam, float3 surfaceColor,
-	sClGradientsCollection *gradients, float3 *specularOut, float3 *outShadow)
+REAL3 AuxLightsShader(__constant sClInConstants *consts, sRenderData *renderData,
+	sShaderInputDataCl *input, sClCalcParams *calcParam, REAL3 surfaceColor,
+	sClGradientsCollection *gradients, REAL3 *specularOut, REAL3 *outShadow)
 {
 
 	int numberOfLights = renderData->numberOfLights;
 
-	float3 shadeAuxSum = 0.0f;
-	float3 specularAuxSum = 0.0f;
+	REAL3 shadeAuxSum = 0.0;
+	REAL3 specularAuxSum = 0.0;
 	for (int i = 0; i < numberOfLights; i++)
 	{
 		__global sLightCl *light = &renderData->lights[i];
 
 		if (light->enabled)
 		{
-			float3 specularAuxOutTemp;
-			float3 shadeAux = LightShading(consts, renderData, input, calcParam, surfaceColor, light,
+			REAL3 specularAuxOutTemp;
+			REAL3 shadeAux = LightShading(consts, renderData, input, calcParam, surfaceColor, light,
 				gradients, &specularAuxOutTemp, outShadow);
 			shadeAuxSum += shadeAux;
 			specularAuxSum += specularAuxOutTemp;

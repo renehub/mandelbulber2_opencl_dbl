@@ -16,13 +16,13 @@
 
 REAL4 TransfScale4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	useScale = aux->actualScaleA + fractal->transformCommon.scale;
 
 	z *= useScale;
 
 	if (!fractal->analyticDE.enabledFalse)
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 	else
 		aux->DE = aux->DE * fabs(useScale) * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 

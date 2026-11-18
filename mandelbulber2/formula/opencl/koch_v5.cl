@@ -17,8 +17,8 @@
 
 REAL4 KochV5Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL temp = 0.0f;
-	REAL colAdd = 0.0f;
+	REAL temp = 0.0;
+	REAL colAdd = 0.0;
 
 	if (fractal->transformCommon.functionEnabledAx
 			&& aux->i >= fractal->transformCommon.startIterationsCx
@@ -73,7 +73,7 @@ REAL4 KochV5Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int8X;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -201,7 +201,7 @@ REAL4 KochV5Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 				{
 					a = fractal->transformCommon.offsetA0 / (aux->i + 1) * fractal->transformCommon.scaleA1;
 				}
-				REAL4 b = fabs(z) - (REAL4){a, a, a, 0.0f};
+				REAL4 b = fabs(z) - (REAL4){a, a, a, 0.0};
 				d = max(b.x, max(b.y, b.z));
 			}
 			else
@@ -246,7 +246,7 @@ REAL4 KochV5Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 			if (!fractal->transformCommon.functionEnabledEFalse)
 			{
 				c.z -= fractal->transformCommon.offsetB0;
-				REAL4 f = fabs(c) - (REAL4){e, e, e, 0.0f};
+				REAL4 f = fabs(c) - (REAL4){e, e, e, 0.0};
 				if (!fractal->transformCommon.functionEnabledIFalse)
 					e = max(f.x, f.y); // sq
 				else
@@ -256,9 +256,9 @@ REAL4 KochV5Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 			{
 				c.z -= fractal->transformCommon.offsetB0;
 				if (!fractal->transformCommon.functionEnabledIFalse)
-					e = clamp(native_sqrt(c.x * c.x + c.y * c.y) - e, 0.0f, 100.0f); // circle
+					e = clamp(native_sqrt(c.x * c.x + c.y * c.y) - e, 0.0, 100.0); // circle
 				else
-					e = clamp(length(c) - e, 0.0f, 100.0f); // sphere
+					e = clamp(length(c) - e, 0.0, 100.0); // sphere
 			}
 			d = max(d, e);
 		}

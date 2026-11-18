@@ -35,73 +35,74 @@
 #ifdef FULL_ENGINE
 
 #ifdef RAYLEIGH_SCATTERING
-void RayleighScattering(__constant sClInConstants *consts, float3 lightVectorTemp,
-	sShaderInputDataCl *input, float3 *raleighScatteringRGB, float3 *mieScatteringRGB)
+void RayleighScattering(__constant sClInConstants *consts, REAL3 lightVectorTemp,
+	sShaderInputDataCl *input, REAL3 *raleighScatteringRGB, REAL3 *mieScatteringRGB)
 {
-	if (consts->params.rayleighScatteringBlue > 0.0f)
+	if (consts->params.rayleighScatteringBlue > 0.0)
 	{
-		float raleighScattering = (1.0f + pow(dot(lightVectorTemp, input->viewVector), 2.0f))
+		REAL raleighScattering = (1.0 + pow(dot(lightVectorTemp, input->viewVector), 2.0))
 															* consts->params.rayleighScatteringBlue;
-		raleighScatteringRGB->s0 = 1.0f;
-		raleighScatteringRGB->s1 = (1.0f + 0.2f * raleighScattering);
-		raleighScatteringRGB->s2 = (1.0f + 2.0f * raleighScattering);
+		raleighScatteringRGB->s0 = 1.0;
+		raleighScatteringRGB->s1 = (1.0 + 0.2 * raleighScattering);
+		raleighScatteringRGB->s2 = (1.0 + 2.0 * raleighScattering);
 	}
-	if (consts->params.rayleighScatteringRed > 0.0f)
+	if (consts->params.rayleighScatteringRed > 0.0)
 	{
-		float mieScatteringR = pow(dot(lightVectorTemp, input->viewVector) * 0.5f + 0.5f, 15.0f)
+		REAL mieScatteringR = pow(dot(lightVectorTemp, input->viewVector) * 0.5 + 0.5, 15.0)
 													 * consts->params.rayleighScatteringRed;
-		float mieScatteringG = pow(dot(lightVectorTemp, input->viewVector) * 0.5f + 0.5f, 10.0f)
+		REAL mieScatteringG = pow(dot(lightVectorTemp, input->viewVector) * 0.5 + 0.5, 10.0)
 													 * consts->params.rayleighScatteringRed;
-		mieScatteringRGB->s0 = (1.0f + 5.0f * mieScatteringR);
-		mieScatteringRGB->s1 = (1.0f + mieScatteringG);
-		mieScatteringRGB->s2 = 1.0f;
+		mieScatteringRGB->s0 = (1.0 + 5.0 * mieScatteringR);
+		mieScatteringRGB->s1 = (1.0 + mieScatteringG);
+		mieScatteringRGB->s2 = 1.0;
 	}
 }
 #endif // RAYLEIGH_SCATTERING
 
 //------------ Volumetric shader ----------------
-float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderData,
-	sShaderInputDataCl *input, sClCalcParams *calcParam, image2d_t image2dBackground, float4 oldPixel,
-	float *opacityOut)
+REAL4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderData,
+	sShaderInputDataCl *input, sClCalcParams *calcParam, image2d_t image2dBackground, REAL4 oldPixel,
+	REAL *opacityOut)
 {
-	float4 out4 = oldPixel;
-	float3 output = oldPixel.xyz;
-	float totalOpacity = 0.0f;
+	REAL4 out4 = oldPixel;
+	REAL3 output = oldPixel.xyz;
+	REAL totalOpacity = 0.0;
 
 	// visible lights init
 	int numberOfLights = renderData->numberOfLights;
 
 #ifdef GLOW
 	// glow init
-	float glow = input->stepCount * consts->params.glowIntensity / 512.0f * consts->params.DEFactor;
-	float glowN = 1.0f - glow;
-	if (glowN < 0.0f) glowN = 0.0f;
+	REAL glow = input->stepCount * consts->params.glowIntensity / 512.0 * consts->params.DEFactor;
+	REAL glowN = 1.0 - glow;
+	if (glowN < 0.0) glowN = 0.0;
 
-	float3 glowColor;
+	REAL3 glowColor;
 
-	glowColor = (glowN * consts->params.glowColor1 + consts->params.glowColor2 * glow);
+	glowColor = (glowN * TO_REAL3(consts->params.glowColor1)
+								 + TO_REAL3(consts->params.glowColor2) * glow);
 
 #endif // GLOW
 
 #ifdef SIMPLE_GLOW // only simple glow, no another shaders
 #ifdef GLOW
-	glow *= 0.7f;
-	float glowOpacity = 1.0f * glow;
-	if (glowOpacity > 1.0f) glowOpacity = 1.0f;
-	output = glow * glowColor + (1.0f - glowOpacity) * output;
+	glow *= 0.7;
+	REAL glowOpacity = 1.0 * glow;
+	if (glowOpacity > 1.0) glowOpacity = 1.0;
+	output = glow * glowColor + (1.0 - glowOpacity) * output;
 	out4.s3 += glowOpacity;
 #endif // GLOW
 
 #else // not SIMPLE_GLOW
-	float totalStep = 0.0f;
-	float scan = CalcDistThresh(input->point, consts);
-	float lastCloudDistance = consts->params.cloudsPeriod;
+	REAL totalStep = 0.0;
+	REAL scan = CalcDistThresh(input->point, consts);
+	REAL lastCloudDistance = consts->params.cloudsPeriod;
 
 	sShaderInputDataCl input2 = *input;
 
 	for (int i = 0; i < MAX_RAYMARCHING; i++)
 	{
-		float3 point = input->point - input->viewVector * scan;
+		REAL3 point = input->point - input->viewVector * scan;
 
 		input2.point = point;
 		input2.distThresh = CalcDistThresh(point, consts);
@@ -112,7 +113,7 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 
 		formulaOut outF;
 		outF = CalculateDistance(consts, point, calcParam, renderData);
-		float distance = outF.distance;
+		REAL distance = outF.distance;
 
 		// Apply per-object detailLevelMultiplier to input2.distThresh dynamically
 		if (outF.objectId >= 0 && outF.objectId < renderData->numberOfObjects)
@@ -120,13 +121,13 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 			input2.distThresh *= renderData->objectsData[outF.objectId].detailLevelMultiplier;
 		}
 
-		float step = (min(distance, lastCloudDistance) - 0.5f * input2.distThresh)
+		REAL step = (min(distance, lastCloudDistance) - 0.5 * input2.distThresh)
 								 * consts->params.DEFactor * consts->params.volumetricLightDEFactor;
 
 #ifdef MONTE_CARLO
-		step *= (1.0f - Random(1000, &input->randomSeed) / 4000.0f);
+		step *= (1.0 - Random(1000, &input->randomSeed) / 4000.0);
 #else
-		step *= (1.0f - Random(1000, &input->randomSeed) / 10000.0f);
+		step *= (1.0 - Random(1000, &input->randomSeed) / 10000.0);
 #endif
 
 #ifdef ADVANCED_QUALITY
@@ -152,17 +153,17 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 		{
 			if (input->stepCount > 0)
 			{
-				float glowOpacity = glow / input->stepCount * consts->params.volumetricLightDEFactor;
-				if (glowOpacity > 1.0f) glowOpacity = 1.0f;
+				REAL glowOpacity = glow / input->stepCount * consts->params.volumetricLightDEFactor;
+				if (glowOpacity > 1.0) glowOpacity = 1.0;
 
-				output = glowOpacity * glowColor + (1.0f - glowOpacity) * output;
+				output = glowOpacity * glowColor + (1.0 - glowOpacity) * output;
 				out4.s3 += glowOpacity;
 			}
 		}
 #endif // GLOW
 
 #ifdef BASIC_FOG
-		float basicFogOpacity = 0.0f;
+		REAL basicFogOpacity = 0.0;
 		{
 			basicFogOpacity = step / consts->params.fogVisibility;
 
@@ -174,15 +175,15 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 			//
 			//				if (TotalDistanceToPrimitives(consts, renderData, point, distance, input2.delta,
 			//false, 							&closestId, renderData->primitivesGlobalData->primitiveIndexForBasicFog) 						>
-			//input2.delta) 					basicFogOpacity = 0.0f;
+			//input2.delta) 					basicFogOpacity = 0.0;
 			//			}
 			// #endif // USE_PRIMITIVES
 		}
 #endif // BASIC_FOG
 
 #ifdef ITER_FOG
-		float iterFogOpacity = 0.0f;
-		float3 iterFogCol = 0.0f;
+		REAL iterFogOpacity = 0.0;
+		REAL3 iterFogCol = 0.0;
 
 		{
 			int L = outF.iters;
@@ -191,37 +192,38 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 
 			// FIXME: it needs to be rewritten to work with ObjectsTree
 			// #if (defined(USE_PRIMITIVES) && defined(ITER_FOG_SHAPE_FROM_PRIMITIVE))
-			//			if (iterFogOpacity > 0.0f &&
+			//			if (iterFogOpacity > 0.0 &&
 			//renderData->primitivesGlobalData->primitiveIndexForIterFog >= 0)
 			//			{
 			//				int closestId = -1;
 			//
 			//				if (TotalDistanceToPrimitives(consts, renderData, point, distance, input2.delta,
 			//false, 							&closestId, renderData->primitivesGlobalData->primitiveIndexForIterFog) 						>
-			//input2.delta) 					iterFogOpacity = 0.0f;
+			//input2.delta) 					iterFogOpacity = 0.0;
 			//			}
 			// #endif // USE_PRIMITIVES
 
-			if (iterFogOpacity > 0.0f)
+			if (iterFogOpacity > 0.0)
 			{
 				// fog colour
-				float iterFactor1 =
+				REAL iterFactor1 =
 					(L - consts->params.iterFogOpacityTrim)
 					/ (consts->params.iterFogColor1Maxiter - consts->params.iterFogOpacityTrim);
-				float k = iterFactor1;
-				if (k > 1.0f) k = 1.0f;
-				if (k < 0.0f) k = 0.0f;
-				float kn = 1.0f - k;
-				iterFogCol = consts->params.iterFogColour1 * kn + consts->params.iterFogColour2 * k;
+				REAL k = iterFactor1;
+				if (k > 1.0) k = 1.0;
+				if (k < 0.0) k = 0.0;
+				REAL kn = 1.0 - k;
+				iterFogCol = TO_REAL3(consts->params.iterFogColour1) * kn
+				+ TO_REAL3(consts->params.iterFogColour2) * k;
 
-				float iterFactor2 =
+				REAL iterFactor2 =
 					(L - consts->params.iterFogColor1Maxiter)
 					/ (consts->params.iterFogColor2Maxiter - consts->params.iterFogColor1Maxiter);
-				float k2 = iterFactor2;
-				if (k2 < 0.0f) k2 = 0.0f;
-				if (k2 > 1.0f) k2 = 1.0f;
-				kn = 1.0f - k2;
-				iterFogCol = iterFogCol * kn + consts->params.iterFogColour3 * k2;
+				REAL k2 = iterFactor2;
+				if (k2 < 0.0) k2 = 0.0;
+				if (k2 > 1.0) k2 = 1.0;
+				kn = 1.0 - k2;
+				iterFogCol = iterFogCol * kn + TO_REAL3(consts->params.iterFogColour3) * k2;
 				//----
 			}
 		}
@@ -229,13 +231,13 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 
 		//--------- clouds --------
 #ifdef CLOUDS
-		float cloudsOpacity = 0.0f;
-		float cloudDensity = 0.0;
-		float3 deltaCloud = 0.0f;
+		REAL cloudsOpacity = 0.0;
+		REAL cloudDensity = 0.0;
+		REAL3 deltaCloud = 0.0;
 
 		{
 			// perlin noise clouds
-			float distanceToClouds = 0.0f;
+			REAL distanceToClouds = 0.0;
 			bool calculateClouds = true;
 
 			// FIXME: it needs to be rewritten to work with ObjectsTree
@@ -248,7 +250,7 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 			//false, 							&closestId, renderData->primitivesGlobalData->primitiveIndexForClouds) 						>
 			//input2.delta)
 			//				{
-			//					cloudDensity = 0.0f;
+			//					cloudDensity = 0.0;
 			//					calculateClouds = false;
 			//				}
 			//			}
@@ -265,28 +267,28 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 			}
 
 #ifndef CLOUDSSHADOWS
-			if (cloudDensity > 0.0f)
+			if (cloudDensity > 0.0)
 			{
-				float delta =
-					consts->params.cloudsPeriod / pown(2.0f, consts->params.cloudsIterations) * 5.0f;
-				float distanceToCloudsDummy = 0.0f;
+				REAL delta =
+					consts->params.cloudsPeriod / pown(2.0, consts->params.cloudsIterations) * 5.0;
+				REAL distanceToCloudsDummy = 0.0;
 
 				deltaCloud.x =
-					CloudOpacity(consts, renderData->perlinNoiseSeeds, point + (float3){delta, 0.0f, 0.0f},
+					CloudOpacity(consts, renderData->perlinNoiseSeeds, point + (REAL3){delta, 0.0, 0.0},
 						distance, input2.delta, &distanceToCloudsDummy)
 					- cloudDensity;
 
 				deltaCloud.y =
-					CloudOpacity(consts, renderData->perlinNoiseSeeds, point + (float3){0.0f, delta, 0.0f},
+					CloudOpacity(consts, renderData->perlinNoiseSeeds, point + (REAL3){0.0, delta, 0.0},
 						distance, input2.delta, &distanceToCloudsDummy)
 					- cloudDensity;
 
 				deltaCloud.z =
-					CloudOpacity(consts, renderData->perlinNoiseSeeds, point + (float3){0.0f, 0.0f, delta},
+					CloudOpacity(consts, renderData->perlinNoiseSeeds, point + (REAL3){0.0, 0.0, delta},
 						distance, input2.delta, &distanceToCloudsDummy)
 					- cloudDensity;
 
-				if (length(deltaCloud) > 0.0f)
+				if (length(deltaCloud) > 0.0)
 				{
 					deltaCloud = normalize(deltaCloud);
 				}
@@ -301,43 +303,44 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 
 //-------------------- volumetric fog
 #ifdef VOLUMETRIC_FOG
-		float distFogOpacity = 0.0f;
-		float3 distFogColor = 0.0f;
+		REAL distFogOpacity = 0.0;
+		REAL3 distFogColor = 0.0;
 
 		{
-			float distanceShifted;
+			REAL distanceShifted;
 			distFogOpacity = DistanceFogOpacity(step, distance, consts->params.volFogDistanceFromSurface,
 				consts->params.volFogDistanceFactor, consts->params.volFogDensity, &distanceShifted);
 
 			// FIXME: it needs to be rewritten to work with ObjectsTree
 			// #if (defined(USE_PRIMITIVES) && defined(DIST_FOG_SHAPE_FROM_PRIMITIVE))
-			//			if (distFogOpacity > 0.0f &&
+			//			if (distFogOpacity > 0.0 &&
 			//renderData->primitivesGlobalData->primitiveIndexForDistFog >= 0)
 			//			{
 			//				int closestId = -1;
 			//
 			//				if (TotalDistanceToPrimitives(consts, renderData, point, distance, input2.delta,
 			//false, 							&closestId, renderData->primitivesGlobalData->primitiveIndexForDistFog) 						>
-			//input2.delta) 					distFogOpacity = 0.0f;
+			//input2.delta) 					distFogOpacity = 0.0;
 			//			}
 			// #endif // USE_PRIMITIVES
 
-			float k = distanceShifted / consts->params.volFogColour1Distance;
-			if (k > 1.0f) k = 1.0f;
-			float kn = 1.0f - k;
-			float3 fogTemp;
-			fogTemp = consts->params.volFogColour1 * kn + consts->params.volFogColour2 * k;
+			REAL k = distanceShifted / consts->params.volFogColour1Distance;
+			if (k > 1.0) k = 1.0;
+			REAL kn = 1.0 - k;
+			REAL3 fogTemp;
+			fogTemp = TO_REAL3(consts->params.volFogColour1) * kn
+				+ TO_REAL3(consts->params.volFogColour2) * k;
 
-			float k2 = distanceShifted / consts->params.volFogColour2Distance * k;
-			if (k2 > 1.0f) k2 = 1.0f;
-			kn = 1.0f - k2;
-			distFogColor = fogTemp * kn + consts->params.volFogColour3 * k2;
+			REAL k2 = distanceShifted / consts->params.volFogColour2Distance * k;
+			if (k2 > 1.0) k2 = 1.0;
+			kn = 1.0 - k2;
+			distFogColor = fogTemp * kn + TO_REAL3(consts->params.volFogColour3) * k2;
 		}
 #endif // VOLUMETRIC_FOG
 
-		float3 totalLightsWithShadows = 0.0f;
-		float3 totalLights = 0.0f;
-		float3 totalLightsClouds = 0.0f;
+		REAL3 totalLightsWithShadows = 0.0;
+		REAL3 totalLights = 0.0;
+		REAL3 totalLightsClouds = 0.0;
 
 // loop for proceessing all lights and volumetric effects
 #ifdef AUX_LIGHTS
@@ -361,7 +364,7 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 #endif
 
 #ifdef ITER_FOG
-				if (iterFogOpacity > 0.0f)
+				if (iterFogOpacity > 0.0)
 				{
 					lightNeeded = true;
 					if (consts->params.iterFogShadows) shadowNeeded = true;
@@ -377,7 +380,7 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 #endif
 
 #ifdef VOLUMETRIC_FOG
-				if (consts->params.distanceFogShadows && distFogOpacity > 0.0f)
+				if (consts->params.distanceFogShadows && distFogOpacity > 0.0)
 				{
 					lightNeeded = true;
 					shadowNeeded = true;
@@ -385,7 +388,7 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 #endif
 
 #ifdef BASIC_FOG
-				if (consts->params.fogCastShadows && basicFogOpacity > 0.0f)
+				if (consts->params.fogCastShadows && basicFogOpacity > 0.0)
 				{
 					lightNeeded = true;
 					shadowNeeded = true;
@@ -396,26 +399,26 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 
 				if (lightNeeded)
 				{
-					float distanceLight = 0.0f;
+					REAL distanceLight = 0.0;
 
-					float3 lightVectorTemp =
+					REAL3 lightVectorTemp =
 						CalculateLightVector(light, point, input2.delta, consts->params.resolution,
 							consts->params.viewDistanceMax, &distanceLight, &input->randomSeed);
 
-					float lightIntensity = 0.0f;
+					REAL lightIntensity = 0.0;
 					if (light->type == lightDirectional)
 						lightIntensity = light->intensity;
 					else if (light->type == lightConical)
 						lightIntensity = light->intensity * 10.0;
 					else
 						lightIntensity =
-							light->intensity / LightDecay(distanceLight, light->decayFunction) * 4.0f;
+							light->intensity / LightDecay(distanceLight, light->decayFunction) * 4.0;
 
-					float3 textureColor;
+					REAL3 textureColor;
 					lightIntensity *=
 						CalculateLightCone(light, renderData, point, lightVectorTemp, &textureColor);
 
-					float3 lightShadow = 1.0f;
+					REAL3 lightShadow = 1.0;
 
 #ifdef SHADOWS
 					if (shadowNeeded)
@@ -424,25 +427,25 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 							lightShadow = AuxShadow(consts, renderData, &input2, light, distanceLight,
 								lightVectorTemp, calcParam, light->intensity);
 						else
-							lightShadow = 0.0f;
+							lightShadow = 0.0;
 					}
 #endif
 
-					float3 raleighScatteringRGB = 1.0f;
-					float3 mieScatteringRGB = 1.0f;
+					REAL3 raleighScatteringRGB = 1.0;
+					REAL3 mieScatteringRGB = 1.0;
 
 #ifdef RAYLEIGH_SCATTERING
 					RayleighScattering(
 						consts, lightVectorTemp, input, &raleighScatteringRGB, &mieScatteringRGB);
 #endif
 
-					float3 calculatedLight =
+					REAL3 calculatedLight =
 						light->color * lightIntensity * textureColor * raleighScatteringRGB * mieScatteringRGB;
 					totalLightsWithShadows += calculatedLight * lightShadow;
 					totalLights += calculatedLight;
 
 #ifdef CLOUDS
-					float shadeClouds = clamp(-dot(lightVectorTemp, deltaCloud), 0.0f, 1.0f);
+					REAL shadeClouds = clamp(-dot(lightVectorTemp, deltaCloud), 0.0, 1.0);
 					totalLightsClouds += calculatedLight * shadeClouds;
 #endif
 
@@ -461,20 +464,20 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 #if !defined(MC_GI_VOLUMETRIC) && defined(MC_GI_FOG_ILLUMINATION) \
 	&& defined(MONTE_CARLO_DOF_GLOBAL_ILLUMINATION)
 		{
-			float3 gi =
-				GlobalIlumination(consts, renderData, &input2, calcParam, image2dBackground, 1.0f, true);
+			REAL3 gi =
+				GlobalIlumination(consts, renderData, &input2, calcParam, image2dBackground, 1.0, true);
 			totalLights += gi;
 			totalLightsWithShadows += gi;
 		}
 #endif
 
-		float3 AO = 0.0f;
+		REAL3 AO = 0.0;
 		bool aoNeeded = false;
 #ifdef ITER_FOG
-		if (iterFogOpacity > 0.0f) aoNeeded = true;
+		if (iterFogOpacity > 0.0) aoNeeded = true;
 #endif
 		// #ifdef VOLUMETRIC_FOG
-		//		if (distFogOpacity > 0.0f) aoNeeded = true;
+		//		if (distFogOpacity > 0.0) aoNeeded = true;
 		// #endif
 
 #ifdef AO_MODE_MULTIPLE_RAYS
@@ -486,53 +489,54 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 #endif // AO_MODE_MULTIPLE_RAYS
 
 #ifdef ITER_FOG
-		if (iterFogOpacity > 0.0f)
+		if (iterFogOpacity > 0.0)
 		{
-			float3 light = (consts->params.iterFogShadows) ? totalLightsWithShadows : totalLights;
+			REAL3 light = (consts->params.iterFogShadows) ? totalLightsWithShadows : totalLights;
 
-			if (iterFogOpacity > 1.0f) iterFogOpacity = 1.0f;
+			if (iterFogOpacity > 1.0) iterFogOpacity = 1.0;
 
-			output = output * (1.0f - iterFogOpacity)
+			output = output * (1.0 - iterFogOpacity)
 							 + (light * consts->params.iterFogBrightnessBoost + AO) * iterFogOpacity * iterFogCol;
 
-			totalOpacity = iterFogOpacity + (1.0f - iterFogOpacity) * totalOpacity;
-			out4.s3 = iterFogOpacity + (1.0f - iterFogOpacity) * out4.s3;
+			totalOpacity = iterFogOpacity + (1.0 - iterFogOpacity) * totalOpacity;
+			out4.s3 = iterFogOpacity + (1.0 - iterFogOpacity) * out4.s3;
 		}
 
 #endif // ITER_FOG
 
 #ifdef CLOUDS
-		if (cloudsOpacity > 0.0f)
+		if (cloudsOpacity > 0.0)
 		{
-			float3 light =
+			REAL3 light =
 				(consts->params.cloudsCastShadows) ? totalLightsWithShadows : totalLightsClouds;
 
-			float ambient = consts->params.cloudsAmbientLight;
-			float nAmbient = 1.0f - consts->params.cloudsAmbientLight;
+			REAL ambient = consts->params.cloudsAmbientLight;
+			REAL nAmbient = 1.0 - consts->params.cloudsAmbientLight;
 
 			light = ambient * totalLights + nAmbient * light;
 
-			if (cloudsOpacity > 1.0f) cloudsOpacity = 1.0f;
+			if (cloudsOpacity > 1.0) cloudsOpacity = 1.0;
 
 			output =
-				output * (1.0f - cloudsOpacity) + (light + AO) * cloudsOpacity * consts->params.cloudsColor;
+				output * (1.0 - cloudsOpacity)
+					+ (light + AO) * cloudsOpacity * TO_REAL3(consts->params.cloudsColor);
 
-			totalOpacity = cloudsOpacity + (1.0f - cloudsOpacity) * totalOpacity;
-			out4.s3 = cloudsOpacity + (1.0f - cloudsOpacity) * out4.s3;
+			totalOpacity = cloudsOpacity + (1.0 - cloudsOpacity) * totalOpacity;
+			out4.s3 = cloudsOpacity + (1.0 - cloudsOpacity) * out4.s3;
 		}
 #endif // CLOUDS
 
 #ifdef VOLUMETRIC_FOG
-		if (distFogOpacity > 0.0f)
+		if (distFogOpacity > 0.0)
 		{
-			float3 light = (consts->params.distanceFogShadows) ? totalLightsWithShadows : 1.0f;
+			REAL3 light = (consts->params.distanceFogShadows) ? totalLightsWithShadows : 1.0;
 
-			if (distFogOpacity > 1.0f) distFogOpacity = 1.0f;
+			if (distFogOpacity > 1.0) distFogOpacity = 1.0;
 
-			output = distFogOpacity * distFogColor * (light + AO) + (1.0f - distFogOpacity) * output;
+			output = distFogOpacity * distFogColor * (light + AO) + (1.0 - distFogOpacity) * output;
 
-			totalOpacity = distFogOpacity + (1.0f - distFogOpacity) * totalOpacity;
-			out4.s3 = distFogOpacity + (1.0f - distFogOpacity) * out4.s3;
+			totalOpacity = distFogOpacity + (1.0 - distFogOpacity) * totalOpacity;
+			out4.s3 = distFogOpacity + (1.0 - distFogOpacity) * out4.s3;
 		}
 #endif
 
@@ -540,15 +544,15 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 #ifdef BASIC_FOG
 		if (basicFogOpacity > 0)
 		{
-			float3 light = (consts->params.fogCastShadows) ? totalLightsWithShadows : 1.0f;
+			REAL3 light = (consts->params.fogCastShadows) ? totalLightsWithShadows : 1.0;
 
-			if (basicFogOpacity > 1.0f) basicFogOpacity = 1.0f;
+			if (basicFogOpacity > 1.0) basicFogOpacity = 1.0;
 
-			output = basicFogOpacity * consts->params.fogColor * (light + AO)
-							 + (1.0f - basicFogOpacity) * output;
+			output = basicFogOpacity * TO_REAL3(consts->params.fogColor) * (light + AO)
+							 + (1.0 - basicFogOpacity) * output;
 
-			totalOpacity = basicFogOpacity + (1.0f - basicFogOpacity) * totalOpacity;
-			out4.s3 = basicFogOpacity + (1.0f - basicFogOpacity) * out4.s3;
+			totalOpacity = basicFogOpacity + (1.0 - basicFogOpacity) * totalOpacity;
+			out4.s3 = basicFogOpacity + (1.0 - basicFogOpacity) * out4.s3;
 		}
 #endif // BASIC_FOG
 
@@ -558,49 +562,49 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 			for (int i = 0; i < numberOfLights; ++i)
 			{
 				__global sLightCl *light = &renderData->lights[i];
-				if (light->enabled && light->intensity > 0.0f && light->visibility > 0.0f
+				if (light->enabled && light->intensity > 0.0 && light->visibility > 0.0
 						&& light->type != lightDirectional)
 				{
-					float lastMiniSteps = -1.0f;
-					float miniStep = 0.0f;
+					REAL lastMiniSteps = -1.0;
+					REAL miniStep = 0.0;
 
-					float3 lightPosition =
+					REAL3 lightPosition =
 						CalculateBeam(light, light->position, light->target, &input->randomSeed);
 
-					for (float miniSteps = 0.0f; miniSteps < step; miniSteps += miniStep)
+					for (REAL miniSteps = 0.0; miniSteps < step; miniSteps += miniStep)
 					{
-						float3 lightDistVect = point - input->viewVector * miniSteps - lightPosition;
-						float lightDist = fast_length(lightDistVect);
-						float lightSize = native_sqrt(light->intensity) * light->size;
+						REAL3 lightDistVect = point - input->viewVector * miniSteps - lightPosition;
+						REAL lightDist = fast_length(lightDistVect);
+						REAL lightSize = native_sqrt(light->intensity) * light->size;
 
-						float distToLightSurface = lightDist - lightSize;
-						distToLightSurface = max(distToLightSurface, 0.0f);
+						REAL distToLightSurface = lightDist - lightSize;
+						distToLightSurface = max(distToLightSurface, 0.0);
 
-						miniStep = 0.1f * (distToLightSurface + 0.1f * distToLightSurface);
-						miniStep = clamp(miniStep, step * 0.01f, step - miniSteps);
-						miniStep = max(miniStep, 1e-6f);
+						miniStep = 0.1 * (distToLightSurface + 0.1 * distToLightSurface);
+						miniStep = clamp(miniStep, step * 0.01, step - miniSteps);
+						miniStep = max(miniStep, 1e-6);
 
-						float r2 = lightDist / lightSize;
-						float bellFunction;
+						REAL r2 = lightDist / lightSize;
+						REAL bellFunction;
 						if (light->type == lightConical)
 						{
-							bellFunction = 1.0f;
+							bellFunction = 1.0;
 						}
 						else
 						{
-							bellFunction = 1.0f / (1.0f + pown(r2, ((int)light->decayFunction + 1) * 2));
+							bellFunction = 1.0 / (1.0 + pown(r2, ((int)light->decayFunction + 1) * 2));
 						}
 
-						float3 lightDirection = normalize(lightDistVect);
+						REAL3 lightDirection = normalize(lightDistVect);
 
-						float3 textureColor;
+						REAL3 textureColor;
 						bellFunction *=
-							CalculateLightCone(light, renderData, point, (-1.0f) * lightDirection, &textureColor);
+							CalculateLightCone(light, renderData, point, (-1.0) * lightDirection, &textureColor);
 
-						float lightDensity = miniStep * bellFunction * light->visibility / lightSize;
+						REAL lightDensity = miniStep * bellFunction * light->visibility / lightSize;
 
 #ifdef CLOUDS
-						lightDensity *= 1.0f + consts->params.cloudsLightsBoost * cloudsOpacity;
+						lightDensity *= 1.0 + consts->params.cloudsLightsBoost * cloudsOpacity;
 #endif
 
 						output += lightDensity * light->color * textureColor;
@@ -631,24 +635,24 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 				formulaOut outF;
 				outF = Fractal(consts, input2.point, calcParam, calcModeOrbitTrap, NULL, -1, renderData, 0,
 					input2.transformedPoint, input2.hasTransformedPoint);
-				float r = outF.orbitTrapR;
-				r = sqrt(1.0f / (r + 1.0e-20f));
-				float fakeLight = 1.0f
-													/ (pow(r, 10.0f / consts->params.fakeLightsVisibilitySize)
-															 * pow(10.0f, 10.0f / consts->params.fakeLightsVisibilitySize)
-														 + 0.1f);
-				float3 light = fakeLight * step * consts->params.fakeLightsVisibility;
+				REAL r = outF.orbitTrapR;
+				r = sqrt(1.0 / (r + 1.0e-20));
+				REAL fakeLight = 1.0
+													/ (pow(r, 10.0 / consts->params.fakeLightsVisibilitySize)
+															 * pow(10.0, 10.0 / consts->params.fakeLightsVisibilitySize)
+														 + 0.1);
+				REAL3 light = fakeLight * step * consts->params.fakeLightsVisibility;
 #ifdef CLOUDS
-				light *= 1.0f + consts->params.cloudsLightsBoost * cloudDensity;
+				light *= 1.0 + consts->params.cloudsLightsBoost * cloudDensity;
 #endif
 
-				float3 color;
+				REAL3 color;
 				switch (fakeLightLoop)
 				{
-					case 0: color = consts->params.fakeLightsColor; break;
-					case 1: color = consts->params.fakeLightsColor2; break;
-					case 2: color = consts->params.fakeLightsColor3; break;
-					default: color = consts->params.fakeLightsColor; break;
+					case 0: color = TO_REAL3(consts->params.fakeLightsColor); break;
+					case 1: color = TO_REAL3(consts->params.fakeLightsColor2); break;
+					case 2: color = TO_REAL3(consts->params.fakeLightsColor3); break;
+					default: color = TO_REAL3(consts->params.fakeLightsColor); break;
 				}
 
 				output += light * color;
@@ -657,8 +661,8 @@ float4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDa
 		}
 #endif // FAKE_LIGHTS
 
-		if (totalOpacity > 1.0f) totalOpacity = 1.0f;
-		if (out4.s3 > 1.0f) out4.s3 = 1.0f; // alpha channel
+		if (totalOpacity > 1.0) totalOpacity = 1.0;
+		if (out4.s3 > 1.0) out4.s3 = 1.0; // alpha channel
 
 		*opacityOut = totalOpacity;
 

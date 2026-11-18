@@ -28,7 +28,7 @@ REAL4 TransfDIFSClipPlaneIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	{
 		zc.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int6;
-		psi = fabs(fmod(atan2(zc.y, zc.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(zc.y, zc.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(zc.x * zc.x + zc.y * zc.y);
 		zc.x = native_cos(psi) * len;
 		zc.y = native_sin(psi) * len;
@@ -87,7 +87,7 @@ REAL4 TransfDIFSClipPlaneIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	REAL plD = fabs(c.z - fractal->transformCommon.offsetF0) - fractal->transformCommon.offsetAp01;
 
 	// rec clip plane
-	REAL d = 1000.0f;
+	REAL d = 1000.0;
 	if (fractal->transformCommon.functionEnabledCy)
 	{
 		REAL4 rec = zc;
@@ -109,7 +109,7 @@ REAL4 TransfDIFSClipPlaneIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	}
 
 	// cir clip plane
-	REAL e = 1000.0f;
+	REAL e = 1000.0;
 	if (fractal->transformCommon.functionEnabledCxFalse)
 	{
 		REAL4 cir = zc;
@@ -119,18 +119,18 @@ REAL4 TransfDIFSClipPlaneIteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 		if (!fractal->transformCommon.functionEnabledYFalse)
 			e = clamp(native_sqrt(cir.x * cir.x + cir.y * cir.y * fractal->transformCommon.scaleA1) - e,
-				0.0f, 100.0f); // circle,
+				0.0, 100.0); // circle,
 		else
 			e = clamp(native_sqrt(
 									cir.x * cir.x + cir.y * cir.y + cir.z * cir.z * fractal->transformCommon.scaleA1)
 									- e,
-				0.0f, 100.0f); // sphere
+				0.0, 100.0); // sphere
 	}
 
 	aux->DE0 = min(e, d); // clip value
 
 	// base plane
-	REAL a = 1000.0f;
+	REAL a = 1000.0;
 	if (fractal->transformCommon.functionEnabledBFalse)
 	{
 		a = (c.z - fractal->transformCommon.offsetA0);
@@ -140,7 +140,7 @@ REAL4 TransfDIFSClipPlaneIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	// aux->color
 	if (fractal->foldColor.auxColorEnabled)
 	{
-		REAL addColor = 0.0f;
+		REAL addColor = 0.0;
 		if (e > d) addColor += fractal->foldColor.difs0000.x;
 		if (e < d) addColor += fractal->foldColor.difs0000.y;
 		if (aux->DE0 == a) addColor += fractal->foldColor.difs0000.z;

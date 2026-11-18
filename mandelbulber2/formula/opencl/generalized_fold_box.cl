@@ -68,7 +68,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	// (Y + L*a).Dot(Nv) = solid.
 	// a = (solid - dot(Y, Nv))/dot(L, Nv) = b/c
 	REAL3 L = zXYZ;
-	REAL a = 1.0f;
+	REAL a = 1.0;
 	REAL3 Y; // Y is the origin in this case.
 	int side = -1;
 	REAL b, c;
@@ -78,7 +78,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		b = solid;
 		c = dot(L, Nv[i]);
 		// A bit subtle here. a_r must be positive and I want to avoid divide by zero.
-		if ((c > 0.0f) && ((a * c) > b))
+		if ((c > 0.0) && ((a * c) > b))
 		{
 			side = i;
 			a = b / c;
@@ -97,7 +97,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		// a = (solid - dot(Y, Nv)/dot(L, Nv) = b/c.
 		L = X_m - Nv_m;
 		Y = Nv_m;
-		a = 1.0f;
+		a = 1.0;
 		side = -1;
 
 		for (i = 0; i < sides; i++)
@@ -107,7 +107,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 				b = solid - dot(Y, Nv[i]);
 				c = dot(L, Nv[i]);
 				// A bit subtle here. a_r must be positive and I want to avoid divide by zero.
-				if ((c > 0.0f) && ((a * c) > b))
+				if ((c > 0.0) && ((a * c) > b))
 				{
 					side = i;
 					a = b / c;
@@ -131,10 +131,10 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			REAL a_rmin = (dot(zXYZ, L_r) - dot(Xmr_intersect, L_r)) / (dot(L_r, L_r));
 
 			// force a_rmin to be positive. I think I made an even number of sign errors here.
-			if (a_rmin < 0.0f)
+			if (a_rmin < 0.0)
 			{
 				a_rmin = -a_rmin;
-				L_r = L_r * (-1.0f);
+				L_r = L_r * (-1.0);
 			}
 			REAL3 X_r = Xmr_intersect + L_r * a_rmin;
 
@@ -143,7 +143,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			// a = (solid - dot(Y, Nv)/dot(L, Nv) = b/c.
 			L = X_r - Xmr_intersect;
 			Y = Xmr_intersect;
-			a = 1.0f;
+			a = 1.0;
 			side = -1;
 
 			for (i = 0; i < sides; i++)
@@ -153,7 +153,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 					b = solid - dot(Y, Nv[i]);
 					c = dot(L, Nv[i]);
 					// A bit subtle here. a must be positive and I want to avoid divide by zero.
-					if ((c > 0.0f) && ((a * c) > b))
+					if ((c > 0.0) && ((a * c) > b))
 					{
 						side = i;
 						a = b / c;
@@ -171,7 +171,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 				if (dot(z2X, z2X) > (melt * melt))
 				{
 					REAL z2X_mag = length(z2X);
-					zXYZ += z2X * (2.0f * (z2X_mag - melt) / (z2X_mag + .00000001f));
+					zXYZ += z2X * (2.0 * (z2X_mag - melt) / (z2X_mag + .00000001));
 					aux->color += fractal->mandelbox.color.factor.z;
 				}
 			}
@@ -183,7 +183,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 				if (dot(z2X, z2X) > (melt * melt))
 				{
 					REAL z2X_mag = length(z2X);
-					zXYZ += z2X * (2.0f * (z2X_mag - melt) / (z2X_mag + .00000001f));
+					zXYZ += z2X * (2.0 * (z2X_mag - melt) / (z2X_mag + .00000001));
 					aux->color += fractal->mandelbox.color.factor.y;
 				}
 			}
@@ -195,7 +195,7 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			if (dot(z2X, z2X) > (melt * melt))
 			{
 				REAL z2X_mag = length(z2X);
-				zXYZ += z2X * (2.0f * (z2X_mag - melt) / (z2X_mag + .00000001f));
+				zXYZ += z2X * (2.0 * (z2X_mag - melt) / (z2X_mag + .00000001));
 				aux->color += fractal->mandelbox.color.factor.x;
 			}
 		}
@@ -229,6 +229,6 @@ REAL4 GeneralizedFoldBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	}
 
 	z *= fractal->mandelbox.scale;
-	aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0f;
+	aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0;
 	return z;
 }

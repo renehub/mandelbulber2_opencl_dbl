@@ -28,7 +28,7 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		{
 			z.y = fabs(z.y);
 			ang = M_PI_F / fractal->transformCommon.int8X;
-			ang = fabs(fmod(atan2(z.y, z.x) + ang, 2.0f * ang) - ang);
+			ang = fabs(fmod(atan2(z.y, z.x) + ang, 2.0 * ang) - ang);
 			temp = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(ang) * temp;
 			z.y = native_sin(ang) * temp;
@@ -37,7 +37,7 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		{
 			z.z = fabs(z.z);
 			ang = M_PI_F / fractal->transformCommon.int8Y;
-			ang = fabs(fmod(atan2(z.z, z.y) + ang, 2.0f * ang) - ang);
+			ang = fabs(fmod(atan2(z.z, z.y) + ang, 2.0 * ang) - ang);
 			temp = native_sqrt(z.y * z.y + z.z * z.z);
 			z.y = native_cos(ang) * temp;
 			z.z = native_sin(ang) * temp;
@@ -46,7 +46,7 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		{
 			z.x = fabs(z.x);
 			ang = M_PI_F / fractal->transformCommon.int8Z;
-			ang = fabs(fmod(atan2(z.x, z.z) + ang, 2.0f * ang) - ang);
+			ang = fabs(fmod(atan2(z.x, z.z) + ang, 2.0 * ang) - ang);
 			temp = native_sqrt(z.z * z.z + z.x * z.x);
 			z.z = native_cos(ang) * temp;
 			z.x = native_sin(ang) * temp;
@@ -120,7 +120,7 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			else
 			{
 				temp = fractal->transformCommon.scaleA2 * ang + fractal->transformCommon.offsetR1;
-				z.x = temp - 2.0f * floor(temp * 0.5f) - 1.0f;
+				z.x = temp - 2.0 * floor(temp * 0.5) - 1.0;
 			}
 		}
 
@@ -128,8 +128,8 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		if (fractal->transformCommon.functionEnabledAxFalse)
 		{
 			REAL Voff = fractal->transformCommon.offsetA2;
-			temp = z.z - Voff * 0.5f;
-			z.z = temp - Voff * floor(temp / Voff) - Voff * 0.5f;
+			temp = z.z - Voff * 0.5;
+			z.z = temp - Voff * floor(temp / Voff) - Voff * 0.5;
 		}
 
 		// twist
@@ -164,8 +164,8 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			&& aux->i >= fractal->transformCommon.startIterationsTM
 			&& aux->i < fractal->transformCommon.stopIterationsTM1)
 	{
-		if ((z.z < (fractal->transformCommon.scaleB1 + 0.5f) * fractal->transformCommon.offset2)
-				&& (z.z > (fractal->transformCommon.offsetT1 + 0.5f) * -fractal->transformCommon.offset2))
+		if ((z.z < (fractal->transformCommon.scaleB1 + 0.5) * fractal->transformCommon.offset2)
+				&& (z.z > (fractal->transformCommon.offsetT1 + 0.5) * -fractal->transformCommon.offset2))
 		{
 			z.z -= round(z.z / fractal->transformCommon.offset2) * fractal->transformCommon.offset2;
 			z.z = clamp(fabs(z.z), -fractal->transformCommon.offset1, fractal->transformCommon.offset1);
@@ -197,7 +197,7 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 		}
 
-		REAL col = 0.0f;
+		REAL col = 0.0;
 		if (z.x < z.y)
 		{
 			temp = z.y;
@@ -230,7 +230,7 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		z.z = fabs(z.z - FRAC_1_3_F * fractal->transformCommon.offset111.z)
 					+ FRAC_1_3_F * fractal->transformCommon.offset111.z;
 		z = z * fractal->transformCommon.scale3
-				- fractal->transformCommon.offset111 * (fractal->transformCommon.scale3 - 1.0f);
+				- fractal->transformCommon.offset111 * (fractal->transformCommon.scale3 - 1.0);
 		aux->DE = aux->DE * fractal->transformCommon.scale3;
 
 		// Analytic DE tweak
@@ -242,9 +242,9 @@ REAL4 MengerPyramidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	{
 		REAL4 zc = z;
 		REAL4 d = fabs(zc);
-		d.x = max(d.x - fractal->transformCommon.offsetA1, 0.0f);
-		d.y = max(d.y - fractal->transformCommon.offset01, 0.0f);
-		d.z = max(d.z - fractal->transformCommon.offsetp1, 0.0f);
+		d.x = max(d.x - fractal->transformCommon.offsetA1, 0.0);
+		d.y = max(d.y - fractal->transformCommon.offset01, 0.0);
+		d.z = max(d.z - fractal->transformCommon.offsetp1, 0.0);
 
 		REAL rDE;
 		{

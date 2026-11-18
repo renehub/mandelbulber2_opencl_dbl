@@ -34,11 +34,11 @@
  */
 
 #ifdef USE_TEXTURES
-float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataCl *objectData,
-	__global sMaterialCl *material, float3 *textureVectorX, float3 *textureVectorY)
+REAL2 TextureMapping(REAL3 inPoint, REAL3 normalVector, __global sObjectDataCl *objectData,
+	__global sMaterialCl *material, REAL3 *textureVectorX, REAL3 *textureVectorY)
 {
-	float2 textureCoordinates;
-	float3 point = inPoint;
+	REAL2 textureCoordinates;
+	REAL3 point = inPoint;
 	if (!material->textureFractalize)
 	{
 		// Transform to object local space (same as calculate_distance)
@@ -58,7 +58,7 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 		case mappingPlanar:
 		{
 #ifdef USE_PLANAR_MAPPING
-			textureCoordinates = (float2){point.x, point.y};
+			textureCoordinates = (REAL2){point.x, point.y};
 			textureCoordinates.x /= -material->textureScale.x;
 			textureCoordinates.y /= material->textureScale.y;
 			textureCoordinates.x -= material->textureCenter.x;
@@ -67,12 +67,12 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 #ifdef USE_NORMAL_MAP_TEXTURE
 			if (textureVectorX && textureVectorY)
 			{
-				float3 texX = (float3){1.0f, 0.0f, 0.0f};
+				REAL3 texX = (REAL3){1.0, 0.0, 0.0};
 				texX = Matrix33MulFloat3(TransposeMatrix(objectData->rotationMatrix), texX);
 				texX = Matrix33MulFloat3(TransposeMatrix(material->rotMatrixTexture), texX);
 				*textureVectorX = texX;
 
-				float3 texY = (float3){0.0f, -1.0f, 0.0f};
+				REAL3 texY = (REAL3){0.0, -1.0, 0.0};
 				texY = Matrix33MulFloat3(TransposeMatrix(objectData->rotationMatrix), texY);
 				texY = Matrix33MulFloat3(TransposeMatrix(material->rotMatrixTexture), texY);
 				*textureVectorY = texY;
@@ -85,8 +85,8 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 		case mappingCylindrical:
 		{
 #ifdef USE_CYLINDRICAL_MAPPING
-			float alphaTexture = fmod(GetAlpha(point) + 2.0f * M_PI_F, 2.0f * M_PI_F);
-			textureCoordinates.x = alphaTexture / (2.0f * M_PI_F);
+			REAL alphaTexture = fmod(GetAlpha(point) + 2.0 * M_PI_F, 2.0 * M_PI_F);
+			textureCoordinates.x = alphaTexture / (2.0 * M_PI_F);
 			textureCoordinates.y = -point.z;
 			textureCoordinates.x /= material->textureScale.x;
 			textureCoordinates.y /= material->textureScale.y;
@@ -96,8 +96,8 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 #ifdef USE_NORMAL_MAP_TEXTURE
 			if (textureVectorX && textureVectorY)
 			{
-				float3 texY = (float3){0.0f, 0.0f, 1.0f};
-				float3 texX = cross(point, texY);
+				REAL3 texY = (REAL3){0.0, 0.0, 1.0};
+				REAL3 texX = cross(point, texY);
 				texX = Matrix33MulFloat3(TransposeMatrix(objectData->rotationMatrix), texX);
 				texX = Matrix33MulFloat3(TransposeMatrix(material->rotMatrixTexture), texX);
 				*textureVectorX = texX;
@@ -113,9 +113,9 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 		case mappingSpherical:
 		{
 #ifdef USE_SPHERICAL_MAPPING
-			float alphaTexture = fmod(GetAlpha(point) + 2.0f * M_PI_F, 2.0f * M_PI_F);
-			float betaTexture = -GetBeta(point);
-			textureCoordinates.x = alphaTexture / (2.0f * M_PI_F);
+			REAL alphaTexture = fmod(GetAlpha(point) + 2.0 * M_PI_F, 2.0 * M_PI_F);
+			REAL betaTexture = -GetBeta(point);
+			textureCoordinates.x = alphaTexture / (2.0 * M_PI_F);
 			textureCoordinates.y = betaTexture / M_PI_F;
 			textureCoordinates.x /= material->textureScale.x;
 			textureCoordinates.y /= material->textureScale.y;
@@ -125,8 +125,8 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 #ifdef USE_NORMAL_MAP_TEXTURE
 			if (textureVectorX && textureVectorY)
 			{
-				float3 texY = (float3){0.0f, 0.0f, -1.0f};
-				float3 texX = cross(texY, point);
+				REAL3 texY = (REAL3){0.0, 0.0, -1.0};
+				REAL3 texX = cross(texY, point);
 				texX = normalize(texX);
 				texY = cross(texX, point);
 
@@ -148,29 +148,29 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 			point /= material->textureScale;
 			point -= material->textureCenter;
 
-			float3 texX, texY;
+			REAL3 texX, texY;
 			if (fabs(normalVector.x) > fabs(normalVector.y))
 			{
 				if (fabs(normalVector.x) > fabs(normalVector.z))
 				{
 					// x
-					if (normalVector.x > 0.0f)
-						textureCoordinates = (float2){point.y, -point.z};
+					if (normalVector.x > 0.0)
+						textureCoordinates = (REAL2){point.y, -point.z};
 					else
-						textureCoordinates = (float2){-point.y, -point.z};
+						textureCoordinates = (REAL2){-point.y, -point.z};
 
 #ifdef USE_NORMAL_MAP_TEXTURE
 					if (textureVectorX && textureVectorY)
 					{
-						if (normalVector.x > 0.0f)
+						if (normalVector.x > 0.0)
 						{
-							texX = (float3){0.0f, -1.0f, 0.0f};
-							texY = (float3){0.0f, 0.0f, 1.0f};
+							texX = (REAL3){0.0, -1.0, 0.0};
+							texY = (REAL3){0.0, 0.0, 1.0};
 						}
 						else
 						{
-							texX = (float3)(0.0f, 1.0f, 0.0f);
-							texY = (float3)(0.0f, 0.0f, 1.0f);
+							texX = (REAL3)(0.0, 1.0, 0.0);
+							texY = (REAL3)(0.0, 0.0, 1.0);
 						}
 					}
 #endif
@@ -178,23 +178,23 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 				else
 				{
 					// z
-					if (normalVector.z > 0.0f)
-						textureCoordinates = (float2){-point.x, point.y};
+					if (normalVector.z > 0.0)
+						textureCoordinates = (REAL2){-point.x, point.y};
 					else
-						textureCoordinates = (float2){point.x, point.y};
+						textureCoordinates = (REAL2){point.x, point.y};
 
 #ifdef USE_NORMAL_MAP_TEXTURE
 					if (textureVectorX && textureVectorY)
 					{
-						if (normalVector.z > 0.0f)
+						if (normalVector.z > 0.0)
 						{
-							texX = (float3){1.0f, 0.0f, 0.0f};
-							texY = (float3){0.0f, -1.0f, 0.0f};
+							texX = (REAL3){1.0, 0.0, 0.0};
+							texY = (REAL3){0.0, -1.0, 0.0};
 						}
 						else
 						{
-							texX = (float3){-1.0f, 0.0f, 0.0f};
-							texY = (float3){0.0f, -1.0f, 0.0f};
+							texX = (REAL3){-1.0, 0.0, 0.0};
+							texY = (REAL3){0.0, -1.0, 0.0};
 						}
 					}
 #endif
@@ -205,23 +205,23 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 				if (fabs(normalVector.y) > fabs(normalVector.z))
 				{
 					// y
-					if (normalVector.y > 0.0f)
-						textureCoordinates = (float2){-point.x, -point.z};
+					if (normalVector.y > 0.0)
+						textureCoordinates = (REAL2){-point.x, -point.z};
 					else
-						textureCoordinates = (float2){point.x, -point.z};
+						textureCoordinates = (REAL2){point.x, -point.z};
 
 #ifdef USE_NORMAL_MAP_TEXTURE
 					if (textureVectorX && textureVectorY)
 					{
-						if (normalVector.y > 0.0f)
+						if (normalVector.y > 0.0)
 						{
-							texX = (float3){1.0f, 0.0f, 0.0f};
-							texY = (float3){0.0f, 0.0f, 1.0f};
+							texX = (REAL3){1.0, 0.0, 0.0};
+							texY = (REAL3){0.0, 0.0, 1.0};
 						}
 						else
 						{
-							texX = (float3){-1.0f, 0.0f, 0.0f};
-							texY = (float3){0.0f, 0.0f, 1.0f};
+							texX = (REAL3){-1.0, 0.0, 0.0};
+							texY = (REAL3){0.0, 0.0, 1.0};
 						}
 					}
 #endif
@@ -229,23 +229,23 @@ float2 TextureMapping(float3 inPoint, float3 normalVector, __global sObjectDataC
 				else
 				{
 					// z
-					if (normalVector.z > 0.0f)
-						textureCoordinates = (float2){-point.x, point.y};
+					if (normalVector.z > 0.0)
+						textureCoordinates = (REAL2){-point.x, point.y};
 					else
-						textureCoordinates = (float2){point.x, point.y};
+						textureCoordinates = (REAL2){point.x, point.y};
 
 #ifdef USE_NORMAL_MAP_TEXTURE
 					if (textureVectorX && textureVectorY)
 					{
-						if (normalVector.z > 0.0f)
+						if (normalVector.z > 0.0)
 						{
-							texX = (float3){1.0f, 0.0f, 0.0f};
-							texY = (float3){0.0f, -1.0f, 0.0f};
+							texX = (REAL3){1.0, 0.0, 0.0};
+							texY = (REAL3){0.0, -1.0, 0.0};
 						}
 						else
 						{
-							texX = (float3){-1.0f, 0.0f, 0.0f};
-							texY = (float3){0.0f, -1.0f, 0.0f};
+							texX = (REAL3){-1.0, 0.0, 0.0};
+							texY = (REAL3){0.0, -1.0, 0.0};
 						}
 					}
 #endif

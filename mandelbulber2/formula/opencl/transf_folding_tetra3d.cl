@@ -22,20 +22,20 @@ REAL4 TransfFoldingTetra3dIteration(REAL4 z, __global sFractalCl *fractal, sExte
 
 	if (fractal->transformCommon.functionEnabledx)
 	{
-		REAL temp = 0.0f;
-		if (z.x + z.y < 0.0f)
+		REAL temp = 0.0;
+		if (z.x + z.y < 0.0)
 		{
 			temp = -z.y;
 			z.y = -z.x;
 			z.x = temp;
 		}
-		if (z.x + z.z < 0.0f)
+		if (z.x + z.z < 0.0)
 		{
 			temp = -z.z;
 			z.z = -z.x;
 			z.x = temp;
 		}
-		if (z.y + z.z < 0.0f)
+		if (z.y + z.z < 0.0)
 		{
 			temp = -z.z;
 			z.z = -z.y;
@@ -44,19 +44,19 @@ REAL4 TransfFoldingTetra3dIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	}
 	if (fractal->transformCommon.functionEnabledy)
 	{
-		if (z.x - z.y < 0.0f)
+		if (z.x - z.y < 0.0)
 		{
 			REAL temp = z.y;
 			z.y = z.x;
 			z.x = temp;
 		}
-		if (z.x - z.z < 0.0f)
+		if (z.x - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.x;
 			z.x = temp;
 		}
-		if (z.y - z.z < 0.0f)
+		if (z.y - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.y;

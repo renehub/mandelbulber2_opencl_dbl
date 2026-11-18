@@ -20,7 +20,7 @@
 REAL4 AmazingSurfMod4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	// sphere inversion
 	if (fractal->transformCommon.sphereInversionEnabledFalse
@@ -49,10 +49,10 @@ REAL4 AmazingSurfMod4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	REAL rr = dot(z, z);
 	REAL rrCol = rr;
 	REAL MinRR = fractal->transformCommon.minR2p25;
-	REAL dividend = rr < MinRR ? MinRR : min(rr, 1.0f);
+	REAL dividend = rr < MinRR ? MinRR : min(rr, 1.0);
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 
 	useScale = (aux->actualScaleA + fractal->transformCommon.scale2) / dividend;
 	z *= useScale;
@@ -90,7 +90,7 @@ REAL4 AmazingSurfMod4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 									* (fabs(zCol.z) - fractal->transformCommon.additionConstant111.z);
 		if (rrCol > fractal->transformCommon.minR2p25)
 			colorAdd +=
-				fractal->mandelbox.color.factorSp2 * (rrCol - fractal->transformCommon.minR2p25) / 100.0f;
+				fractal->mandelbox.color.factorSp2 * (rrCol - fractal->transformCommon.minR2p25) / 100.0;
 		aux->color += colorAdd;
 	}
 	return z;

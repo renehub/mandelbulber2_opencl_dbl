@@ -17,19 +17,19 @@
 REAL4 RiemannSphereMsltoeM3dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	if (z.z > fractal->transformCommon.offsetA1)
-		z * 1000.0f; // fail bailout check
+		z * 1000.0; // fail bailout check
 	else
 	{
 		z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 		REAL r = aux->r;
 		REAL s, t;
-		// if (r < 1e-21f) r = 1e-21f;
+		// if (r < 1e-21) r = 1e-21;
 		z *= fractal->transformCommon.scale / r;
-		REAL q = 1.0f / (1.0f - z.z);
+		REAL q = 1.0 / (1.0 - z.z);
 		s = z.x * q;
 		t = z.y * q;
-		REAL w = 1.0f + s * s + t * t;
-		REAL limit = fractal->transformCommon.scale8 * 8000.0f; // fudge
+		REAL w = 1.0 + s * s + t * t;
+		REAL limit = fractal->transformCommon.scale8 * 8000.0; // fudge
 		if (w > limit) w = limit;
 
 		s = fabs(native_sin(M_PI_F * s + fractal->transformCommon.offsetA0));
@@ -37,11 +37,11 @@ REAL4 RiemannSphereMsltoeM3dIteration(REAL4 z, __global sFractalCl *fractal, sEx
 		s = fabs(s - fractal->transformCommon.offsetC0);
 		t = fabs(t - fractal->transformCommon.offsetD0);
 
-		r = -0.25f + fractal->transformCommon.offsetE0 + pow(r, (fractal->transformCommon.scale2 * w));
-		w = 2.0f / (1.0f + s * s + t * t);
+		r = -0.25 + fractal->transformCommon.offsetE0 + pow(r, (fractal->transformCommon.scale2 * w));
+		w = 2.0 / (1.0 + s * s + t * t);
 		z.x = r * s * w;
 		z.y = r * t * w;
-		z.z = r * (1.0f - w);
+		z.z = r * (1.0 - w);
 		z += fractal->transformCommon.offset001;
 	}
 	return z;

@@ -16,7 +16,7 @@
 
 REAL4 BuffaloIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	if (fractal->buffalo.preabsx) z.x = fabs(z.x);
 	if (fractal->buffalo.preabsy) z.y = fabs(z.y);
@@ -25,10 +25,10 @@ REAL4 BuffaloIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	REAL x2 = z.x * z.x;
 	REAL y2 = z.y * z.y;
 	REAL z2 = z.z * z.z;
-	REAL temp = 1.0f - z2 / (x2 + y2);
+	REAL temp = 1.0 - z2 / (x2 + y2);
 	REAL newx = (x2 - y2) * temp;
-	REAL newy = 2.0f * z.x * z.y * temp;
-	REAL newz = (fractal->buffalo.posz ? 2.0f : -2.0f) * z.z * native_sqrt(x2 + y2);
+	REAL newy = 2.0 * z.x * z.y * temp;
+	REAL newz = (fractal->buffalo.posz ? 2.0 : -2.0) * z.z * native_sqrt(x2 + y2);
 
 	z.x = fractal->buffalo.absx ? fabs(newx) : newx;
 	z.y = fractal->buffalo.absy ? fabs(newy) : newy;

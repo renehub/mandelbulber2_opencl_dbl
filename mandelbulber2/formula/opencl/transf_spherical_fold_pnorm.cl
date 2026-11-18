@@ -22,19 +22,19 @@ REAL4 TransfSphericalFoldPnormIteration(REAL4 z, __global sFractalCl *fractal, s
 	REAL pNorm = lpN.x + lpN.y + lpN.z;
 	// if (fractal->transformCommon.functionEnabledFalse)
 	//	pNorm +=  pow(lpN.w, fractal->transformCommon.scale2);
-	if (fractal->transformCommon.scaleA1 != 1.0f)
+	if (fractal->transformCommon.scaleA1 != 1.0)
 		pNorm = pow(pNorm, fractal->transformCommon.scaleA1);
 	REAL rr = pNorm;
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 
 	useScale = fractal->transformCommon.scale1 - aux->actualScaleA;
 	if (fractal->transformCommon.functionEnabledKFalse) // update actualScaleA
-		aux->actualScaleA = fractal->transformCommon.scaleVary0 * (fabs(aux->actualScaleA) + 1.0f);
+		aux->actualScaleA = fractal->transformCommon.scaleVary0 * (fabs(aux->actualScaleA) + 1.0);
 	pNorm = useScale / pNorm;
 
 	z += fractal->transformCommon.offset000;
 	REAL minR = fractal->transformCommon.minR0;
-	REAL temp = 0.0f;
+	REAL temp = 0.0;
 	if (rr < minR)
 	{
 		temp = useScale / minR;

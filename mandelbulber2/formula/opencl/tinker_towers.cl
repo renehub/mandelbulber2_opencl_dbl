@@ -17,27 +17,27 @@
 
 REAL4 TinkerTowersIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL t = 0.0f;
-	REAL3 tv = (REAL3){0.0f, 0.0f, 0.0f};
+	REAL t = 0.0;
+	REAL3 tv = (REAL3){0.0, 0.0, 0.0};
 	REAL3 zXYZ = z.xyz;
 
-	REAL3 u_zXYZ = (REAL3){0.0f, 0.0f, 1.0f}; // angle does matter if mag_zXYZ==0
-	REAL mag_zXYZ = 0.0f;
+	REAL3 u_zXYZ = (REAL3){0.0, 0.0, 1.0}; // angle does matter if mag_zXYZ==0
+	REAL mag_zXYZ = 0.0;
 
 	t = dot(zXYZ, zXYZ);
-	if (t > 0.0f)
+	if (t > 0.0)
 	{
 		t = native_sqrt(t);
 		u_zXYZ = zXYZ / t;
 		mag_zXYZ = t;
 	}
 
-	REAL flat = 0.0f;
+	REAL flat = 0.0;
 	int sides;
 	int i;
 
 	// By defination u_Fv are unit vectors (rays) that define the orentation of the facets that cut a
-	// unit sphere. The Nv vectors need to be scaled by a number between 0 and 1f, mag_Fv, in order to
+	// unit sphere. The Nv vectors need to be scaled by a number between 0 and 1, mag_Fv, in order to
 	// cut the unit sphere. They don't have to be scaled by the same amount, but every facit must
 	// contain its definining u_Fv vector.
 
@@ -103,13 +103,13 @@ REAL4 TinkerTowersIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	// The value of h at the intersection point is h = mag_Fv/(u_zXYZ dot u_Fv)
 
 	int side = -1; // Assume no facet found before unit sphere.
-	REAL h = 1.0f; // so h=1.
+	REAL h = 1.0; // so h=1.
 	REAL my_h;
 	for (i = 0; i < sides; i++)
 	{
-		my_h = 2.0f; // just needs to be >1
+		my_h = 2.0; // just needs to be >1
 		REAL u_zXYZ_dot_u_Fvi = dot(u_zXYZ, u_Fv[i]);
-		if (u_zXYZ_dot_u_Fvi > 0.0f)
+		if (u_zXYZ_dot_u_Fvi > 0.0)
 		{
 			my_h = mag_Fv[i] / u_zXYZ_dot_u_Fvi;
 		}
@@ -150,22 +150,22 @@ REAL4 TinkerTowersIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 
 		REAL3 u_Fv_to_Zc = (Zc - mag_Fv[side] * u_Fv[side]);
 		// REAL3 u_Fv_to_Zc;
-		if (D_u_Fv_to_Zc > 0.0f)
+		if (D_u_Fv_to_Zc > 0.0)
 		{
 			u_Fv_to_Zc = u_Fv_to_Zc / D_u_Fv_to_Zc;
 		}
 
 		// Assume no cutting plane before the unit sphere.
 		// Find the distancd from u_Fv to edge of sphere.
-		w = native_sqrt(1.0f - mag_Fv[side] * mag_Fv[side]);
+		w = native_sqrt(1.0 - mag_Fv[side] * mag_Fv[side]);
 
 		for (i = 0; i < sides; i++)
 		{
-			// Don't check side found in step 1.f
+			// Don't check side found in step 1.
 			if (side != i)
 			{
 				// avoid dividing by zero.
-				if ((dot(u_Fv_to_Zc, u_Fv[i])) > 0.0f)
+				if ((dot(u_Fv_to_Zc, u_Fv[i])) > 0.0)
 				{
 					// Distance from mag_Fv * u_Fv to cutting plane i.
 					my_w =
@@ -182,10 +182,10 @@ REAL4 TinkerTowersIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		// w is the distance between u_Fv[side] and either an edge (cutting plane mag_Fv * u_Fv[edge])
 		// The ratio of the distance (|mag_nv * u_Fv - Zc|)/w is the radial parameter for the patch map.
 
-		REAL D = 0.0f;
-		REAL3 Axis = (REAL3){0.0f, 0.0f, 1.0f}; // angle does not matter if D=0;
+		REAL D = 0.0;
+		REAL3 Axis = (REAL3){0.0, 0.0, 1.0}; // angle does not matter if D=0;
 		// D = native_sqrt((Zc - mag_Fv * u_Fv[side]).Dot(Zc - mag_Fv * u_Fv[side]))/w;
-		if (w > 0.0f)
+		if (w > 0.0)
 		{
 			D = D_u_Fv_to_Zc / w;
 			Axis = cross(u_Fv[side], zXYZ);
@@ -199,7 +199,7 @@ REAL4 TinkerTowersIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 			// REAL rot_angle = 3.14159*(1-D)*(1-D); // Move detail toward center.
 			// REAL rot_angle = 3.14159*(1-D*D); // Move detail tword edge.
 			// REAL rot_angle = 3.14159*(1-.3 * D*D - .7*D);  // Mixing
-			REAL rot_angle = M_PI_F * (1.0f - D); // Linear
+			REAL rot_angle = M_PI_F * (1.0 - D); // Linear
 
 			// Sign of rot_angel determines the patch includes self
 			// rot_angle = rot_angle * ((side & 2)-1); // mix it up
@@ -211,31 +211,31 @@ REAL4 TinkerTowersIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 			// rot_angle = rot_angle;  // Exclude self
 			// rot_angle = -rot_angle; // Include self
 
-			// zXYZ = zXYZ *(1.0f - .0*flat);  // Does not play well with power DE
+			// zXYZ = zXYZ *(1.0 - .0*flat);  // Does not play well with power DE
 			// zXYZ =  RotateAroundVectorByAngle4(zXYZ, u_Fv[side], 3.14159/3.0); // Taffy
 
-			REAL4 v4 = (REAL4){zXYZ.x, zXYZ.y, zXYZ.z, 0.0f};
+			REAL4 v4 = (REAL4){zXYZ.x, zXYZ.y, zXYZ.z, 0.0};
 			v4 = RotateAroundVectorByAngle4(v4, Axis, rot_angle); // php angel4 ?? mmmmmmmmmmmfix
 			zXYZ = (REAL3){v4.x, v4.y, v4.z};
 		}
 		else
 		{
 			zXYZ = zXYZ / flat;
-			REAL ramp = 5.0f * D - (int)(5.0f * D);			 // (int)
-			REAL saw = -1.0f + 2.0f * fabs(ramp - 0.5f); // fabs
-			saw = (saw + 0.6f) + fabs(saw + 0.6f);			 // fabs
-			saw = 0.02f * saw * saw;
-			REAL rings = 1.0f - (saw * (1.0f - 0.1f * ramp));
-			if (D < 0.02f) rings = rings * 0.98f;
+			REAL ramp = 5.0 * D - (int)(5.0 * D);			 // (int)
+			REAL saw = -1.0 + 2.0 * fabs(ramp - 0.5); // fabs
+			saw = (saw + 0.6) + fabs(saw + 0.6);			 // fabs
+			saw = 0.02 * saw * saw;
+			REAL rings = 1.0 - (saw * (1.0 - 0.1 * ramp));
+			if (D < 0.02) rings = rings * 0.98;
 			zXYZ = zXYZ * rings;
 		}
 	}
 
 	// zXYZ ray hits unit sphere first.
 
-	REAL rp = pow(mag_zXYZ, power - 1.0f); // what about julia bulb or proper bulb
+	REAL rp = pow(mag_zXYZ, power - 1.0); // what about julia bulb or proper bulb
 
-	aux->DE = rp * aux->DE * power + 1.0f;
+	aux->DE = rp * aux->DE * power + 1.0;
 
 	zXYZ = zXYZ * rp;
 

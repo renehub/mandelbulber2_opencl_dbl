@@ -30,7 +30,7 @@ REAL4 PseudoKleinianMod7Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	signs.y = sign(z.y);
 	signs.z = sign(z.z);
 	signs.w = sign(z.w);
-	REAL k = 0.0f;
+	REAL k = 0.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
@@ -38,7 +38,7 @@ REAL4 PseudoKleinianMod7Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		REAL4 tt = z - fractal->mandelbox.offset;
 
 		REAL trr = dot(tt, tt);
-		k = min(max(1.0f / trr, 1.0f), 1.0f / fractal->transformCommon.offsetR0);
+		k = min(max(1.0 / trr, 1.0), 1.0 / fractal->transformCommon.offsetR0);
 
 		z += fractal->transformCommon.offsetA000;
 
@@ -73,7 +73,7 @@ REAL4 PseudoKleinianMod7Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		REAL ty = z.y - fractal->transformCommon.offsetD0;
 		REAL rxy = native_sqrt(tx * tx + ty * ty) - fractal->transformCommon.offsetC0;
 
-		REAL tp = 0.0f;
+		REAL tp = 0.0;
 		if (fractal->transformCommon.functionEnabledBFalse
 				&& aux->i >= fractal->transformCommon.startIterationsB
 				&& aux->i < fractal->transformCommon.stopIterationsB)
@@ -86,7 +86,7 @@ REAL4 PseudoKleinianMod7Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		}
 		else // pk
 		{
-			REAL tp2 = 0.0f;
+			REAL tp2 = 0.0;
 			if (!fractal->transformCommon.functionEnabledEFalse)
 			{
 				tp = (rxy * z.z - fractal->transformCommon.offsetA0);

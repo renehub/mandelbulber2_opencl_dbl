@@ -28,7 +28,7 @@ REAL4 TransfBoxFoldVaryV1Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 		int iterationRange =
 			fractal->transformCommon.stopIterations - fractal->transformCommon.startIterations250;
 		int currentIteration = (aux->i - fractal->transformCommon.startIterations250);
-		tempVC += fractal->transformCommon.offset * (1.0f * currentIteration) / iterationRange;
+		tempVC += fractal->transformCommon.offset * (1.0 * currentIteration) / iterationRange;
 	}
 	if (aux->i >= fractal->transformCommon.stopIterations)
 	{

@@ -16,38 +16,38 @@
 
 REAL4 TransfOffsetSCurve4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 limit = fractal->transformCommon.additionConstant0000 / 2.0f;
+	REAL4 limit = fractal->transformCommon.additionConstant0000 / 2.0;
 	REAL4 oldZ = z;
 
-	REAL4 temp = fractal->transformCommon.additionConstant0000 / -2.0f;
+	REAL4 temp = fractal->transformCommon.additionConstant0000 / -2.0;
 	REAL4 temp2 = temp * temp;
-	REAL4 offS = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
-	if (z.w < 1e-15f && z.w > -1e-15f) z.w = (z.w > 0) ? 1e-15f : -1e-15f;
+	REAL4 offS = (REAL4){0.0, 0.0, 0.0, 0.0};
+	if (z.w < 1e-15 && z.w > -1e-15) z.w = (z.w > 0) ? 1e-15 : -1e-15;
 
 	if (fractal->transformCommon.functionEnabledAx)
 	{
-		offS.x += ((8.0f * temp.x * temp2.x) / ((z.x * z.x) + (4.0f * temp2.x)) - 2.0f * temp.x)
+		offS.x += ((8.0 * temp.x * temp2.x) / ((z.x * z.x) + (4.0 * temp2.x)) - 2.0 * temp.x)
 							* sign(z.x) * fractal->transformCommon.scale1;
 		z.x += offS.x;
 	}
 
 	if (fractal->transformCommon.functionEnabledAyFalse)
 	{
-		offS.y += ((8.0f * temp.y * temp2.y) / ((z.y * z.y) + (4.0f * temp2.y)) - 2.0f * temp.y)
+		offS.y += ((8.0 * temp.y * temp2.y) / ((z.y * z.y) + (4.0 * temp2.y)) - 2.0 * temp.y)
 							* sign(z.y) * fractal->transformCommon.scale1;
 		z.y += offS.y;
 	}
 
 	if (fractal->transformCommon.functionEnabledAzFalse)
 	{
-		offS.z += ((8.0f * temp.z * temp2.z) / ((z.z * z.z) + (4.0f * temp2.z)) - 2.0f * temp.z)
+		offS.z += ((8.0 * temp.z * temp2.z) / ((z.z * z.z) + (4.0 * temp2.z)) - 2.0 * temp.z)
 							* sign(z.z) * fractal->transformCommon.scale1;
 		z.z += offS.z;
 	}
 
 	if (fractal->transformCommon.functionEnabledAwFalse)
 	{
-		offS.w += ((8.0f * temp.w * temp2.w) / ((z.w * z.w) + (4.0f * temp2.w)) - 2.0f * temp.w)
+		offS.w += ((8.0 * temp.w * temp2.w) / ((z.w * z.w) + (4.0 * temp2.w)) - 2.0 * temp.w)
 							* sign(z.w) * fractal->transformCommon.scale1;
 		z.w += offS.w;
 	}

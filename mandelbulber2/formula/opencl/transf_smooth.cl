@@ -19,7 +19,7 @@ REAL4 TransfSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	(void)aux;
 
 	REAL OffsetS = fractal->transformCommon.offset0005;
-	REAL4 Zigns = (REAL4){1.0f, 1.0f, 1.0f, 1.0f};
+	REAL4 Zigns = (REAL4){1.0, 1.0, 1.0, 1.0};
 	Zigns.x = sign(z.x);
 	Zigns.y = sign(z.y);
 	Zigns.z = sign(z.z);
@@ -34,21 +34,21 @@ REAL4 TransfSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	if (fractal->transformCommon.functionEnabledx)
 	{
 		t = z.x - z.y;
-		t = 0.5f * (t - native_sqrt(t * t + OffsetS));
+		t = 0.5 * (t - native_sqrt(t * t + OffsetS));
 		z.x = z.x - t;
 		z.y = z.y + t;
 	}
 	if (fractal->transformCommon.functionEnabledy)
 	{
 		t = z.x - z.z;
-		t = 0.5f * (t - native_sqrt(t * t + OffsetS));
+		t = 0.5 * (t - native_sqrt(t * t + OffsetS));
 		z.x = z.x - t;
 		z.z = z.z + t;
 	}
 	if (fractal->transformCommon.functionEnabledz)
 	{
 		t = z.y - z.z;
-		t = 0.5f * (t - native_sqrt(t * t + OffsetS));
+		t = 0.5 * (t - native_sqrt(t * t + OffsetS));
 		z.y = z.y - t;
 		z.z = z.z + t;
 	}

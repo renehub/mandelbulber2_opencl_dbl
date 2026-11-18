@@ -28,9 +28,9 @@
 REAL4 AboxMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	aux->actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 	// Tglad Fold
 	REAL4 oldZ = z;
 	z.x = fabs(z.x + fractal->transformCommon.additionConstant111.x)
@@ -46,14 +46,14 @@ REAL4 AboxMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 	if (z.y != oldZ.y) colorAdd += fractal->mandelbox.color.factor.y;
 	if (z.z != oldZ.z) colorAdd += fractal->mandelbox.color.factor.z;
 	/*	REAL rr;
-		if (temp > 0.0f)
+		if (temp > 0.0)
 			rr = z.x * z.x + z.y * z.y + z.z * z.z; // on top & bottom of cyl. z.z should be tempZ
 		else
 			rr = z.x * z.x + z.y * z.y; // on cyl body*/
 	// cylinder half size
 	REAL tempZ = fabs(z.z) - fractal->transformCommon.offset05;
 	REAL rr = z.x * z.x + z.y * z.y;
-	if (tempZ > 0.0f) rr = rr + (tempZ * tempZ * fractal->transformCommon.scale1);
+	if (tempZ > 0.0) rr = rr + (tempZ * tempZ * fractal->transformCommon.scale1);
 	// rPower
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
@@ -75,7 +75,7 @@ REAL4 AboxMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 	}
 	// Scale
 	z *= aux->actualScale;
-	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0f;
+	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0;
 
 	// addCpixel
 	if (fractal->transformCommon.addCpixelEnabledFalse

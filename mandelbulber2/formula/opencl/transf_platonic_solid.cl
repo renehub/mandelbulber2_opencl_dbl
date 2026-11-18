@@ -17,8 +17,8 @@
 
 REAL4 TransfPlatonicSolidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL platonicR = 0.0f;
-	REAL rho = 0.0f;
+	REAL platonicR = 0.0;
+	REAL rho = 0.0;
 	if (!fractal->transformCommon.functionEnabledFalse)
 	{
 		rho = native_sqrt(aux->r); // the radius
@@ -33,9 +33,9 @@ REAL4 TransfPlatonicSolidIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	}
 	else
 	{
-		REAL rho1 = 0.0f;
-		REAL rho2 = 0.0f;
-		REAL rho3 = 0.0f;
+		REAL rho1 = 0.0;
+		REAL rho2 = 0.0;
+		REAL rho3 = 0.0;
 		if (fractal->transformCommon.functionEnabledx) rho1 = native_sqrt(aux->r);
 		if (fractal->transformCommon.functionEnabledyFalse) rho2 = aux->r;
 		if (fractal->transformCommon.functionEnabledzFalse) rho3 = aux->r * aux->r;
@@ -53,7 +53,7 @@ REAL4 TransfPlatonicSolidIteration(REAL4 z, __global sFractalCl *fractal, sExten
 										 * native_sin(fractal->platonicSolid.frequency * z.z)
 								 + native_cos(fractal->platonicSolid.frequency * z.z)
 										 * native_sin(fractal->platonicSolid.frequency * z.x);
-		// theta is pos or neg && < 3.0f
+		// theta is pos or neg && < 3.0
 
 		if (fractal->transformCommon.functionEnabledAzFalse) theta = fabs(theta);
 

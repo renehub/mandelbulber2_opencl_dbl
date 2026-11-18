@@ -29,10 +29,10 @@ REAL4 BoxFoldBulbV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	z *= fractal->transformCommon.scaleA1;
 	aux->DE *= fabs(fractal->transformCommon.scaleA1);
 	aux->r = length(z);
-	// if (aux->r < 1e-21f) aux->r = 1e-21f;
+	// if (aux->r < 1e-21) aux->r = 1e-21;
 	REAL th0 = asin(z.z / aux->r) + fractal->bulb.betaAngleOffset;
 	REAL ph0 = atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset;
-	REAL rp = pow(aux->r, fractal->transformCommon.scale2 - 1.0f);
+	REAL rp = pow(aux->r, fractal->transformCommon.scale2 - 1.0);
 	REAL th = th0 * fractal->transformCommon.scale2;
 	REAL ph = ph0 * fractal->transformCommon.scale2;
 	REAL cth = native_cos(th);
@@ -49,20 +49,20 @@ REAL4 BoxFoldBulbV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 
 	if (fractal->foldColor.auxColorEnabledFalse)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		if (zCol.x != oldZ.x)
 			aux->color += fractal->foldColor.difs0000.x
-										* (fabs(zCol.x) / fractal->transformCommon.offset222.x - 1.0f);
+										* (fabs(zCol.x) / fractal->transformCommon.offset222.x - 1.0);
 
 		if (zCol.y != oldZ.y)
 			aux->color += fractal->foldColor.difs0000.y
-										* (fabs(zCol.y) / fractal->transformCommon.offset222.y - 1.0f);
+										* (fabs(zCol.y) / fractal->transformCommon.offset222.y - 1.0);
 
 		if (zCol.z != oldZ.z)
 			aux->color += fractal->foldColor.difs0000.z
-										* (fabs(zCol.z) / fractal->transformCommon.offset222.z - 1.0f);
+										* (fabs(zCol.z) / fractal->transformCommon.offset222.z - 1.0);
 
-		colorAdd += fractal->foldColor.difs0000.w * rp * 0.001f;
+		colorAdd += fractal->foldColor.difs0000.w * rp * 0.001;
 		aux->color += colorAdd;
 	}
 	return z;

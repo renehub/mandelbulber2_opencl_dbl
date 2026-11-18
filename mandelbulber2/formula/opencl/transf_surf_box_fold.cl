@@ -129,12 +129,12 @@ REAL4 TransfSurfBoxFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		REAL4 zCol = fabs(z - oldZ);
 
-		if (zCol.x > 0.0f) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
-		if (zCol.y > 0.0f) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
-		if (zCol.z > 0.0f) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
+		if (zCol.x > 0.0) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
+		if (zCol.y > 0.0) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
+		if (zCol.z > 0.0) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
 
 		aux->color += colorAdd;
 	}

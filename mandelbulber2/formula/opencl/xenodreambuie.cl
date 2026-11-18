@@ -17,14 +17,14 @@
 
 REAL4 XenodreambuieIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
-	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0f;
+	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
+	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 	rp *= aux->r;
 
 	REAL th = (atan2(z.y, z.x) + fractal->bulb.betaAngleOffset) * fractal->bulb.power;
 	REAL ph = acos(z.z / aux->r) + fractal->bulb.alphaAngleOffset;
 
-	if (fabs(ph) > 0.5f * M_PI_F) ph = sign(ph) * M_PI_F - ph;
+	if (fabs(ph) > 0.5 * M_PI_F) ph = sign(ph) * M_PI_F - ph;
 
 	ph *= fractal->bulb.power;
 

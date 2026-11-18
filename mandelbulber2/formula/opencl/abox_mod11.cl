@@ -21,9 +21,9 @@
 
 REAL4 AboxMod11Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	aux->actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 	REAL4 c = aux->const_c;
 
 	// tglad fold
@@ -50,9 +50,9 @@ REAL4 AboxMod11Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
 		REAL4 limit = fractal->transformCommon.additionConstant111;
-		REAL4 length = 2.0f * limit;
-		REAL4 tgladS = 1.0f / length;
-		REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 length = 2.0 * limit;
+		REAL4 tgladS = 1.0 / length;
+		REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 		if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 		if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;
 		if (fabs(z.z) < limit.z) Add.z = z.z * z.z * tgladS.z;
@@ -77,8 +77,8 @@ REAL4 AboxMod11Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
-		REAL para = 0.0f;
-		REAL paraAddP0 = 0.0f;
+		REAL para = 0.0;
+		REAL paraAddP0 = 0.0;
 		if (fractal->transformCommon.functionEnabledyFalse)
 		{
 			// para += paraAddP0 + fractal->transformCommon.minR2p25;
@@ -112,13 +112,13 @@ REAL4 AboxMod11Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 				// Curvi part on "true"
 				if (fractal->Cpara.enabledCurves)
 				{
-					REAL paraAdd = 0.0f;
+					REAL paraAdd = 0.0;
 					REAL paraIt;
-					if (lengthAB > 2.0f * fractal->Cpara.iterA) // stop  error, todo fix.
+					if (lengthAB > 2.0 * fractal->Cpara.iterA) // stop  error, todo fix.
 					{
-						REAL curve1 = (grade2 - grade1) / (4.0f * fractal->Cpara.iterA);
+						REAL curve1 = (grade2 - grade1) / (4.0 * fractal->Cpara.iterA);
 						REAL tempL = lengthAB - fractal->Cpara.iterA;
-						REAL curve2 = (grade3 - grade2) / (4.0f * tempL);
+						REAL curve2 = (grade3 - grade2) / (4.0 * tempL);
 						if (aux->i < 2 * fractal->Cpara.iterA)
 						{
 							paraIt = tempA - fabs(tempA - aux->i);
@@ -133,11 +133,11 @@ REAL4 AboxMod11Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 					}
 				}
 			}
-			paraAddP0 = 0.0f;
+			paraAddP0 = 0.0;
 			if (fractal->Cpara.enabledParabFalse)
 			{ // parabolic = paraOffset + iter *slope + (iter *iter *scale)
 				paraAddP0 = fractal->Cpara.parabOffset0 + (aux->i * fractal->Cpara.parabSlope)
-										+ (aux->i * aux->i * 0.001f * fractal->Cpara.parabScale);
+										+ (aux->i * aux->i * 0.001 * fractal->Cpara.parabScale);
 			}
 		}
 		para += paraAddP0 + fractal->transformCommon.minR2p25;
@@ -146,7 +146,7 @@ REAL4 AboxMod11Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 
 		z += fractal->mandelbox.offset;
 
-		// if (r2 < 1e-21f) r2 = 1e-21f;
+		// if (r2 < 1e-21) r2 = 1e-21;
 		if (rr < para)
 		{
 			REAL tglad_factor1 = fractal->transformCommon.maxR2d1 / para;
@@ -171,7 +171,7 @@ REAL4 AboxMod11Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		z *= aux->actualScale;
 
 		if (!fractal->analyticDE.enabledFalse)
-			aux->DE = aux->DE * fabs(aux->actualScale) + 1.0f;
+			aux->DE = aux->DE * fabs(aux->actualScale) + 1.0;
 		else
 			aux->DE =
 				aux->DE * fabs(aux->actualScale) * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;

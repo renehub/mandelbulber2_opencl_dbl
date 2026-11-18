@@ -17,7 +17,7 @@
 REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 { // info amoser's complex sine formula, DE by amoser
 	REAL4 oldZ = z;
-	REAL temp = 0.0f;
+	REAL temp = 0.0;
 
 	// pi scale
 	if (fractal->transformCommon.functionEnabledTFalse
@@ -36,16 +36,16 @@ REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	{
 		z += fractal->mandelbox.offset;
 		z *= fractal->transformCommon.scale;
-		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0f;
+		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0;
 		// Combine the magnitude-based inversion
-		REAL invRR = 1.0f / dot(z, z);
+		REAL invRR = 1.0 / dot(z, z);
 		z *= invRR;
 		aux->DE *= invRR;
 
 		z -= fractal->mandelbox.offset + fractal->transformCommon.additionConstant000;
 	}
 
-	// 1.f Fold & Offset (Pre-Trig)
+	// 1. Fold & Offset (Pre-Trig)
 	if (aux->i >= fractal->transformCommon.startIterationsF
 			&& aux->i < fractal->transformCommon.stopIterationsF)
 	{
@@ -55,7 +55,7 @@ REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		z -= fractal->transformCommon.offsetA000;
 	}
 
-	// 2.f Trigonometry & Hyperbolics
+	// 2. Trigonometry & Hyperbolics
 	REAL sx, cx, sy, cy;
 	// Use sincos to compute pairs in half the time
 	sx = native_sin(z.x);
@@ -64,31 +64,31 @@ REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	cy = native_cos(z.y);
 
 	REAL ez = exp(z.z);
-	REAL invEz = 1.0f / (ez);
-	REAL shz = 0.5f * (ez - invEz);
-	REAL chz = 0.5f * (ez + invEz);
+	REAL invEz = 1.0 / (ez);
+	REAL shz = 0.5 * (ez - invEz);
+	REAL chz = 0.5 * (ez + invEz);
 
-	// 3.f Pre-compute components for 'z' update
+	// 3. Pre-compute components for 'z' update
 	REAL sxchz = sx * chz;
 	REAL sychz = sy * chz;
 	REAL cxcy_shz = (cx * cy) * shz;
-	z = (REAL4){sxchz, sychz, cxcy_shz, 0.0f};
+	z = (REAL4){sxchz, sychz, cxcy_shz, 0.0};
 
 	if (fractal->transformCommon.rotationEnabledFalse
 			&& aux->i >= fractal->transformCommon.startIterationsR
 			&& aux->i < fractal->transformCommon.stopIterationsR)
 		z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 
-	// 4.f Regulator
+	// 4. Regulator
 	if (fractal->transformCommon.functionEnabledHFalse)
 	{
 		// native_rsqrt is 3x faster
-		REAL reg = 1.0f / native_sqrt(1.0f + (sx * sx * sy * sy));
+		REAL reg = 1.0 / native_sqrt(1.0 + (sx * sx * sy * sy));
 		z *= reg;
 		aux->DE *= reg;
 	}
 
-	// 5.f Transform & Stretch
+	// 5. Transform & Stretch
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
@@ -97,17 +97,17 @@ REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	}
 	z -= fractal->transformCommon.offsetF000;
 
-	// Use Identity: native_sqrt(chz^2 + shz^2) = native_sqrt(0.5f * (ez^2 + invEz^2))
+	// Use Identity: native_sqrt(chz^2 + shz^2) = native_sqrt(0.5 * (ez^2 + invEz^2))
 	REAL stretch = 1.0;
 	if (fractal->transformCommon.functionEnabledNFalse)
 	{
 		REAL ez2 = ez * ez;
 		REAL invEz2 = invEz * invEz;
-		stretch = fractal->transformCommon.scaleF1 * native_sqrt(0.5f * (ez2 + invEz2));
+		stretch = fractal->transformCommon.scaleF1 * native_sqrt(0.5 * (ez2 + invEz2));
 		stretch = max(fractal->transformCommon.scaleA1, stretch);
 	}
 
-	// 6.f Distance Estimation update
+	// 6. Distance Estimation update
 	aux->DE = aux->DE * fractal->analyticDE.scale1 * stretch + fractal->analyticDE.offset0;
 
 	if (fractal->analyticDE.enabled)
@@ -120,8 +120,8 @@ REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		REAL B = cos_x2 * cos_y2;
 
 		// Combined math multiplication multipliers
-		REAL S = fractal->transformCommon.scaleG1 * (sinh_z2 * (2.0f + A - B) + A + B) * FRAC_1_3_F;
-		//	S = max(S, 0.0f); // nnnnnnnnn 0.5f
+		REAL S = fractal->transformCommon.scaleG1 * (sinh_z2 * (2.0 + A - B) + A + B) * FRAC_1_3_F;
+		//	S = max(S, 0.0); // nnnnnnnnn 0.5
 
 		aux->DE *= S;
 		aux->DE0 = max(aux->DE0, aux->DE);
@@ -129,7 +129,7 @@ REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		if (aux->i >= fractal->analyticDE.startIterationsA
 				&& aux->i < fractal->analyticDE.stopIterationsA)
 		{
-			aux->dist = 1.0f * 1.0f / native_sqrt(aux->DE0); // scale?
+			aux->dist = 1.0 * 1.0 / native_sqrt(aux->DE0); // scale?
 		}
 	}
 	else
@@ -144,7 +144,7 @@ REAL4 PseudoKleinianTrigV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		REAL addCol = fabs(z.x * z.y) * fractal->foldColor.difs0;
 		addCol += fractal->foldColor.difs0000.x * stretch + fractal->foldColor.difs0000.y * fabs(z.z)
 							+ fractal->foldColor.difs0000.w * fabs(oldZ.z - z.z);
-		if (fractal->foldColor.difs0000.z != 0.0f)
+		if (fractal->foldColor.difs0000.z != 0.0)
 			addCol += fractal->foldColor.difs0000.z * length(oldZ - z);
 
 		if (!fractal->foldColor.auxColorEnabledBFalse)

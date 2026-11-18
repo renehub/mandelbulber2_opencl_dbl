@@ -34,30 +34,30 @@
 
 #ifdef USE_TEXTURES
 #ifdef USE_ROUGHNESS_TEXTURE
-float RoughnessTexture(sShaderInputDataCl *input, sRenderData *renderData,
+REAL RoughnessTexture(sShaderInputDataCl *input, sRenderData *renderData,
 	__global sObjectDataCl *objectData, int textureIndex)
 {
 	if (textureIndex >= 0)
 	{
-		float3 textureVectorX = 0.0f;
-		float3 textureVectorY = 0.0f;
-		float3 shaderPoint = input->point;
-		float2 texturePoint = TextureMapping(
+		REAL3 textureVectorX = 0.0;
+		REAL3 textureVectorY = 0.0;
+		REAL3 shaderPoint = input->point;
+		REAL2 texturePoint = TextureMapping(
 			shaderPoint, input->normal, objectData, input->material, &textureVectorX, &textureVectorY);
 
-		texturePoint += (float2){0.5f, 0.5f};
+		texturePoint += (REAL2){0.5, 0.5};
 
 		int2 textureSize = renderData->textureSizes[textureIndex];
 		__global uchar4 *texture = renderData->textures[textureIndex];
 
-		float3 pixel =
-			BicubicInterpolation(texturePoint.x, texturePoint.y, texture, textureSize.x, textureSize.y);
+		REAL3 pixel = TO_REAL3(
+			BicubicInterpolation(texturePoint.x, texturePoint.y, texture, textureSize.x, textureSize.y));
 
 		return (pixel.s0 + pixel.s1 + pixel.s2) / 3.0;
 	}
 	else
 	{
-		return 1.0f;
+		return 1.0;
 	}
 }
 #endif // USE_ROUGHNESS_TEXTURE

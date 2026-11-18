@@ -7,7 +7,7 @@
  * see also COPYING file in this folder.    ~+{i%+++
  *
  * ABoxMod1 (mb3d1), a formula from Mandelbulb3D by DarkBeam
- * Based on the documented formula from ABoxMod1.m3f:
+ * Based on the documented formula from ABoxMod1.m3:
  *   Scale = Scale + Scale_vary*(abs(Scale)-1)
  *   x = Fold-abs(abs(x+FoldXM)-Fold)-abs(FoldXM)
  *   y = Fold-abs(abs(y+FoldYM)-Fold)-abs(FoldYM)
@@ -28,7 +28,7 @@ REAL4 AboxMb3d1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	// Step 1: Mandelbox scale variation
 	// Scale = Scale + Scale_vary*(abs(Scale)-1)
 	REAL actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 	aux->actualScale = actualScale;
 
 	// Step 2: Box fold with FoldX/Y/ZMod (additionConstant000)
@@ -48,7 +48,7 @@ REAL4 AboxMb3d1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	}
 
 	// Track color changes from box fold
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	if (z.x != oldZ.x) colorAdd += fractal->mandelbox.color.factor.x;
 	if (z.y != oldZ.y) colorAdd += fractal->mandelbox.color.factor.y;
 	if (fractal->transformCommon.functionEnabled && z.z != oldZ.z)
@@ -60,7 +60,7 @@ REAL4 AboxMb3d1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	// elif rr < 1 then m = Scale/rr
 	// else m = 1
 	REAL rr = dot(z, z);
-	REAL m = 1.0f;
+	REAL m = 1.0;
 	REAL minRSqr = fractal->mandelbox.foldingSphericalMin * fractal->mandelbox.foldingSphericalMin;
 
 	if (rr < minRSqr)
@@ -68,7 +68,7 @@ REAL4 AboxMb3d1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		m = fractal->mandelbox.scale / minRSqr;
 		colorAdd += fractal->mandelbox.color.factorSp1;
 	}
-	else if (rr < 1.0f)
+	else if (rr < 1.0)
 	{
 		m = fractal->mandelbox.scale / rr;
 		colorAdd += fractal->mandelbox.color.factorSp2;
@@ -79,7 +79,7 @@ REAL4 AboxMb3d1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 
 	// Step 4: Scale by actualScale
 	z *= actualScale;
-	aux->DE = aux->DE * fabs(actualScale) + 1.0f;
+	aux->DE = aux->DE * fabs(actualScale) + 1.0;
 
 	// Step 5: Add constant c (with Cx/Cy swap - key ABox feature)
 	// x = x * m + Cy  -> z.x += const_c.y

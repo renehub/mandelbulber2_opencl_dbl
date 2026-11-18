@@ -91,6 +91,6 @@ REAL4 MandelboxIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	if (fractal->mandelbox.mainRotationEnabled) z = Matrix33MulFloat4(fractal->mandelbox.mainRot, z);
 
 	z = z * fractal->mandelbox.scale;
-	aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0f;
+	aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0;
 	return z;
 }

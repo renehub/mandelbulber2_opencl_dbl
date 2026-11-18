@@ -24,7 +24,7 @@ REAL4 TransfSphericalFoldV3Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	signs.z = sign(z.z);
 	signs.w = sign(z.w);
 
-	REAL4 out = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 out = (REAL4){0.0, 0.0, 0.0, 0.0};
 	REAL4 in = out;
 	if (aux->i >= fractal->transformCommon.startIterationsX
 			&& aux->i < fractal->transformCommon.stopIterationsX)
@@ -40,7 +40,7 @@ REAL4 TransfSphericalFoldV3Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	}
 	if (fractal->transformCommon.functionEnabledAx) z -= out;
 
-	REAL m = 0.0f;
+	REAL m = 0.0;
 	REAL rr = dot(z, z);
 	if (fractal->transformCommon.functionEnabledBxFalse) z -= in;
 

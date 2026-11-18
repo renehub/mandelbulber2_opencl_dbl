@@ -17,8 +17,8 @@
 
 REAL4 KochIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL temp = 0.0f;
-	REAL colAdd = 0.0f;
+	REAL temp = 0.0;
+	REAL colAdd = 0.0;
 
 	if (fractal->transformCommon.functionEnabledAx
 			&& aux->i >= fractal->transformCommon.startIterationsCx
@@ -73,7 +73,7 @@ REAL4 KochIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int8X;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;

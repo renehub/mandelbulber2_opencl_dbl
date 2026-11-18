@@ -17,26 +17,26 @@ REAL4 Mandelbulb3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 {
 	(void)fractal;
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	REAL temp, tempR;
 
-	REAL sign = 1.0f;
-	REAL sign2 = 1.0f;
+	REAL sign = 1.0;
+	REAL sign2 = 1.0;
 
-	if (z.x < 0.0f) sign2 = -1.0f;
-	tempR = native_sqrt(z.x * z.x + z.y * z.y); //+ 1e-030f
-	z *= 1.0f / tempR;
+	if (z.x < 0.0) sign2 = -1.0;
+	tempR = native_sqrt(z.x * z.x + z.y * z.y); //+ 1e-030
+	z *= 1.0 / tempR;
 	temp = z.x * z.x - z.y * z.y;
-	z.y = 2.0f * z.x * z.y;
+	z.y = 2.0 * z.x * z.y;
 	z.x = temp;
 	z *= tempR;
 
-	if (z.x < 0.0f) sign = -1.0f;
-	tempR = native_sqrt(z.x * z.x + z.z * z.z); //+ 1e-030f
-	z *= 1.0f / tempR;
+	if (z.x < 0.0) sign = -1.0;
+	tempR = native_sqrt(z.x * z.x + z.z * z.z); //+ 1e-030
+	z *= 1.0 / tempR;
 	temp = z.x * z.x - z.z * z.z;
-	z.z = 2.0f * z.x * z.z * sign2;
+	z.z = 2.0 * z.x * z.z * sign2;
 	z.x = temp * sign;
 	z *= tempR;
 

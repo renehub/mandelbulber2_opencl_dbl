@@ -31,7 +31,7 @@ REAL4 TransfDIFSPrismV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		zc.x = zc.z;
 		zc.z = temp;
 	}
-	REAL tp = 0.0f;
+	REAL tp = 0.0;
 	REAL absZ = fabs(zc.z);
 	REAL len = fractal->transformCommon.offset1;
 	REAL face = fractal->transformCommon.offset05;
@@ -56,7 +56,7 @@ REAL4 TransfDIFSPrismV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		if (fractal->transformCommon.functionEnabledCzFalse) tp *= tp;
 		face += tp * fractal->transformCommon.scaleB0;
 	}
-	REAL priX = max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5f, -zc.z) - face;
+	REAL priX = max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5, -zc.z) - face;
 	face = fabs(priX);
 	if (fractal->transformCommon.functionEnabledFalse)
 	{

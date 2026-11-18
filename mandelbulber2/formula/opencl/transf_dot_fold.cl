@@ -22,7 +22,7 @@ REAL4 TransfDotFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	{
 		t = fractal->transformCommon.cosA;
 		n = (REAL4){t * fractal->transformCommon.sinB, fractal->transformCommon.sinA,
-			t * fractal->transformCommon.cosB, 0.0f};
+			t * fractal->transformCommon.cosB, 0.0};
 		n += fractal->transformCommon.offset000;
 	}
 	else
@@ -30,7 +30,7 @@ REAL4 TransfDotFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		n = fractal->transformCommon.offset000;
 	}
 	t = length(n);
-	if (t == 0.0f) t = 1e-21f;
+	if (t == 0.0) t = 1e-21;
 	n /= t;
 
 	if (fractal->transformCommon.functionEnabledAxFalse) z.x = fabs(z.x);
@@ -38,7 +38,7 @@ REAL4 TransfDotFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	if (fractal->transformCommon.functionEnabledAzFalse) z.z = fabs(z.z);
 	t = dot(z, n);
 
-	z = (z - (2.0f * max(t, 0.0f) * n));
+	z = (z - (2.0 * max(t, 0.0) * n));
 
 	// scale
 	z *= fractal->transformCommon.scale1;

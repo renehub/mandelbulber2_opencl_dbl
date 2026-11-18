@@ -32,11 +32,11 @@ REAL4 MandelbulbPower1234Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 			z.z = fabs(z.z);
 	}
 	REAL r = aux->r;
-	REAL de1 = 0.0f;
-	REAL de2 = 0.0f;
-	REAL de3 = 0.0f;
-	REAL de4 = 0.0f;
-	REAL4 zer0s = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL de1 = 0.0;
+	REAL de2 = 0.0;
+	REAL de3 = 0.0;
+	REAL de4 = 0.0;
+	REAL4 zer0s = (REAL4){0.0, 0.0, 0.0, 0.0};
 	REAL4 newZ1 = zer0s;
 	REAL4 newZ2 = zer0s;
 	REAL4 newZ3 = zer0s;
@@ -67,20 +67,20 @@ REAL4 MandelbulbPower1234Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 	if (fractal->transformCommon.functionEnabledy) // two
 	{
-		de2 = (rp * aux->DE * 2.0f + 1.0f) * w8ts.y;
+		de2 = (rp * aux->DE * 2.0 + 1.0) * w8ts.y;
 		rp *= r;
-		REAL th = th0 * 2.0f * fractal->transformCommon.scaleA1;
-		REAL ph = ph0 * 2.0f * fractal->transformCommon.scaleB1;
+		REAL th = th0 * 2.0 * fractal->transformCommon.scaleA1;
+		REAL ph = ph0 * 2.0 * fractal->transformCommon.scaleB1;
 
 		if (!fractal->transformCommon.functionEnabledxFalse)
 		{
 			REAL costh = native_cos(th);
-			newZ2 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0f};
+			newZ2 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0};
 		}
 		else
 		{
 			REAL sinth = native_sin(th);
-			newZ2 = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0f};
+			newZ2 = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0};
 		}
 		newZ2 *= w8ts.y;
 	}
@@ -88,20 +88,20 @@ REAL4 MandelbulbPower1234Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 	if (fractal->transformCommon.functionEnabledz) // three
 	{
 		rp = r * r;
-		de3 = (rp * aux->DE * 3.0f + 1.0f) * w8ts.z;
+		de3 = (rp * aux->DE * 3.0 + 1.0) * w8ts.z;
 		rp *= r;
-		REAL th = th0 * 3.0f * fractal->transformCommon.scaleA1;
-		REAL ph = ph0 * 3.0f * fractal->transformCommon.scaleB1;
+		REAL th = th0 * 3.0 * fractal->transformCommon.scaleA1;
+		REAL ph = ph0 * 3.0 * fractal->transformCommon.scaleB1;
 
 		if (!fractal->transformCommon.functionEnabledxFalse)
 		{
 			REAL costh = native_cos(th);
-			newZ3 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0f};
+			newZ3 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0};
 		}
 		else
 		{
 			REAL sinth = native_sin(th);
-			newZ3 = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0f};
+			newZ3 = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0};
 		}
 		newZ3 *= w8ts.z;
 	}
@@ -109,20 +109,20 @@ REAL4 MandelbulbPower1234Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 	if (fractal->transformCommon.functionEnabledw) // four
 	{
 		rp = r * r * r;
-		de4 = (rp * aux->DE * 4.0f + 1.0f) * w8ts.w;
+		de4 = (rp * aux->DE * 4.0 + 1.0) * w8ts.w;
 		rp *= r;
-		REAL th = th0 * 4.0f * fractal->transformCommon.scaleA1;
-		REAL ph = ph0 * 4.0f * fractal->transformCommon.scaleB1;
+		REAL th = th0 * 4.0 * fractal->transformCommon.scaleA1;
+		REAL ph = ph0 * 4.0 * fractal->transformCommon.scaleB1;
 
 		if (!fractal->transformCommon.functionEnabledxFalse)
 		{
 			REAL costh = native_cos(th);
-			newZ4 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0f};
+			newZ4 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0};
 		}
 		else
 		{
 			REAL sinth = native_sin(th);
-			newZ4 = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0f};
+			newZ4 = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0};
 		}
 		newZ4 *= w8ts.w;
 	}

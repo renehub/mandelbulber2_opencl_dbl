@@ -20,7 +20,7 @@
 
 REAL4 AboxSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL t = 1.0f;
+	REAL t = 1.0;
 	// sphere inversion
 	if (fractal->transformCommon.sphereInversionEnabledFalse
 			&& aux->i >= fractal->transformCommon.startIterationsI
@@ -45,21 +45,21 @@ REAL4 AboxSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 		REAL zk1 = SmoothConditionAGreaterB(z.x, fractal->transformCommon.offset111.x, sm);
 		REAL zk2 = SmoothConditionALessB(z.x, -fractal->transformCommon.offset111.x, sm);
-		z.x = z.x * (1.0f - zk1) + (2.0f * fractal->transformCommon.offset111.x - z.x) * zk1;
-		z.x = z.x * (1.0f - zk2) + (-2.0f * fractal->transformCommon.offset111.x - z.x) * zk2;
+		z.x = z.x * (1.0 - zk1) + (2.0 * fractal->transformCommon.offset111.x - z.x) * zk1;
+		z.x = z.x * (1.0 - zk2) + (-2.0 * fractal->transformCommon.offset111.x - z.x) * zk2;
 		// aux->color += (zk3 + zk4) * fractal->mandelbox.color.factor.y;
 
 		zk1 = SmoothConditionAGreaterB(z.y, fractal->transformCommon.offset111.y, sm);
 		zk2 = SmoothConditionALessB(z.y, -fractal->transformCommon.offset111.y, sm);
-		z.y = z.y * (1.0f - zk1) + (2.0f * fractal->transformCommon.offset111.y - z.y) * zk1;
-		z.y = z.y * (1.0f - zk2) + (-2.0f * fractal->transformCommon.offset111.y - z.y) * zk2;
+		z.y = z.y * (1.0 - zk1) + (2.0 * fractal->transformCommon.offset111.y - z.y) * zk1;
+		z.y = z.y * (1.0 - zk2) + (-2.0 * fractal->transformCommon.offset111.y - z.y) * zk2;
 		// aux->color += (zk3 + zk4) * fractal->mandelbox.color.factor.y;
 		if (fractal->transformCommon.functionEnabled)
 		{
 			zk1 = SmoothConditionAGreaterB(z.z, fractal->transformCommon.offset111.z, sm);
 			zk2 = SmoothConditionALessB(z.z, -fractal->transformCommon.offset111.z, sm);
-			z.z = z.z * (1.0f - zk1) + (2.0f * fractal->transformCommon.offset111.z - z.z) * zk1;
-			z.z = z.z * (1.0f - zk2) + (-2.0f * fractal->transformCommon.offset111.z - z.z) * zk2;
+			z.z = z.z * (1.0 - zk1) + (2.0 * fractal->transformCommon.offset111.z - z.z) * zk1;
+			z.z = z.z * (1.0 - zk2) + (-2.0 * fractal->transformCommon.offset111.z - z.z) * zk2;
 			// aux->color += (zk5 + zk6) * fractal->mandelbox.color.factor.z;
 		}
 	}
@@ -82,9 +82,9 @@ REAL4 AboxSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
 		REAL4 limit = fractal->transformCommon.offset111;
-		REAL4 length = 2.0f * limit;
-		REAL4 tgladS = 1.0f / length;
-		REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 length = 2.0 * limit;
+		REAL4 tgladS = 1.0 / length;
+		REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 		if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 		if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;
 		if (fabs(z.z) < limit.z) Add.z = z.z * z.z * tgladS.z;
@@ -108,7 +108,7 @@ REAL4 AboxSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 	// spherical fold
 	REAL rrCol = dot(z, z);
-	REAL m = 1.0f;
+	REAL m = 1.0;
 	if (fractal->transformCommon.functionEnabledCxFalse
 			&& aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
@@ -130,23 +130,23 @@ REAL4 AboxSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 		REAL rk1 = SmoothConditionALessB(
 			rr, fractal->transformCommon.minR2p25, fractal->transformCommon.scaleA3);
-		REAL sm1 = (fractal->transformCommon.maxMinR2factor * rk1) + (1.0f - rk1);
+		REAL sm1 = (fractal->transformCommon.maxMinR2factor * rk1) + (1.0 - rk1);
 
-		t = 1.0f;
+		t = 1.0;
 		if (aux->i >= fractal->transformCommon.startIterationsY
 				&& aux->i < fractal->transformCommon.stopIterationsY)
 		{
 			REAL rk2 = SmoothConditionALessB(
 				rr, fractal->transformCommon.maxR2d1, fractal->transformCommon.scaleB3);
-			REAL rk21 = (1.0f - rk1) * rk2;
-			t = (1.0f - rk21) + (fractal->transformCommon.maxR2d1 / rr * rk21);
+			REAL rk21 = (1.0 - rk1) * rk2;
+			t = (1.0 - rk21) + (fractal->transformCommon.maxR2d1 / rr * rk21);
 		}
 		t = sm1 * t;
 		z = z * t;
 		aux->DE = aux->DE * t;
 	}
 	REAL rrCol2 = dot(z, z);
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	// scale
 	if (aux->i >= fractal->transformCommon.startIterationsE
 			&& aux->i < fractal->transformCommon.stopIterationsE)
@@ -188,11 +188,11 @@ REAL4 AboxSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		zCol = fabs(zCol - oldZ);
-		if (zCol.x > 0.0f) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
-		if (zCol.y > 0.0f) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
-		if (zCol.z > 0.0f) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
+		if (zCol.x > 0.0) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
+		if (zCol.y > 0.0) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
+		if (zCol.z > 0.0) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
 		if (rrCol != rrCol2) colorAdd += fractal->foldColor.difs0000.w * fabs(rrCol - rrCol2);
 
 		colorAdd += fractal->mandelbox.color.factorSp1 * t * useScale;

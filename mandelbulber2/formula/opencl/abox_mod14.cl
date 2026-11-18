@@ -21,8 +21,8 @@
 REAL4 AboxMod14Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
-	REAL m = 1.0f;
+	REAL colorAdd = 0.0;
+	REAL m = 1.0;
 	// tglad fold
 	if (aux->i >= fractal->transformCommon.startIterationsA
 			&& aux->i < fractal->transformCommon.stopIterationsA)
@@ -42,9 +42,9 @@ REAL4 AboxMod14Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
 		REAL4 limit = fractal->transformCommon.additionConstant111;
-		REAL4 length = 2.0f * limit;
-		REAL4 tgladS = 1.0f / length;
-		REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 length = 2.0 * limit;
+		REAL4 tgladS = 1.0 / length;
+		REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 		if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 		if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;
 		if (fabs(z.z) < limit.z) Add.z = z.z * z.z * tgladS.z;
@@ -71,7 +71,7 @@ REAL4 AboxMod14Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		if (rr < fractal->transformCommon.invert0)
 			m = fractal->transformCommon.inv0;
 		else if (rr < fractal->transformCommon.invert1)
-			m = 1.0f / rr;
+			m = 1.0 / rr;
 		else
 			m = fractal->transformCommon.inv1;
 		z *= m;
@@ -106,10 +106,10 @@ REAL4 AboxMod14Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		REAL4 offset = aux->pos_neg * fractal->transformCommon.additionConstant000;
 
 		if (fractal->transformCommon.functionEnabledAFalse)
-			offset = (REAL4){sign(z.x), sign(z.y), sign(z.z), 1.0f} * offset;
+			offset = (REAL4){sign(z.x), sign(z.y), sign(z.z), 1.0} * offset;
 
 		if (fractal->transformCommon.functionEnabledBFalse)
-			offset = (REAL4){sign(c.x), sign(c.y), sign(c.z), 1.0f} * offset;
+			offset = (REAL4){sign(c.x), sign(c.y), sign(c.z), 1.0} * offset;
 
 		z += offset;
 		aux->pos_neg *= fractal->transformCommon.scale1; // update for next iter

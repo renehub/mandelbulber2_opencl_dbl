@@ -28,8 +28,8 @@ REAL4 TransfBoxTilingV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		}
 		else
 		{
-			if (z.x < (fractal->transformCommon.offsetA111.x + 0.5f) * size.x
-					&& z.x > (fractal->transformCommon.offsetB111.x + 0.5f) * -size.x)
+			if (z.x < (fractal->transformCommon.offsetA111.x + 0.5) * size.x
+					&& z.x > (fractal->transformCommon.offsetB111.x + 0.5) * -size.x)
 			{
 
 				if (fractal->transformCommon.functionEnabledCxFalse) z.x = fabs(z.x);
@@ -64,8 +64,8 @@ REAL4 TransfBoxTilingV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		}
 		else
 		{
-			if (z.y < (fractal->transformCommon.offsetA111.y + 0.5f) * size.y
-					&& z.y > (fractal->transformCommon.offsetB111.y + 0.5f) * -size.y)
+			if (z.y < (fractal->transformCommon.offsetA111.y + 0.5) * size.y
+					&& z.y > (fractal->transformCommon.offsetB111.y + 0.5) * -size.y)
 			{
 				if (fractal->transformCommon.functionEnabledCyFalse) z.y = fabs(z.y);
 				z.y -= fractal->transformCommon.offset000.y;
@@ -99,8 +99,8 @@ REAL4 TransfBoxTilingV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		}
 		else
 		{
-			if (z.z < (fractal->transformCommon.offsetA111.z + 0.5f) * size.z
-					&& z.z > (fractal->transformCommon.offsetB111.z + 0.5f) * -size.z)
+			if (z.z < (fractal->transformCommon.offsetA111.z + 0.5) * size.z
+					&& z.z > (fractal->transformCommon.offsetB111.z + 0.5) * -size.z)
 			{
 				if (fractal->transformCommon.functionEnabledCzFalse) z.z = fabs(z.z);
 				z.z -= fractal->transformCommon.offset000.z;

@@ -20,12 +20,12 @@
 
 REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 	REAL4 limit4 = fractal->transformCommon.additionConstant111;
-	//	REAL4 value4 = 2.0f * fractal->transformCommon.additionConstant111;
+	//	REAL4 value4 = 2.0 * fractal->transformCommon.additionConstant111;
 	//	if (fractal->transformCommon.functionEnabledFalse)
 	//		value4 = fractal->transformCommon.additionConstant222;
 
@@ -73,9 +73,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			{
 				if (aux->i > fractal->transformCommon.startIterationsC)
 				{
-					limit4.x *= (1.0f
-												- 1.0f
-														/ (1.0f
+					limit4.x *= (1.0
+												- 1.0
+														/ (1.0
 															 + (aux->i - fractal->transformCommon.startIterationsC)
 																	 / fractal->transformCommon.offsetA000.x))
 											* fractal->transformCommon.scale3D111.x;
@@ -86,9 +86,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			{
 				if (aux->i > fractal->transformCommon.startIterationsY)
 				{
-					limit4.y *= (1.0f
-												- 1.0f
-														/ (1.0f
+					limit4.y *= (1.0
+												- 1.0
+														/ (1.0
 															 + (aux->i - fractal->transformCommon.startIterationsY)
 																	 / fractal->transformCommon.offsetA000.y))
 											* fractal->transformCommon.scale3D111.y;
@@ -99,9 +99,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			{
 				if (aux->i > fractal->transformCommon.startIterationsZ)
 				{
-					limit4.z *= (1.0f
-												- 1.0f
-														/ (1.0f
+					limit4.z *= (1.0
+												- 1.0
+														/ (1.0
 															 + (aux->i - fractal->transformCommon.startIterationsZ)
 																	 / fractal->transformCommon.offsetA000.z))
 											* fractal->transformCommon.scale3D111.z;
@@ -120,9 +120,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	{
 		if (aux->i > fractal->transformCommon.startIterationsB)
 		{
-			maxR2use *= (1.0f
-										- 1.0f
-												/ (1.0f
+			maxR2use *= (1.0
+										- 1.0
+												/ (1.0
 													 + (aux->i - fractal->transformCommon.startIterationsB)
 															 / fractal->transformCommon.offsetA0))
 									* fractal->transformCommon.scaleA1;
@@ -133,9 +133,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	{
 		if (aux->i > fractal->transformCommon.startIterationsA)
 		{
-			minR2use *= (1.0f
-										- 1.0f
-												/ (1.0f
+			minR2use *= (1.0
+										- 1.0
+												/ (1.0
 													 + (aux->i - fractal->transformCommon.startIterationsA)
 															 / fractal->transformCommon.offset0))
 									* fractal->transformCommon.scale1;
@@ -148,7 +148,7 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 	z += fractal->mandelbox.offset;
 
-	// if (r2 < 1e-21f) r2 = 1e-21f;
+	// if (r2 < 1e-21) r2 = 1e-21;
 	if (rr < minR2use)
 	{
 		REAL tglad_factor1 = maxR2use / minR2use;
@@ -168,7 +168,7 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 				.mainRotationEnabled) // z = Matrix33MulFloat4(fractal->mandelbox.mainRot, z);
 	{
 		REAL4 tempVC = (REAL4){fractal->mandelbox.rotationMain.x, fractal->mandelbox.rotationMain.y,
-			fractal->mandelbox.rotationMain.z, 0.0f}; // constant to be varied
+			fractal->mandelbox.rotationMain.z, 0.0}; // constant to be varied
 		if (fractal->transformCommon.functionEnabledPFalse)
 		{
 			if (aux->i >= fractal->transformCommon.startIterations
@@ -190,18 +190,18 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 		tempVC *= M_PI_180_F;
 
-		z = RotateAroundVectorByAngle4(z, (REAL3){1.0f, 0.0f, 0.0f}, tempVC.x);
-		z = RotateAroundVectorByAngle4(z, (REAL3){0.0f, 1.0f, 0.0f}, tempVC.y);
-		z = RotateAroundVectorByAngle4(z, (REAL3){0.0f, 0.0f, 1.0f}, tempVC.z);
+		z = RotateAroundVectorByAngle4(z, (REAL3){1.0, 0.0, 0.0}, tempVC.x);
+		z = RotateAroundVectorByAngle4(z, (REAL3){0.0, 1.0, 0.0}, tempVC.y);
+		z = RotateAroundVectorByAngle4(z, (REAL3){0.0, 0.0, 1.0}, tempVC.z);
 	}
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	{
 		useScale = aux->actualScaleA + fractal->mandelbox.scale;
 
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 		if (fractal->transformCommon.functionEnabledFFalse
 				&& aux->i >= fractal->transformCommon.startIterationsX
 				&& aux->i < fractal->transformCommon.stopIterationsX)
@@ -265,9 +265,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			{
 				if (aux->i > fractal->transformCommon.startIterationsM)
 				{
-					tempC.x *= (1.0f
-											 - 1.0f
-													 / (1.0f
+					tempC.x *= (1.0
+											 - 1.0
+													 / (1.0
 															+ (aux->i - fractal->transformCommon.startIterationsM)
 																	/ fractal->transformCommon.offsetF000.x))
 										 * fractal->transformCommon.constantMultiplierB111.x;
@@ -277,9 +277,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			{
 				if (aux->i > fractal->transformCommon.startIterationsO)
 				{
-					tempC.y *= (1.0f
-											 - 1.0f
-													 / (1.0f
+					tempC.y *= (1.0
+											 - 1.0
+													 / (1.0
 															+ (aux->i - fractal->transformCommon.startIterationsO)
 																	/ fractal->transformCommon.offsetF000.y))
 										 * fractal->transformCommon.constantMultiplierB111.y;
@@ -289,9 +289,9 @@ REAL4 MandelboxVariableIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			{
 				if (aux->i > fractal->transformCommon.startIterationsP)
 				{
-					tempC.z *= (1.0f
-											 - 1.0f
-													 / (1.0f
+					tempC.z *= (1.0
+											 - 1.0
+													 / (1.0
 															+ (aux->i - fractal->transformCommon.startIterationsP)
 																	/ fractal->transformCommon.offsetF000.z))
 										 * fractal->transformCommon.constantMultiplierB111.z;

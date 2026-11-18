@@ -20,9 +20,9 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	if (aux->i >= fractal->transformCommon.startIterationsE
 			&& aux->i < fractal->transformCommon.stopIterationsE)
 	{
-		if (z.x + z.y < 0.0f) z = (REAL4){-z.y, -z.x, z.z, z.w};
+		if (z.x + z.y < 0.0) z = (REAL4){-z.y, -z.x, z.z, z.w};
 
-		if (z.x + z.z < 0.0f) // z.xz = -z.zx;
+		if (z.x + z.z < 0.0) // z.xz = -z.zx;
 			z = (REAL4){-z.z, z.y, -z.x, z.w};
 
 		if (z.x < z.y) // z.xy = z.yx;
@@ -33,7 +33,7 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 		z.x = fabs(z.x);
 		z = z * fractal->transformCommon.scale2
-				- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0f);
+				- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0);
 
 		aux->DE *= fractal->transformCommon.scale2;
 	}
@@ -50,9 +50,9 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		if (fractal->transformCommon.functionEnabledzFalse)
 		{
 			REAL tempL = length(temp);
-			// if (tempL < 1e-21f) tempL = 1e-21f;
+			// if (tempL < 1e-21) tempL = 1e-21;
 			REAL avgScale = length(z) / tempL;
-			aux->DE = aux->DE * avgScale + 1.0f;
+			aux->DE = aux->DE * avgScale + 1.0;
 		}
 	}
 	// spherical fold
@@ -60,8 +60,8 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 			&& aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
-		REAL para = 0.0f;
-		REAL paraAddP0 = 0.0f;
+		REAL para = 0.0;
+		REAL paraAddP0 = 0.0;
 		if (fractal->transformCommon.functionEnabledyFalse)
 		{
 			// para += paraAddP0 + fractal->transformCommon.minR2p25;
@@ -95,13 +95,13 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 				// Curvi part on "true"
 				if (fractal->Cpara.enabledCurves)
 				{
-					REAL paraAdd = 0.0f;
+					REAL paraAdd = 0.0;
 					REAL paraIt;
-					if (lengthAB > 2.0f * fractal->Cpara.iterA) // stop  error, todo fix.
+					if (lengthAB > 2.0 * fractal->Cpara.iterA) // stop  error, todo fix.
 					{
-						REAL curve1 = (grade2 - grade1) / (4.0f * fractal->Cpara.iterA);
+						REAL curve1 = (grade2 - grade1) / (4.0 * fractal->Cpara.iterA);
 						REAL tempL = lengthAB - fractal->Cpara.iterA;
-						REAL curve2 = (grade3 - grade2) / (4.0f * tempL);
+						REAL curve2 = (grade3 - grade2) / (4.0 * tempL);
 						if (aux->i < 2 * fractal->Cpara.iterA)
 						{
 							paraIt = tempA - fabs(tempA - aux->i);
@@ -116,11 +116,11 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 					}
 				}
 			}
-			paraAddP0 = 0.0f;
+			paraAddP0 = 0.0;
 			if (fractal->Cpara.enabledParabFalse)
 			{ // parabolic = paraOffset + iter *slope + (iter *iter *scale)
 				paraAddP0 = fractal->Cpara.parabOffset0 + (aux->i * fractal->Cpara.parabSlope)
-										+ (aux->i * aux->i * 0.001f * fractal->Cpara.parabScale);
+										+ (aux->i * aux->i * 0.001 * fractal->Cpara.parabScale);
 			}
 		}
 		para += paraAddP0 + fractal->transformCommon.minR2p25;
@@ -129,7 +129,7 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 		z += fractal->mandelbox.offset;
 
-		// if (r2 < 1e-21f) r2 = 1e-21f;
+		// if (r2 < 1e-21) r2 = 1e-21;
 		if (rr < para)
 		{
 			REAL tglad_factor1 = fractal->transformCommon.maxR2d1 / para;
@@ -162,7 +162,7 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	{
 		z = fabs(z);
 		REAL temp;
-		REAL col = 0.0f;
+		REAL col = 0.0;
 		if (z.x < z.y)
 		{
 			temp = z.y;
@@ -190,9 +190,9 @@ REAL4 MengerOctoIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 			aux->color += col;
 		}
 		z *= fractal->transformCommon.scale3;
-		z.x -= 2.0f * fractal->transformCommon.constantMultiplier111.x;
-		z.y -= 2.0f * fractal->transformCommon.constantMultiplier111.y;
-		if (z.z > 1.0f) z.z -= 2.0f * fractal->transformCommon.constantMultiplier111.z;
+		z.x -= 2.0 * fractal->transformCommon.constantMultiplier111.x;
+		z.y -= 2.0 * fractal->transformCommon.constantMultiplier111.y;
+		if (z.z > 1.0) z.z -= 2.0 * fractal->transformCommon.constantMultiplier111.z;
 		aux->DE *= fractal->transformCommon.scale3;
 		z += fractal->transformCommon.additionConstant000;
 	}

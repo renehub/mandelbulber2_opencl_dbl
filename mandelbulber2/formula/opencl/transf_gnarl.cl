@@ -24,7 +24,7 @@ REAL4 TransfGnarlIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	REAL stepX = fractal->transformCommon.scale3D000.x; //-0.1;
 	REAL stepY = fractal->transformCommon.scale3D000.y;
 	REAL stepZ = fractal->transformCommon.scale3D000.z;
-	REAL Alpha = fractal->transformCommon.rotation.x; // 2.0f;
+	REAL Alpha = fractal->transformCommon.rotation.x; // 2.0;
 	REAL Beta = fractal->transformCommon.rotation.y;	//-4.0;
 	REAL Gamma = fractal->transformCommon.rotation.z; //-0.1;
 

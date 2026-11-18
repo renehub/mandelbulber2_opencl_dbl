@@ -36,40 +36,40 @@ __constant sampler_t sampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_REPEAT |
 
 //-------------- background shaders ---------------
 
-float3 BackgroundShader(__constant sClInConstants *consts, sRenderData *renderData,
+REAL3 BackgroundShader(__constant sClInConstants *consts, sRenderData *renderData,
 	image2d_t image2dBackground, sShaderInputDataCl *input)
 {
-	float3 pixel;
-	float3 viewVectorNorm = input->viewVector;
+	REAL3 pixel;
+	REAL3 viewVectorNorm = input->viewVector;
 	viewVectorNorm = normalize(viewVectorNorm);
 
 #ifdef TEXTURED_BACKGROUND
 
 #ifdef BACKGROUND_EQUIRECTANGULAR
-	float3 rotatedViewVector =
+	REAL3 rotatedViewVector =
 		Matrix33MulFloat3(consts->params.mRotBackgroundRotation, input->viewVector);
 
-	float alphaTexture =
-		fmod(-atan2(rotatedViewVector.y, rotatedViewVector.x) + 3.5f * M_PI_F, 2.0f * M_PI_F);
-	float betaTexture = -atan2(rotatedViewVector.z, length(rotatedViewVector.xy));
-	if (betaTexture > 0.5f * M_PI_F) betaTexture = 0.5f * M_PI_F - betaTexture;
-	if (betaTexture < -0.5f * M_PI_F) betaTexture = -0.5f * M_PI_F + betaTexture;
-	float2 texCord;
-	texCord.x = alphaTexture / (2.0f * M_PI_F) / consts->params.backgroundHScale
+	REAL alphaTexture =
+		fmod(-atan2(rotatedViewVector.y, rotatedViewVector.x) + 3.5 * M_PI_F, 2.0 * M_PI_F);
+	REAL betaTexture = -atan2(rotatedViewVector.z, length(rotatedViewVector.xy));
+	if (betaTexture > 0.5 * M_PI_F) betaTexture = 0.5 * M_PI_F - betaTexture;
+	if (betaTexture < -0.5 * M_PI_F) betaTexture = -0.5 * M_PI_F + betaTexture;
+	REAL2 texCord;
+	texCord.x = alphaTexture / (2.0 * M_PI_F) / consts->params.backgroundHScale
 							+ consts->params.backgroundTextureOffsetX;
-	texCord.y = (betaTexture / (M_PI_F) + 0.5f) / consts->params.backgroundVScale
+	texCord.y = (betaTexture / (M_PI_F) + 0.5) / consts->params.backgroundVScale
 							+ consts->params.backgroundTextureOffsetY;
-	float4 pixelTex = read_imagef(image2dBackground, sampler, texCord);
+	float4 pixelTex = read_imagef(image2dBackground, sampler, convert_float2(texCord));
 
-	pixel = pixelTex.xyz;
+	pixel = TO_REAL3(pixelTex.xyz);
 #endif // BACKGROUND_EQUIRECTANGULAR
 
 #ifdef BACKGROUND_FLAT
-	float3 vect = Matrix33MulFloat3(renderData->mRotInv, input->viewVector);
+	REAL3 vect = Matrix33MulFloat3(renderData->mRotInv, input->viewVector);
 	vect = Matrix33MulFloat3(consts->params.mRotBackgroundRotation, vect);
 
-	float2 tex;
-	if (fabs(vect.y) > 1e-10f)
+	REAL2 tex;
+	if (fabs(vect.y) > 1e-10)
 	{
 		tex.x =
 			vect.x / vect.y / consts->params.fov * consts->params.imageHeight / consts->params.imageWidth;
@@ -77,38 +77,38 @@ float3 BackgroundShader(__constant sClInConstants *consts, sRenderData *renderDa
 	}
 	else
 	{
-		tex.x = vect.x > 0.0f ? 1.0f : -1.0f;
-		tex.y = vect.z > 0.0f ? -1.0f : 1.0f;
+		tex.x = vect.x > 0.0 ? 1.0 : -1.0;
+		tex.y = vect.z > 0.0 ? -1.0 : 1.0;
 	}
 
 	tex.x =
-		(tex.x / consts->params.backgroundHScale) + 0.5f + consts->params.backgroundTextureOffsetX;
+		(tex.x / consts->params.backgroundHScale) + 0.5 + consts->params.backgroundTextureOffsetX;
 	tex.y =
-		(tex.y / consts->params.backgroundVScale) + 0.5f + consts->params.backgroundTextureOffsetY;
+		(tex.y / consts->params.backgroundVScale) + 0.5 + consts->params.backgroundTextureOffsetY;
 
-	float4 pixelTex = read_imagef(image2dBackground, sampler, tex);
-	pixel = pixelTex.xyz;
+	float4 pixelTex = read_imagef(image2dBackground, sampler, convert_float2(tex));
+	pixel = TO_REAL3(pixelTex.xyz);
 #endif // BACKGROUND_FLAT
 
 #ifdef BACKGROUND_DOUBLE_HEMISPHERE
-	float3 rotatedViewVector =
+	REAL3 rotatedViewVector =
 		Matrix33MulFloat3(consts->params.mRotBackgroundRotation, input->viewVector);
-	float alphaTexture = atan2(rotatedViewVector.y, rotatedViewVector.x);
-	float betaTexture = atan2(rotatedViewVector.z, length(rotatedViewVector.xy));
+	REAL alphaTexture = atan2(rotatedViewVector.y, rotatedViewVector.x);
+	REAL betaTexture = atan2(rotatedViewVector.z, length(rotatedViewVector.xy));
 
-	float offset = 0.0f;
-	if (betaTexture < 0.0f)
+	REAL offset = 0.0;
+	if (betaTexture < 0.0)
 	{
 		betaTexture = -betaTexture;
 		alphaTexture = M_PI_F - alphaTexture;
-		offset = 0.5f;
+		offset = 0.5;
 	}
 
-	float2 tex;
-	tex.x = 0.25f + cos(alphaTexture) * (1.0f - betaTexture / (0.5f * M_PI_F)) * 0.25f + offset;
-	tex.y = 0.5f + sin(alphaTexture) * (1.0f - betaTexture / (0.5f * M_PI_F)) * 0.5f;
-	float4 pixelTex = read_imagef(image2dBackground, sampler, tex);
-	pixel = pixelTex.xyz;
+	REAL2 tex;
+	tex.x = 0.25 + cos(alphaTexture) * (1.0 - betaTexture / (0.5 * M_PI_F)) * 0.25 + offset;
+	tex.y = 0.5 + sin(alphaTexture) * (1.0 - betaTexture / (0.5 * M_PI_F)) * 0.5;
+	float4 pixelTex = read_imagef(image2dBackground, sampler, convert_float2(tex));
+	pixel = TO_REAL3(pixelTex.xyz);
 
 #endif
 
@@ -116,38 +116,40 @@ float3 BackgroundShader(__constant sClInConstants *consts, sRenderData *renderDa
 
 	if (consts->params.background3ColorsEnable)
 	{
-		float3 vector = (float3){0.0f, 0.0f, 1.0f};
+		REAL3 vector = (REAL3){0.0, 0.0, 1.0};
 		vector = normalize(vector);
-		float grad = dot(viewVectorNorm, vector) + 1.0f;
+		REAL grad = dot(viewVectorNorm, vector) + 1.0;
 
-		if (grad < 1.0f)
+		if (grad < 1.0)
 		{
-			float gradN = 1.0f - grad;
-			pixel = consts->params.background_color3 * gradN + consts->params.background_color2 * grad;
+			REAL gradN = 1.0 - grad;
+			pixel = TO_REAL3(consts->params.background_color3) * gradN
+			+ TO_REAL3(consts->params.background_color2) * grad;
 		}
 		else
 		{
-			grad = grad - 1.0f;
-			float gradN = 1.0f - grad;
-			pixel = consts->params.background_color2 * gradN + consts->params.background_color1 * grad;
+			grad = grad - 1.0;
+			REAL gradN = 1.0 - grad;
+			pixel = TO_REAL3(consts->params.background_color2) * gradN
+			+ TO_REAL3(consts->params.background_color1) * grad;
 		}
 	}
 	else
 	{
-		pixel = consts->params.background_color1;
+		pixel = TO_REAL3(consts->params.background_color1);
 	}
 #endif // TEXTURED_BACKGROUND
 
 	pixel *= consts->params.background_brightness;
-	pixel = pow(pixel, 1.0f / consts->params.background_gamma);
+	pixel = pow(pixel, 1.0 / consts->params.background_gamma);
 
 	for (int i = 0; i < renderData->numberOfLights; i++)
 	{
 		__global sLightCl *light = &renderData->lights[i];
 		if (light->enabled && light->type == lightDirectional)
 		{
-			float intensity = -(dot(viewVectorNorm, light->lightDirection) - 1.0f) * 360.0f / light->size;
-			intensity = 1.0f / (1.0f + pow(intensity, 6.0f * light->contourSharpness)) * light->visibility
+			REAL intensity = -(dot(viewVectorNorm, light->lightDirection) - 1.0) * 360.0 / light->size;
+			intensity = 1.0 / (1.0 + pow(intensity, 6.0 * light->contourSharpness)) * light->visibility
 									* light->intensity;
 			pixel += intensity * light->color;
 		}

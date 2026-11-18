@@ -29,7 +29,7 @@ REAL4 MsltoeDonutIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	REAL theta = atan2(z.y, z.x);
 	REAL theta2 = nSect * round(theta / nSect);
 
-	if (t > 0.03f)
+	if (t > 0.03)
 	{
 		REAL c1 = native_cos(theta2);
 		REAL s1 = native_sin(theta2);

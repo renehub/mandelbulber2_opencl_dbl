@@ -17,7 +17,7 @@
 REAL4 TransfRotationVaryV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 tempVC = (REAL4){fractal->transformCommon.rotation.x, fractal->transformCommon.rotation.y,
-		fractal->transformCommon.rotation.z, 0.0f}; // constant to be varied
+		fractal->transformCommon.rotation.z, 0.0}; // constant to be varied
 	int iterationRange =
 		fractal->transformCommon.stopIterations - fractal->transformCommon.startIterations250;
 
@@ -38,8 +38,8 @@ REAL4 TransfRotationVaryV1Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 
 	tempVC *= M_PI_180_F;
 
-	z = RotateAroundVectorByAngle4(z, (REAL3){1.0f, 0.0f, 0.0f}, tempVC.x);
-	z = RotateAroundVectorByAngle4(z, (REAL3){0.0f, 1.0f, 0.0f}, tempVC.y);
-	z = RotateAroundVectorByAngle4(z, (REAL3){0.0f, 0.0f, 1.0f}, tempVC.z);
+	z = RotateAroundVectorByAngle4(z, (REAL3){1.0, 0.0, 0.0}, tempVC.x);
+	z = RotateAroundVectorByAngle4(z, (REAL3){0.0, 1.0, 0.0}, tempVC.y);
+	z = RotateAroundVectorByAngle4(z, (REAL3){0.0, 0.0, 1.0}, tempVC.z);
 	return z;
 }

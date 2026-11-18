@@ -19,9 +19,9 @@
 
 REAL4 AmazingSurfMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	aux->actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 	REAL4 oldZ = z;
 	if (fractal->transformCommon.functionEnabledAx)
 	{
@@ -89,8 +89,8 @@ REAL4 AmazingSurfMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	if (fractal->transformCommon.functionEnabledFalse) // force cylinder fold
 		r2 -= z.z * z.z;
 
-	// if (r2 < 1e-21f)
-	//	r2 = 1e-21f;
+	// if (r2 < 1e-21)
+	//	r2 = 1e-21;
 
 	REAL sqrtMinR = fractal->transformCommon.sqtR;
 	if (r2 < sqrtMinR)
@@ -99,16 +99,16 @@ REAL4 AmazingSurfMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		aux->DE *= fractal->transformCommon.mboxFactor1;
 		colorAdd += fractal->mandelbox.color.factorSp1;
 	}
-	else if (r2 < 1.0f)
+	else if (r2 < 1.0)
 	{
-		z *= 1.0f / r2;
-		aux->DE *= 1.0f / r2;
+		z *= 1.0 / r2;
+		aux->DE *= 1.0 / r2;
 		colorAdd += fractal->mandelbox.color.factorSp2;
 	}
 
 	z *= aux->actualScale * fractal->transformCommon.scale1
-			 + 1.0f * (1.0f - fractal->transformCommon.scale1);
-	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0f;
+			 + 1.0 * (1.0 - fractal->transformCommon.scale1);
+	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0;
 
 	z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 

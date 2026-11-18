@@ -26,7 +26,7 @@ REAL4 TransfSphericalFoldV1Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	REAL4 tt = z - fractal->mandelbox.offset;
 
 	REAL trr = dot(tt, tt);
-	REAL tp = min(max(1.0f / trr, 1.0f), 1.0f / fractal->transformCommon.minR2p25);
+	REAL tp = min(max(1.0 / trr, 1.0), 1.0 / fractal->transformCommon.minR2p25);
 
 	z *= tp;
 	aux->DE *= tp;

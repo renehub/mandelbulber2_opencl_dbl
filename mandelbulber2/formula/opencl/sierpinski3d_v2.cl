@@ -43,10 +43,10 @@ REAL4 Sierpinski3dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			z.z = fabs(z.z + fractal->transformCommon.offsetA000.z);
 	}
 
-	REAL4 va = (REAL4){0.0f, 0.0f, SQRT_1_3_F, 0.0f};
-	REAL4 vb = (REAL4){0.0f, -2.0f * SQRT_1_3_F, -1.0f, 0.0f};
-	REAL4 vc = (REAL4){-1.0f, SQRT_1_3_F, -1.0f, 0.0f};
-	REAL4 vd = (REAL4){1.0f, SQRT_1_3_F, -1.0f, 0.0f};
+	REAL4 va = (REAL4){0.0, 0.0, SQRT_1_3_F, 0.0};
+	REAL4 vb = (REAL4){0.0, -2.0 * SQRT_1_3_F, -1.0, 0.0};
+	REAL4 vc = (REAL4){-1.0, SQRT_1_3_F, -1.0, 0.0};
+	REAL4 vd = (REAL4){1.0, SQRT_1_3_F, -1.0, 0.0};
 	if (fractal->transformCommon.functionEnabledDFalse)
 	{
 		va *= fractal->transformCommon.scale1111.x;
@@ -87,12 +87,12 @@ REAL4 Sierpinski3dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
-		REAL m = 1.0f;
+		REAL m = 1.0;
 		REAL rr = dot(z, z);
 		if (rr < fractal->transformCommon.invert0)
 			m = fractal->transformCommon.inv0;
 		else if (rr < fractal->transformCommon.invert1)
-			m = 1.0f / rr;
+			m = 1.0 / rr;
 		else
 			m = fractal->transformCommon.inv1;
 		z *= m;

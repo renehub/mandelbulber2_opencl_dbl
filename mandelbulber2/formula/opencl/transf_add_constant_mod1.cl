@@ -27,11 +27,11 @@ REAL4 TransfAddConstantMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 		REAL4 temp2 = temp * temp;
 		REAL4 z2 = z * z * fractal->transformCommon.scaleA1;
 		z.x -=
-			((temp.x * temp2.x) / (z2.x + temp2.x) - 2.0f * temp.x) * fractal->transformCommon.scale1;
+			((temp.x * temp2.x) / (z2.x + temp2.x) - 2.0 * temp.x) * fractal->transformCommon.scale1;
 		z.y -=
-			((temp.y * temp2.y) / (z2.y + temp2.y) - 2.0f * temp.y) * fractal->transformCommon.scale1;
+			((temp.y * temp2.y) / (z2.y + temp2.y) - 2.0 * temp.y) * fractal->transformCommon.scale1;
 		z.z -=
-			((temp.z * temp2.z) / (z2.z + temp2.z) - 2.0f * temp.z) * fractal->transformCommon.scale1;
+			((temp.z * temp2.z) / (z2.z + temp2.z) - 2.0 * temp.z) * fractal->transformCommon.scale1;
 	}
 
 	else if (fractal->transformCommon.functionEnabledByFalse
@@ -42,11 +42,11 @@ REAL4 TransfAddConstantMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 		REAL4 temp2 = temp * temp;
 		REAL4 z2 = z * z * fractal->transformCommon.scaleA1;
 
-		z.x -= ((temp2.x) / (z2.x + temp2.x) - 2.0f * temp.x)
+		z.x -= ((temp2.x) / (z2.x + temp2.x) - 2.0 * temp.x)
 					 * fractal->transformCommon.scale1; // * sign(z.x);
-		z.y -= ((temp2.y) / (z2.y + temp2.y) - 2.0f * temp.y)
+		z.y -= ((temp2.y) / (z2.y + temp2.y) - 2.0 * temp.y)
 					 * fractal->transformCommon.scale1; // * sign(z.y);
-		z.z -= ((temp2.z) / (z2.z + temp2.z) - 2.0f * temp.z)
+		z.z -= ((temp2.z) / (z2.z + temp2.z) - 2.0 * temp.z)
 					 * fractal->transformCommon.scale1; // * sign(z.z);
 	}
 	return z;

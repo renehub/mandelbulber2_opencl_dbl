@@ -33,33 +33,33 @@
  */
 
 #ifdef AO_MODE_FAST
-float3 FastAmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderData,
+REAL3 FastAmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParam)
 {
 	// reference Iñigo Quilez –iq/rgba:
 	// http://www.iquilezles.org/www/material/nvscene2008/rwwtt.pdf
-	float delta = input->distThresh;
-	float aoTemp = 0;
-	float quality = consts->params.ambientOcclusionQuality;
-	float lastDist = 1e20f;
+	REAL delta = input->distThresh;
+	REAL aoTemp = 0;
+	REAL quality = consts->params.ambientOcclusionQuality;
+	REAL lastDist = 1e20;
 	for (int i = 1; i < quality * quality; i++)
 	{
-		float scan = i * i * delta;
-		float3 pointTemp = input->point + input->normal * scan;
+		REAL scan = i * i * delta;
+		REAL3 pointTemp = input->point + input->normal * scan;
 
 		calcParam->distThresh = input->distThresh;
 		formulaOut outF;
 		outF = CalculateDistance(consts, pointTemp, calcParam, renderData);
-		float dist = outF.distance;
+		REAL dist = outF.distance;
 
-		if (dist > lastDist * 2.0f) dist = lastDist * 2.0f;
+		if (dist > lastDist * 2.0) dist = lastDist * 2.0;
 		lastDist = dist;
-		aoTemp += 1.0f / pow(2.0f, i) * (scan - consts->params.ambientOcclusionFastTune * dist)
+		aoTemp += 1.0 / pow(2.0, i) * (scan - consts->params.ambientOcclusionFastTune * dist)
 							/ input->distThresh;
 	}
-	float ao = 1.0f - 0.2f * aoTemp;
+	REAL ao = 1.0 - 0.2 * aoTemp;
 	if (ao < 0) ao = 0;
-	float3 output = (float3){ao, ao, ao};
+	REAL3 output = (REAL3){ao, ao, ao};
 	return output;
 }
 #endif

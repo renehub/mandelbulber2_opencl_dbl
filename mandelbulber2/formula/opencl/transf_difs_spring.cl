@@ -41,9 +41,9 @@ REAL4 TransfDIFSSpringIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	else
 		P = fractal->transformCommon.offsetp01;
 	zc.z += atan2(zc.y, zc.x) / M_PI_F * P;
-	zc.z = (zc.z - P * 2.0f * floor(zc.z / (P * 2.0f))) - P;
+	zc.z = (zc.z - P * 2.0 * floor(zc.z / (P * 2.0))) - P;
 
-	// L = max(max(T, L), 0.0f);
+	// L = max(max(T, L), 0.0);
 	// L = native_sqrt(T * T + L * L);
 
 	REAL dd;
@@ -55,9 +55,9 @@ REAL4 TransfDIFSSpringIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	dd = max(L, dd);
 	REAL colDist = aux->dist;
 	if (!fractal->analyticDE.enabledFalse)
-		aux->dist = (dd - fractal->transformCommon.offset0005) / (aux->DE + 1.0f);
+		aux->dist = (dd - fractal->transformCommon.offset0005) / (aux->DE + 1.0);
 	else
-		aux->dist = min(aux->dist, (dd - fractal->transformCommon.offset0005) / (aux->DE + 1.0f));
+		aux->dist = min(aux->dist, (dd - fractal->transformCommon.offset0005) / (aux->DE + 1.0));
 
 	aux->DE0 = (dd - fractal->transformCommon.offset0005); // temp testing
 

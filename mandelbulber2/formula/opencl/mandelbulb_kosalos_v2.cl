@@ -21,19 +21,19 @@ REAL4 MandelbulbKosalosV2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 	REAL4 c = aux->const_c;
 	REAL power = fractal->bulb.power;
 
-	REAL4 diffVec = (REAL4){0.001f, 0.001f, 0.001f, 0.0f} + aux->c - z;
+	REAL4 diffVec = (REAL4){0.001, 0.001, 0.001, 0.0} + aux->c - z;
 	aux->c = z;
-	REAL diffLen = length(diffVec); // > 3.16e-5f
-	REAL thetaTweak = fractal->transformCommon.scaleA1 * 0.01f
-										/ (diffLen + fractal->transformCommon.offsetA0 * 0.01f);
+	REAL diffLen = length(diffVec); // > 3.16e-5
+	REAL thetaTweak = fractal->transformCommon.scaleA1 * 0.01
+										/ (diffLen + fractal->transformCommon.offsetA0 * 0.01);
 
 	if (!fractal->transformCommon.functionEnabledxFalse)
 	{
-		thetaTweak = (1.0f - thetaTweak);
+		thetaTweak = (1.0 - thetaTweak);
 	}
 	else // mode2
 	{
-		thetaTweak = thetaTweak + (1.0f - thetaTweak) * fractal->transformCommon.scaleB1;
+		thetaTweak = thetaTweak + (1.0 - thetaTweak) * fractal->transformCommon.scaleB1;
 	}
 
 	REAL theta;
@@ -67,7 +67,7 @@ REAL4 MandelbulbKosalosV2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 			z.y += cs * native_cos(phi);
 			z.z += pwr * native_sin(theta);
 		}
-		aux->DE += (pow(aux->r, power - 1.0f) * power * aux->DE);
+		aux->DE += (pow(aux->r, power - 1.0) * power * aux->DE);
 		z.z += fractal->transformCommon.offset0;
 	}
 	else // z = f(z) + c
@@ -86,13 +86,13 @@ REAL4 MandelbulbKosalosV2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 			z.y += cs * native_cos(phi);
 			z.z += pwr * native_sin(theta * power);
 		}
-		aux->DE = (pow(aux->r, power - 1.0f) * power * aux->DE);
+		aux->DE = (pow(aux->r, power - 1.0) * power * aux->DE);
 		z.z += fractal->transformCommon.offset0;
 		c *= fractal->transformCommon.constantMultiplierC111;
 		if (!fractal->transformCommon.functionEnabledyFalse)
 			z += c;
 		else
-			z += (REAL4){c.y, c.x, c.z, 0.0f};
+			z += (REAL4){c.y, c.x, c.z, 0.0};
 	}
 	aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 	return z;

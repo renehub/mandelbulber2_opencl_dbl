@@ -26,7 +26,7 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	}
 	REAL costh;
 	REAL sinth;
-	REAL th0 = fractal->bulb.betaAngleOffset + 1e-030f; // MUST keep exception catch
+	REAL th0 = fractal->bulb.betaAngleOffset + 1e-030; // MUST keep exception catch
 	REAL ph0 = fractal->bulb.alphaAngleOffset;
 	REAL4 v;
 	switch (fractal->mandelbulbMulti.orderOfXYZ)
@@ -54,12 +54,12 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	if (fractal->transformCommon.functionEnabledBxFalse)
 	{
 		costh = native_cos(th0);
-		z = aux->r * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0f};
+		z = aux->r * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0};
 	}
 	else
 	{ // cosine mode default
 		sinth = native_sin(th0);
-		z = aux->r * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0f};
+		z = aux->r * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0};
 	}
 
 	if (fractal->transformCommon.functionEnabledxFalse)
@@ -74,17 +74,17 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 			case multi_OrderOfXYZCl_zxy: v = (REAL4){z.z, z.x, z.y, z.w}; break;
 			case multi_OrderOfXYZCl_zyx: v = (REAL4){z.z, z.y, z.x, z.w}; break;
 		}
-		if (v.x * v.x + v.y * v.y == 0.0f)
+		if (v.x * v.x + v.y * v.y == 0.0)
 		{
 			v.y = v.z * v.z;
-			v.z = 0.0f;
+			v.z = 0.0;
 		}
 		if (fractal->mandelbulbMulti.acosOrAsinA == multi_acosOrAsinCl_acos)
 			th0 = acos(v.x / aux->r) + fractal->transformCommon.betaAngleOffset;
-		//	+ 1e-030f; // MUST keep exception catch
+		//	+ 1e-030; // MUST keep exception catch
 		else
 			th0 += asin(v.x / aux->r) + fractal->transformCommon.betaAngleOffset;
-		//	 + 1e-030f; // MUST keep exception catch;
+		//	 + 1e-030; // MUST keep exception catch;
 
 		if (fractal->mandelbulbMulti.atanOrAtan2A == multi_atanOrAtan2Cl_atan)
 			ph0 += atan(v.y / v.z);
@@ -103,17 +103,17 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 			case multi_OrderOfXYZCl_zxy: v = (REAL4){z.z, z.x, z.y, z.w}; break;
 			case multi_OrderOfXYZCl_zyx: v = (REAL4){z.z, z.y, z.x, z.w}; break;
 		}
-		if (v.x * v.x + v.y * v.y == 0.0f)
+		if (v.x * v.x + v.y * v.y == 0.0)
 		{
 			v.y = v.z * v.z;
-			v.z = 0.0f;
+			v.z = 0.0;
 		}
 		if (fractal->mandelbulbMulti.acosOrAsin == multi_acosOrAsinCl_acos)
 			th0 = acos(v.x / aux->r) + fractal->transformCommon.betaAngleOffset;
-		//	+ 1e-030f; // MUST keep exception catch ??;
+		//	+ 1e-030; // MUST keep exception catch ??;
 		else
 			th0 += asin(v.x / aux->r) + fractal->transformCommon.betaAngleOffset;
-		//	 + 1e-030f; // MUST keep exception catch ??;
+		//	 + 1e-030; // MUST keep exception catch ??;
 
 		if (fractal->mandelbulbMulti.atanOrAtan2 == multi_atanOrAtan2Cl_atan)
 			ph0 += atan(v.y / v.z);
@@ -121,18 +121,18 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 			ph0 += atan2(v.y, v.z);
 	}
 
-	ph0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleB1 * 0.5f; // 0.5f retain
+	ph0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleB1 * 0.5; // 0.5 retain
 	REAL zp = pow(aux->r, fractal->transformCommon.pwr8);
 
 	if (fractal->transformCommon.functionEnabledzFalse)
 	{ // sine mode
 		costh = native_cos(th0);
-		z = zp * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0f};
+		z = zp * (REAL4){costh * native_sin(ph0), native_cos(ph0) * costh, native_sin(th0), 0.0};
 	}
 	else
 	{ // cosine mode default
 		sinth = native_sin(th0);
-		z = zp * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0f};
+		z = zp * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0};
 	}
 
 	if (fractal->analyticDE.enabledFalse)
@@ -141,11 +141,11 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 								* fractal->transformCommon.pwr8 * fractal->analyticDE.scale1
 							+ fractal->analyticDE.offset2;
 	}
-	else // default, i.e. scale1 & offset1 & offset2 = 1.0f
+	else // default, i.e. scale1 & offset1 & offset2 = 1.0
 	{
 		aux->DE =
-			pow(aux->r, fractal->transformCommon.pwr8 - 1.0f) * fractal->transformCommon.pwr8 * aux->DE
-			+ 1.0f;
+			pow(aux->r, fractal->transformCommon.pwr8 - 1.0) * fractal->transformCommon.pwr8 * aux->DE
+			+ 1.0;
 	}
 	if (fractal->transformCommon.addCpixelEnabledFalse)
 	{

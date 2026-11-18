@@ -44,10 +44,10 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 		}
 
 		// scale
-		REAL useScale = 1.0f;
+		REAL useScale = 1.0;
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 
 		if (fractal->transformCommon.functionEnabledKFalse
 				&& aux->i >= fractal->transformCommon.startIterationsK
@@ -60,7 +60,7 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 		}
 
 		// z *= fractal->transformCommon.scale2;
-		// aux->DE = aux->DE * fabs(fractal->transformCommon.scale2) + 1.0f;
+		// aux->DE = aux->DE * fabs(fractal->transformCommon.scale2) + 1.0;
 	}
 
 	// menger
@@ -68,19 +68,19 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	{
 		z = fabs(z + fractal->transformCommon.offsetA000);
 
-		if (z.x - z.y < 0.0f)
+		if (z.x - z.y < 0.0)
 		{
 			REAL temp = z.x;
 			z.x = z.y;
 			z.y = temp;
 		}
-		if (z.x - z.z < 0.0f)
+		if (z.x - z.z < 0.0)
 		{
 			REAL temp = z.x;
 			z.x = z.z;
 			z.z = temp;
 		}
-		if (z.y - z.z < 0.0f)
+		if (z.y - z.z < 0.0)
 		{
 			REAL temp = z.y;
 			z.y = z.z;
@@ -89,9 +89,9 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 
 		z *= fractal->transformCommon.scale3; // 3
 
-		z.x -= 2.0f;
-		z.y -= 2.0f;
-		if (z.z > 1.0f) z.z -= 2.0f;
+		z.x -= 2.0;
+		z.y -= 2.0;
+		if (z.z > 1.0) z.z -= 2.0;
 
 		aux->DE *= fractal->transformCommon.scale3; // 3
 	}
@@ -99,14 +99,14 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	// bulb
 	if (fractal->transformCommon.functionEnabledOFalse)
 	{
-		// if (aux->r < 1e-21f) aux->r = 1e-21f;
+		// if (aux->r < 1e-21) aux->r = 1e-21;
 		REAL th0 = asin(z.z / aux->r) + fractal->bulb.betaAngleOffset;
 		REAL ph0 = atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset;
-		REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
+		REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
 		REAL th = th0 * fractal->bulb.power;
 		REAL ph = ph0 * fractal->bulb.power;
 		REAL cth = native_cos(th);
-		aux->DE = (rp * aux->DE) * fractal->bulb.power + 1.0f;
+		aux->DE = (rp * aux->DE) * fractal->bulb.power + 1.0;
 		rp *= aux->r;
 		z.x = cth * native_cos(ph) * rp;
 		z.y = cth * native_sin(ph) * rp;
@@ -128,17 +128,17 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	REAL cylinder;
 	REAL cylR = native_sqrt(zc.x * zc.x + zc.y * zc.y) - fractal->transformCommon.radius1;
 	REAL cylH = fabs(zc.z) - fractal->transformCommon.offsetA1;
-	cylR = max(cylR, 0.0f);
-	cylH = max(cylH, 0.0f);
+	cylR = max(cylR, 0.0);
+	cylH = max(cylH, 0.0);
 	REAL cylD = native_sqrt(cylR * cylR + cylH * cylH);
-	cylinder = min(max(cylR, cylH), 0.0f) + cylD;
+	cylinder = min(max(cylR, cylH), 0.0) + cylD;
 
 	// box
 	REAL4 boxSize = fractal->transformCommon.offset111;
 	zc = fabs(zc) - boxSize;
-	zc.x = max(zc.x, 0.0f);
-	zc.y = max(zc.y, 0.0f);
-	zc.z = max(zc.z, 0.0f);
+	zc.x = max(zc.x, 0.0);
+	zc.y = max(zc.y, 0.0);
+	zc.z = max(zc.z, 0.0);
 	REAL box = length(zc);
 	zc = z;
 
@@ -151,7 +151,7 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	rrV /= rads3;
 	REAL rd = length(rV);
 	REAL rrd = length(rrV);
-	REAL ellipsoid = rd * (rd - 1.0f) / rrd;
+	REAL ellipsoid = rd * (rd - 1.0) / rrd;
 
 	// sphere
 	REAL sphere = length(zc) - fractal->transformCommon.offset3;
@@ -193,7 +193,7 @@ REAL4 TestingIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *au
 	}
 	if (fractal->transformCommon.functionEnabledCFalse)
 	{
-		dd = 0.5f * dd * log(dd) / aux->DE; // = using linear and increasining detail level
+		dd = 0.5 * dd * log(dd) / aux->DE; // = using linear and increasining detail level
 	}
 
 	if (aux->i < tempC || dd < aux->colorHybrid)

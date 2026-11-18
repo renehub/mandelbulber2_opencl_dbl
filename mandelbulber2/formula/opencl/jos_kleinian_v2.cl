@@ -23,7 +23,7 @@ REAL4 JosKleinianV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			&& aux->i >= fractal->transformCommon.startIterationsD
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
-		REAL rr = 1.0f;
+		REAL rr = 1.0;
 		z += fractal->transformCommon.offset000;
 		rr = dot(z, z);
 		z *= fractal->transformCommon.maxR2d1 / rr;
@@ -39,7 +39,7 @@ REAL4 JosKleinianV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			&& aux->i < fractal->transformCommon.stopIterationsC1)
 	{
 		REAL4 oldZ = z;
-		REAL4 trigZ = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 trigZ = (REAL4){0.0, 0.0, 0.0, 0.0};
 		REAL4 scaleZ = z * fractal->transformCommon.constantMultiplierC111;
 
 		if (fractal->transformCommon.functionEnabledAx)
@@ -67,9 +67,9 @@ REAL4 JosKleinianV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		z = trigZ * fractal->transformCommon.scale;
 		if (fractal->transformCommon.functionEnabledFalse)
 		{
-			z.x = z.x * fractal->transformCommon.scale / (fabs(oldZ.x) + 1.0f);
-			z.y = z.y * fractal->transformCommon.scale / (fabs(oldZ.y) + 1.0f);
-			z.z = z.z * fractal->transformCommon.scale / (fabs(oldZ.z) + 1.0f);
+			z.x = z.x * fractal->transformCommon.scale / (fabs(oldZ.x) + 1.0);
+			z.y = z.y * fractal->transformCommon.scale / (fabs(oldZ.y) + 1.0);
+			z.z = z.z * fractal->transformCommon.scale / (fabs(oldZ.z) + 1.0);
 			// aux->DE = aux->DE * length(z) / length(oldZ);
 		}
 	}
@@ -97,22 +97,22 @@ REAL4 JosKleinianV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 
 		// wrap
 		REAL4 box_size = fractal->transformCommon.offset111;
-		REAL3 box1 = (REAL3){2.0f * box_size.x, a * box_size.y, 2.0f * box_size.z};
-		REAL3 box2 = (REAL3){-box_size.x, -box_size.y + 1.0f, -box_size.z};
+		REAL3 box1 = (REAL3){2.0 * box_size.x, a * box_size.y, 2.0 * box_size.z};
+		REAL3 box2 = (REAL3){-box_size.x, -box_size.y + 1.0, -box_size.z};
 		REAL3 wrapped = wrap(z.xyz, box1, box2);
 
 		z = (REAL4){wrapped.x, wrapped.y, wrapped.z, z.w};
 		/*{
 			z.x += box_size.x;
 			z.z += box_size.z;
-			z.x = z.x - 2.0f * box_size.x * floor(z.x / 2.0f * box_size.x) - box_size.x;
-			z.z = z.z - 2.0f * box_size.z * floor(z.z / 2.0f * box_size.z) - box_size.z;
-			z.y += box_size.y - 1.0f;
+			z.x = z.x - 2.0 * box_size.x * floor(z.x / 2.0 * box_size.x) - box_size.x;
+			z.z = z.z - 2.0 * box_size.z * floor(z.z / 2.0 * box_size.z) - box_size.z;
+			z.y += box_size.y - 1.0;
 			z.y = z.y - a * box_size.y * floor(z.y / a * box_size.y);
-			z.y -= (box_size.y - 1.0f);
+			z.y -= (box_size.y - 1.0);
 		}*/
 
-		if (z.y >= a * (0.5f + 0.2f * native_sin(f * M_PI_F * (z.x + b * 0.5f) / box_size.x)))
+		if (z.y >= a * (0.5 + 0.2 * native_sin(f * M_PI_F * (z.x + b * 0.5) / box_size.x)))
 		{
 			z.x = -z.x - b;
 			z.y = -z.y + a;
@@ -124,7 +124,7 @@ REAL4 JosKleinianV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		REAL4 colorVector = (REAL4){z.x, z.y, z.z, rr};
 		aux->color = min(aux->color, length(colorVector)); // For coloring
 
-		REAL iR = 1.0f / rr;
+		REAL iR = 1.0 / rr;
 		aux->DE *= iR;
 		z *= -iR; // invert and mirror
 		z.x = -z.x - b;

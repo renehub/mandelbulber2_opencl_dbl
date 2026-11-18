@@ -39,7 +39,7 @@ int GetInteger(int byte, __global char *array)
 }
 
 //------------------ MAIN RENDER FUNCTION --------------------
-kernel void fractal3D(__global float *outDistances, __global float *outColor,
+kernel void fractal3D(__global REAL *outDistances, __global REAL *outColor,
 	__global int *outIterations, __global char *inBuff, __constant sClInConstants *consts,
 	__constant sClMeshExport *meshConfig)
 {
@@ -50,13 +50,14 @@ kernel void fractal3D(__global float *outDistances, __global float *outColor,
 	const int cl_offsetY = get_global_offset(1);
 	const int buffIndex = (imageX - cl_offsetX) + (imageY - cl_offsetY) * get_global_size(0);
 
-	float2 screenPoint = (float2){convert_float(imageX), convert_float(imageY)};
-	float width = convert_float(consts->params.imageWidth);
-	float height = convert_float(consts->params.imageHeight);
+	REAL2 screenPoint = (REAL2){convert_float(imageX), convert_float(imageY)};
+	REAL width = convert_float(consts->params.imageWidth);
+	REAL height = convert_float(consts->params.imageHeight);
 
-	float3 delta = (meshConfig->limitMax - meshConfig->limitMin) / convert_float3(meshConfig->size);
+	REAL3 delta =
+		(meshConfig->limitMax - meshConfig->limitMin) / TO_REAL3(convert_float3(meshConfig->size));
 
-	float resolution = 1.0f / height;
+	REAL resolution = 1.0 / height;
 
 	//-------- decode data file ----------------
 	// main offset for materials
@@ -131,7 +132,7 @@ kernel void fractal3D(__global float *outDistances, __global float *outColor,
 
 	//--------- end of data file ----------------------------------
 
-	float3 point;
+	REAL3 point;
 	point.x = meshConfig->limitMin.x + meshConfig->sliceIndex * delta.x;
 	point.y = meshConfig->limitMin.y + imageY * delta.y;
 	point.z = meshConfig->limitMin.z + imageX * delta.z;
@@ -143,7 +144,7 @@ kernel void fractal3D(__global float *outDistances, __global float *outColor,
 	calcParam.distThresh = meshConfig->distThresh;
 	calcParam.detailSize = meshConfig->distThresh;
 
-	float distThresh = meshConfig->distThresh;
+	REAL distThresh = meshConfig->distThresh;
 
 	sRenderData renderData;
 	renderData.materials = 0;
@@ -163,16 +164,16 @@ kernel void fractal3D(__global float *outDistances, __global float *outColor,
 	formulaOut outF;
 
 	outF = CalculateDistance(consts, point, &calcParam, &renderData);
-	float distance = outF.distance;
+	REAL distance = outF.distance;
 
 #ifdef MESH_EXPORT_COLOR
 	int formulaIndex = -1;
 
 	outF = Fractal(consts, point, &calcParam, calcModeColouring, material, formulaIndex, &renderData,
 		0, point, false);
-	float color = outF.colorIndex;
+	REAL color = outF.colorIndex;
 #else
-	float color = 0.0f;
+	REAL color = 0.0;
 #endif
 
 	outDistances[buffIndex] = distance;

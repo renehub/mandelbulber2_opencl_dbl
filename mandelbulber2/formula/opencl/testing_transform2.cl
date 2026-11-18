@@ -18,8 +18,8 @@ REAL4 TestingTransform2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 {
 	REAL4 p = z;
 	REAL dd = aux->DE;
-	REAL m = 0.0f;
-	REAL tp = 1.0f;
+	REAL m = 0.0;
+	REAL tp = 1.0;
 	REAL4 signs = z;
 	signs.x = sign(z.x);
 	signs.y = sign(z.y);
@@ -37,7 +37,7 @@ REAL4 TestingTransform2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	{
 		if (trr < fractal->transformCommon.scale1)
 		{
-			tp = min(1.0f / trr, fractal->transformCommon.scale4);
+			tp = min(1.0 / trr, fractal->transformCommon.scale4);
 		}
 		else
 		{
@@ -51,7 +51,7 @@ REAL4 TestingTransform2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 				 + native_sin(trr * M_PI_F * fractal->transformCommon.scaleB1)
 						 * fractal->transformCommon.scaleC1
 				 + fractal->transformCommon.offset1;
-		tp = min(max(1.0f / tp, fractal->transformCommon.scale1), fractal->transformCommon.scale4);
+		tp = min(max(1.0 / tp, fractal->transformCommon.scale1), fractal->transformCommon.scale4);
 	}
 	/*	if (trr < fractal->transformCommon.scale4)
 		{
@@ -59,18 +59,18 @@ REAL4 TestingTransform2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		}
 		else if (trr < fractal->transformCommon.scale1)
 		{
-			tp = 1.0f / fractal->transformCommon.scale1 / trr;
+			tp = 1.0 / fractal->transformCommon.scale1 / trr;
 		}
 	}*/
 
 	if (fractal->transformCommon.functionEnabledJFalse)
 	{
-		tp = min(max(1.0f / trr, fractal->transformCommon.scale1), fractal->transformCommon.scale4);
+		tp = min(max(1.0 / trr, fractal->transformCommon.scale1), fractal->transformCommon.scale4);
 	}
 
 	if (fractal->transformCommon.functionEnabledMFalse)
 	{
-		tp = 1.0f / trr + fractal->transformCommon.scale1;
+		tp = 1.0 / trr + fractal->transformCommon.scale1;
 		tp = min(tp, fractal->transformCommon.scale4);
 	}
 
@@ -87,14 +87,14 @@ REAL4 TestingTransform2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			&& aux->i < fractal->transformCommon.stopIterationsB)
 	{
 		REAL rr = dot(p, p);
-		if (rr < 1.0f)
+		if (rr < 1.0)
 		{
 			p += fractal->mandelbox.offset;
 			if (rr < fractal->transformCommon.scale025)
 				m = fractal->transformCommon.scale025;
 			else
 				m = rr;
-			m = 1.0f / m;
+			m = 1.0 / m;
 			p *= m;
 			dd *= m;
 			p -= fractal->mandelbox.offset;

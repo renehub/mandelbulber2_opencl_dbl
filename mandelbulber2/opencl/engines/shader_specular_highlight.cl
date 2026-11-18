@@ -32,15 +32,15 @@
  * calculation of specular highlights
  */
 
-float3 SpecularHighlight(sShaderInputDataCl *input, sClCalcParams *calcParam, float3 lightVector,
-	float specularWidth, float roughness, sClGradientsCollection *gradients)
+REAL3 SpecularHighlight(sShaderInputDataCl *input, sClCalcParams *calcParam, REAL3 lightVector,
+	REAL specularWidth, REAL roughness, sClGradientsCollection *gradients)
 {
-	float3 halfVector = lightVector - input->viewVector;
-	halfVector = fast_normalize(halfVector);
-	float specular = dot(input->normal, halfVector);
-	if (specular < 0.0f) specular = 0.0f;
+	REAL3 halfVector = lightVector - input->viewVector;
+	halfVector = normalize(halfVector);
+	REAL specular = dot(input->normal, halfVector);
+	if (specular < 0.0) specular = 0.0;
 
-	float diffuse = 1.0f;
+	REAL diffuse = 1.0;
 
 #ifdef USE_ROUGHNESS_GRADIENT
 	if (input->material->useColorsFromPalette && input->material->roughnessGradientEnable)
@@ -53,10 +53,12 @@ float3 SpecularHighlight(sShaderInputDataCl *input, sClCalcParams *calcParam, fl
 	if (input->material->useDiffusionTexture)
 	{
 		diffuse *=
-			10.0f
-			* (1.1f
-				 - input->material->diffusionTextureIntensity
-						 * (input->texDiffuse.s0 + input->texDiffuse.s1 + input->texDiffuse.s2) / 3.0f);
+			10.0
+			* (1.1
+				- input->material->diffusionTextureIntensity
+						* (TO_REAL3(input->texDiffuse).s0 + TO_REAL3(input->texDiffuse).s1
+								+ TO_REAL3(input->texDiffuse).s2)
+				/ 3.0);
 	}
 #endif
 
@@ -64,19 +66,19 @@ float3 SpecularHighlight(sShaderInputDataCl *input, sClCalcParams *calcParam, fl
 	if (input->material->useColorsFromPalette && input->material->diffuseGradientEnable)
 	{
 		diffuse *=
-			10.0f
-			* (1.1f - (gradients->diffuse.s0 + gradients->diffuse.s1 + gradients->diffuse.s2) / 3.0f);
+			10.0
+			* (1.1 - (gradients->diffuse.s0 + gradients->diffuse.s1 + gradients->diffuse.s2) / 3.0);
 	}
 #endif
 
-	specular = pow(specular, 30.0f / specularWidth / diffuse) / diffuse;
+	specular = pow(specular, 30.0 / specularWidth / diffuse) / diffuse;
 
-	if (roughness > 0.0f)
+	if (roughness > 0.0)
 	{
-		specular *= (1.0f + Random(1000, &calcParam->randomSeed) / 1000.0f * roughness);
+		specular *= (1.0 + Random(1000, &calcParam->randomSeed) / 1000.0 * roughness);
 	}
-	if (specular > 15.0f) specular = 15.0f;
-	float3 out = specular;
+	if (specular > 15.0) specular = 15.0;
+	REAL3 out = specular;
 	out *= input->material->specularColor;
 	return out;
 }

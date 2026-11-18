@@ -38,11 +38,11 @@
 			|| defined(USE_PERLIN_NOISE_TRANSPARENCY_COLOR)                         \
 			|| defined(USE_PERLIN_NOISE_TRANSPARENCY_ALPHA) || defined(USE_PERLIN_NOISE_REFLECTANCE))
 void PerlinNoiseForShaders(__constant sClInConstants *consts, sClCalcParams *calcParam,
-	sShaderInputDataCl *shaderInputData, sRenderData *renderData, float3 point)
+	sShaderInputDataCl *shaderInputData, sRenderData *renderData, REAL3 point)
 {
 	if (shaderInputData->material->perlinNoiseEnable)
 	{
-		float3 pointModified = point;
+		REAL3 pointModified = point;
 
 #ifdef FRACTALIZE_TEXTURE
 		// texture fractalize requires a valid fractal sequence; primitives (sequenceIndex < 0)
@@ -60,7 +60,7 @@ void PerlinNoiseForShaders(__constant sClInConstants *consts, sClCalcParams *cal
 		pointModified =
 			Matrix33MulFloat3(shaderInputData->material->rotMatrixPerlinNoise, pointModified);
 
-		float perlin = NormalizedOctavePerlinNoise3D_0_1(
+		REAL perlin = NormalizedOctavePerlinNoise3D_0_1(
 			pointModified.x / shaderInputData->material->perlinNoisePeriod.x,
 			pointModified.y / shaderInputData->material->perlinNoisePeriod.y,
 			pointModified.z / shaderInputData->material->perlinNoisePeriod.z,
@@ -69,33 +69,33 @@ void PerlinNoiseForShaders(__constant sClInConstants *consts, sClCalcParams *cal
 
 		perlin += shaderInputData->material->perlinNoiseValueOffset;
 
-		if (shaderInputData->material->perlinNoiseAbs) perlin = fabs(perlin - 0.5f) * 2.0f;
-		perlin = clamp(perlin, 0.0f, 1.0f);
+		if (shaderInputData->material->perlinNoiseAbs) perlin = fabs(perlin - 0.5) * 2.0;
+		perlin = clamp(perlin, 0.0, 1.0);
 		shaderInputData->perlinNoise = perlin;
 	}
 	else
 	{
-		shaderInputData->perlinNoise = 0.0f;
+		shaderInputData->perlinNoise = 0.0;
 	}
 }
 #endif // USE_PERLIN_NOISE
 
 #if defined(USE_PERLIN_NOISE) && defined(USE_PERLIN_NOISE_REFLECTANCE)
-float3 PerlinNoiseForReflectance(sShaderInputDataCl *shaderInputData, float3 reflectance)
+REAL3 PerlinNoiseForReflectance(sShaderInputDataCl *shaderInputData, REAL3 reflectance)
 {
-	float perlin = (shaderInputData->material->perlinNoiseReflectanceInvert)
-									 ? 1.0f - shaderInputData->perlinNoise
+	REAL perlin = (shaderInputData->material->perlinNoiseReflectanceInvert)
+									 ? 1.0 - shaderInputData->perlinNoise
 									 : shaderInputData->perlinNoise;
-	float3 reflectancePerlin = 1.0f;
+	REAL3 reflectancePerlin = 1.0;
 
 #ifdef USE_REFLECTANCE_GRADIENT
 	if (shaderInputData->material->reflectanceGradientEnable)
 	{
-		float colorPosition = fmod(
+		REAL colorPosition = fmod(
 			perlin * shaderInputData->material->coloring_speed + shaderInputData->material->paletteOffset,
-			1.0f);
+			1.0);
 
-		float3 gradientColor =
+		REAL3 gradientColor =
 			GetColorFromGradient(colorPosition, false, shaderInputData->paletteReflectanceLength,
 				shaderInputData->palette + shaderInputData->paletteReflectanceOffset);
 
@@ -104,11 +104,11 @@ float3 PerlinNoiseForReflectance(sShaderInputDataCl *shaderInputData, float3 ref
 	else
 #endif // USE_REFLECTANCE_GRADIENT
 	{
-		float perlinCol = perlin;
+		REAL perlinCol = perlin;
 		reflectancePerlin = perlinCol;
 	}
-	float perlinRefInt = shaderInputData->material->perlinNoiseReflectanceIntensity;
-	float perlinRefIntN = 1.0f - shaderInputData->material->perlinNoiseReflectanceIntensity;
+	REAL perlinRefInt = shaderInputData->material->perlinNoiseReflectanceIntensity;
+	REAL perlinRefIntN = 1.0 - shaderInputData->material->perlinNoiseReflectanceIntensity;
 	reflectance *= reflectancePerlin * perlinRefInt + perlinRefIntN;
 
 	return reflectance;
@@ -118,22 +118,22 @@ float3 PerlinNoiseForReflectance(sShaderInputDataCl *shaderInputData, float3 ref
 #if defined(USE_PERLIN_NOISE)                      \
 	&& (defined(USE_PERLIN_NOISE_TRANSPARENCY_COLOR) \
 			|| defined(USE_PERLIN_NOISE_TRANSPARENCY_ALPHA))
-float3 PerlinNoiseForTransparency(
-	sShaderInputDataCl *shaderInputData, float3 transparency, bool volumeMode)
+REAL3 PerlinNoiseForTransparency(
+	sShaderInputDataCl *shaderInputData, REAL3 transparency, bool volumeMode)
 {
-	float perlin = (shaderInputData->material->perlinNoiseTransparencyColorInvert)
-									 ? 1.0f - shaderInputData->perlinNoise
+	REAL perlin = (shaderInputData->material->perlinNoiseTransparencyColorInvert)
+									 ? 1.0 - shaderInputData->perlinNoise
 									 : shaderInputData->perlinNoise;
-	float3 transparencyPerlin = 1.0f;
+	REAL3 transparencyPerlin = 1.0;
 
 #ifdef USE_TRANSPARENCY_GRADIENT
 	if (shaderInputData->material->transparencyGradientEnable)
 	{
-		float colorPosition = fmod(
+		REAL colorPosition = fmod(
 			perlin * shaderInputData->material->coloring_speed + shaderInputData->material->paletteOffset,
-			1.0f);
+			1.0);
 
-		float3 gradientColor =
+		REAL3 gradientColor =
 			GetColorFromGradient(colorPosition, false, shaderInputData->paletteTransparencyLength,
 				shaderInputData->palette + shaderInputData->paletteTransparencyOffset);
 
@@ -142,16 +142,16 @@ float3 PerlinNoiseForTransparency(
 	else
 #endif // USE_TRANSPARENCY_GRADIENT
 	{
-		float perlinCol = perlin;
+		REAL perlinCol = perlin;
 		transparencyPerlin = perlinCol;
 	}
 
-	float intensity = (volumeMode)
+	REAL intensity = (volumeMode)
 											? shaderInputData->material->perlinNoiseTransparencyColorIntensityVol
 											: shaderInputData->material->perlinNoiseTransparencyColorIntensity;
 
-	float perlinRefInt = intensity;
-	float perlinRefIntN = 1.0f - intensity;
+	REAL perlinRefInt = intensity;
+	REAL perlinRefIntN = 1.0 - intensity;
 	transparency *= transparencyPerlin * perlinRefInt + perlinRefIntN;
 
 	return transparency;
@@ -159,24 +159,24 @@ float3 PerlinNoiseForTransparency(
 #endif // USE_PERLIN_NOISE_TRANSPARENCY_COLOR or USE_PERLIN_NOISE_TRANSPARENCY_ALPHA
 
 #if defined(USE_PERLIN_NOISE) && defined(USE_PERLIN_NOISE_DISPLACEMENT)
-float PerlinNoiseDisplacement(float distance, float3 point, sRenderData *renderData, int objectId)
+REAL PerlinNoiseDisplacement(REAL distance, REAL3 point, sRenderData *renderData, int objectId)
 {
 	__global sObjectDataCl *objectData = &renderData->objectsData[objectId];
 	__global sMaterialCl *mat = renderData->materials[objectData->materialId];
 
 	if (mat->perlinNoiseEnable && mat->perlinNoiseDisplacementEnable)
 	{
-		float3 pointModified = Matrix33MulFloat3(mat->rotMatrixPerlinNoise, point);
+		REAL3 pointModified = Matrix33MulFloat3(mat->rotMatrixPerlinNoise, point);
 
-		float perlin = NormalizedOctavePerlinNoise3D_0_1(pointModified.x / mat->perlinNoisePeriod.x,
+		REAL perlin = NormalizedOctavePerlinNoise3D_0_1(pointModified.x / mat->perlinNoisePeriod.x,
 			pointModified.y / mat->perlinNoisePeriod.y, pointModified.z / mat->perlinNoisePeriod.z,
 			mat->perlinNoisePositionOffset, mat->perlinNoiseIterations, renderData->perlinNoiseSeeds);
 
 		perlin += mat->perlinNoiseValueOffset;
 
-		if (mat->perlinNoiseAbs) perlin = fabs(perlin - 0.5f) * 2.0f;
+		if (mat->perlinNoiseAbs) perlin = fabs(perlin - 0.5) * 2.0;
 		if (mat->perlinNoiseDisplacementInvert) perlin = 1.0 - perlin;
-		perlin = clamp(perlin, 0.0f, 1.0f);
+		perlin = clamp(perlin, 0.0, 1.0);
 
 		distance -= perlin * mat->perlinNoiseDisplacementIntensity;
 	}

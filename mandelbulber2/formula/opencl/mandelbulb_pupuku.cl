@@ -47,7 +47,7 @@ REAL4 MandelbulbPupukuIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			&& aux->i >= fractal->transformCommon.startIterationsX
 			&& aux->i < fractal->transformCommon.stopIterationsX)
 	{
-		if (native_cos(th) < 0.0f) ph = ph + M_PI_F;
+		if (native_cos(th) < 0.0) ph = ph + M_PI_F;
 	}
 
 	aux->DE = rp * aux->DE * fabs(fractal->bulb.power) + fractal->analyticDE.offset1;
@@ -69,7 +69,7 @@ REAL4 MandelbulbPupukuIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			&& aux->i >= fractal->transformCommon.startIterationsB
 			&& aux->i < fractal->transformCommon.stopIterationsB)
 	{
-		z.x = (1.0f + (t - 1.0f) * fractal->transformCommon.scaleB0) * native_cos(ph);
+		z.x = (1.0 + (t - 1.0) * fractal->transformCommon.scaleB0) * native_cos(ph);
 	}
 	else
 	{
@@ -79,7 +79,7 @@ REAL4 MandelbulbPupukuIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			&& aux->i >= fractal->transformCommon.startIterationsA
 			&& aux->i < fractal->transformCommon.stopIterationsA)
 	{
-		z.y = (1.0f + (t - 1.0f) * fractal->transformCommon.scaleA0) * native_sin(ph);
+		z.y = (1.0 + (t - 1.0) * fractal->transformCommon.scaleA0) * native_sin(ph);
 	}
 	else
 	{
@@ -107,13 +107,13 @@ REAL4 MandelbulbPupukuIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	{
 		aux->DE0 = length(z);
 
-		if (aux->DE0 > 1.0f)
+		if (aux->DE0 > 1.0)
 		{
-			aux->DE0 = 0.5f * log(aux->DE0) * aux->DE0 / aux->DE;
+			aux->DE0 = 0.5 * log(aux->DE0) * aux->DE0 / aux->DE;
 		}
 		else
 		{
-			aux->DE0 = 0.0f; // 0.01f artifacts in openCL
+			aux->DE0 = 0.0; // 0.01 artifacts in openCL
 		}
 
 		if (!fractal->transformCommon.functionEnabledEFalse)

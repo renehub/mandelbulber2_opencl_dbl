@@ -23,8 +23,8 @@
 
 REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 	REAL4 c = aux->const_c;
@@ -80,7 +80,7 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		{
 			aux->c *= fractal->transformCommon.scale3D111;
 			REAL rSqrL = dot(aux->c, aux->c);
-			rSqrL = 1.0f / rSqrL;
+			rSqrL = 1.0 / rSqrL;
 			aux->c *= rSqrL;
 			z += aux->c;
 		}
@@ -88,7 +88,7 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		{
 			c *= fractal->transformCommon.scale3D111;
 			REAL rSqrL = dot(c, c);
-			rSqrL = 1.0f / rSqrL;
+			rSqrL = 1.0 / rSqrL;
 			z += c * rSqrL;
 		}
 	}
@@ -123,9 +123,9 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 							&& aux->i < fractal->transformCommon.stopIterationsT1)
 					{
 						REAL4 limit = fractal->transformCommon.additionConstant111;
-						REAL4 length = 2.0f * limit;
-						REAL4 tgladS = 1.0f / length;
-						REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+						REAL4 length = 2.0 * limit;
+						REAL4 tgladS = 1.0 / length;
+						REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 						if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 						if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;
 						if (fabs(z.x) > limit.x && fabs(z.x) < length.x)
@@ -185,11 +185,11 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			REAL4 temp = fractal->transformCommon.additionConstant000;
 			REAL4 temp2 = temp * temp;
 
-			z.x -= ((temp.x * temp2.x) / ((z.x * z.x) + (temp2.x)) - 2.0f * temp.x)
+			z.x -= ((temp.x * temp2.x) / ((z.x * z.x) + (temp2.x)) - 2.0 * temp.x)
 						 * fractal->transformCommon.scale1;
-			z.y -= ((temp.y * temp2.y) / ((z.y * z.y) + (temp2.y)) - 2.0f * temp.y)
+			z.y -= ((temp.y * temp2.y) / ((z.y * z.y) + (temp2.y)) - 2.0 * temp.y)
 						 * fractal->transformCommon.scale1;
-			z.z -= ((temp.z * temp2.z) / ((z.z * z.z) + (temp2.z)) - 2.0f * temp.z)
+			z.z -= ((temp.z * temp2.z) / ((z.z * z.z) + (temp2.z)) - 2.0 * temp.z)
 						 * fractal->transformCommon.scale1;
 		}
 		else if (fractal->transformCommon.functionEnabledByFalse)
@@ -197,11 +197,11 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			REAL4 temp = fractal->transformCommon.additionConstant000;
 			REAL4 temp2 = temp * temp;
 
-			z.x -= ((temp2.x) / ((z.x * z.x) + (temp2.x)) - 2.0f * temp.x)
+			z.x -= ((temp2.x) / ((z.x * z.x) + (temp2.x)) - 2.0 * temp.x)
 						 * fractal->transformCommon.scale1; // * sign(z.x);
-			z.y -= ((temp2.y) / ((z.y * z.y) + (temp2.y)) - 2.0f * temp.y)
+			z.y -= ((temp2.y) / ((z.y * z.y) + (temp2.y)) - 2.0 * temp.y)
 						 * fractal->transformCommon.scale1; // * sign(z.y);
-			z.z -= ((temp2.z) / ((z.z * z.z) + (temp2.z)) - 2.0f * temp.z)
+			z.z -= ((temp2.z) / ((z.z * z.z) + (temp2.z)) - 2.0 * temp.z)
 						 * fractal->transformCommon.scale1; // * sign(z.z);
 		}
 	}
@@ -222,7 +222,7 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		{
 			z += fractal->mandelbox.offset;
 
-			// if (r2 < 1e-21f) r2 = 1e-21f;
+			// if (r2 < 1e-21) r2 = 1e-21;
 			if (rr < fractal->transformCommon.minR2p25)
 			{
 				REAL tglad_factor1 = fractal->transformCommon.maxR2d1 / fractal->transformCommon.minR2p25;
@@ -239,7 +239,7 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 
 		// scale
-		REAL useScale = 1.0f;
+		REAL useScale = 1.0;
 		if (aux->i >= fractal->transformCommon.startIterationsS
 				&& aux->i < fractal->transformCommon.stopIterationsS)
 		{
@@ -248,7 +248,7 @@ REAL4 AmazingSurfMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			z *= useScale;
 
 			if (!fractal->analyticDE.enabledFalse)
-				aux->DE = aux->DE * fabs(useScale) + 1.0f;
+				aux->DE = aux->DE * fabs(useScale) + 1.0;
 			else // testing for log
 				aux->DE =
 					aux->DE * fabs(useScale) * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;

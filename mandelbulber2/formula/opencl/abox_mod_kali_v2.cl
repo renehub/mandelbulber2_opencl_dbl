@@ -17,7 +17,7 @@
 REAL4 AboxModKaliV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	// fold
 	REAL4 oldZ = z;
@@ -45,7 +45,7 @@ REAL4 AboxModKaliV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	}
 	// z -= fractal->transformCommon.additionConstant000;
 	z = z * m;
-	aux->DE = aux->DE * fabs(m) + 1.0f;
+	aux->DE = aux->DE * fabs(m) + 1.0;
 
 	z += fractal->transformCommon.additionConstant000;
 
@@ -93,9 +93,9 @@ REAL4 AboxModKaliV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	if (fractal->foldColor.auxColorEnabledFalse)
 	{
 		postZ -= oldZ;
-		if (postZ.x < 1.0f) aux->color += fractal->mandelbox.color.factor.x;
-		if (postZ.y < 1.0f) aux->color += fractal->mandelbox.color.factor.y;
-		if (postZ.z < 1.0f) aux->color += fractal->mandelbox.color.factor.z;
+		if (postZ.x < 1.0) aux->color += fractal->mandelbox.color.factor.x;
+		if (postZ.y < 1.0) aux->color += fractal->mandelbox.color.factor.y;
+		if (postZ.z < 1.0) aux->color += fractal->mandelbox.color.factor.z;
 		aux->color += colorAdd;
 	}
 	return z;

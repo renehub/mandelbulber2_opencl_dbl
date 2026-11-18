@@ -23,13 +23,13 @@ REAL4 MandelbulbSinCosV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			&& aux->i < fractal->transformCommon.stopIterationsT1)
 	{
 		REAL4 t = z;
-		temp = 1.0f / dot(t, t);
+		temp = 1.0 / dot(t, t);
 
-		temp = temp + (1.0f / aux->r - temp) * fractal->transformCommon.scaleC1;
+		temp = temp + (1.0 / aux->r - temp) * fractal->transformCommon.scaleC1;
 
 		REAL4 g = fractal->transformCommon.scale3D111;
 		t *= g * temp;
-		aux->DE += 1.0f / aux->DE;
+		aux->DE += 1.0 / aux->DE;
 		z = (z - t) * fractal->transformCommon.scaleD1;
 		aux->DE *= fractal->transformCommon.scaleD1;
 	}
@@ -83,8 +83,8 @@ REAL4 MandelbulbSinCosV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	ph = (ph + fractal->bulb.alphaAngleOffset)
 			 * (fractal->bulb.power + fractal->transformCommon.offsetA0);
 
-	REAL rp = pow(aux->r, (fractal->bulb.power - 1.0f) * fractal->transformCommon.scaleA1);
-	aux->DE = aux->DE * rp * fabs(fractal->bulb.power) + 1.0f;
+	REAL rp = pow(aux->r, (fractal->bulb.power - 1.0) * fractal->transformCommon.scaleA1);
+	aux->DE = aux->DE * rp * fabs(fractal->bulb.power) + 1.0;
 	rp *= aux->r * fractal->transformCommon.scaleB1;
 
 	// polar to cartesian
@@ -147,10 +147,10 @@ REAL4 MandelbulbSinCosV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->transformCommon.functionEnabledCFalse)
 	{
 		aux->DE0 = length(z);
-		if (aux->DE0 > 1.0f)
-			aux->DE0 = 0.5f * log(aux->DE0) * aux->DE0 / (aux->DE);
+		if (aux->DE0 > 1.0)
+			aux->DE0 = 0.5 * log(aux->DE0) * aux->DE0 / (aux->DE);
 		else
-			aux->DE0 = 0.0f; // 0.01f artifacts in openCL
+			aux->DE0 = 0.0; // 0.01 artifacts in openCL
 
 		if (aux->i >= fractal->transformCommon.startIterationsO
 				&& aux->i < fractal->transformCommon.stopIterationsO)

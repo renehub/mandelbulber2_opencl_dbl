@@ -16,7 +16,7 @@
 REAL4 TransfSinOrCosIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 oldZ = z;
-	REAL4 trigZ = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 trigZ = (REAL4){0.0, 0.0, 0.0, 0.0};
 	REAL4 scaleZ = z * fractal->transformCommon.constantMultiplierC111;
 
 	if (fractal->transformCommon.functionEnabledAx)
@@ -44,14 +44,14 @@ REAL4 TransfSinOrCosIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	z = trigZ * fractal->transformCommon.scale;
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
-		z.x = z.x * fractal->transformCommon.scale / (fabs(oldZ.x) + 1.0f);
-		z.y = z.y * fractal->transformCommon.scale / (fabs(oldZ.y) + 1.0f);
-		z.z = z.z * fractal->transformCommon.scale / (fabs(oldZ.z) + 1.0f);
+		z.x = z.x * fractal->transformCommon.scale / (fabs(oldZ.x) + 1.0);
+		z.y = z.y * fractal->transformCommon.scale / (fabs(oldZ.y) + 1.0);
+		z.z = z.z * fractal->transformCommon.scale / (fabs(oldZ.z) + 1.0);
 		// aux->DE = aux->DE * length(z) / length(oldZ);
 	}
 	//   if z == oldZ    z = oldZ * fractal->transformCommon.scale;
 	if (!fractal->analyticDE.enabledFalse)
-		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0f;
+		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0;
 	else
 		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) * fractal->analyticDE.scale1
 							+ fractal->analyticDE.offset1;

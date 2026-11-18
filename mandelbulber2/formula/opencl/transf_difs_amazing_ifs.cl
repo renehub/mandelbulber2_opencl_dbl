@@ -41,13 +41,13 @@ REAL4 TransfDIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	REAL RR = fractal->transformCommon.minR2p25;
 	if (rr < RR)
 	{
-		RR = 1.0f / RR;
+		RR = 1.0 / RR;
 		z *= RR;
 		aux->DE *= RR;
 	}
-	else if (rr < 1.0f)
+	else if (rr < 1.0)
 	{
-		RR = 1.0f / rr;
+		RR = 1.0 / rr;
 		z *= RR;
 		aux->DE *= RR;
 	}
@@ -63,20 +63,20 @@ REAL4 TransfDIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExte
 
 	if (fractal->transformCommon.functionEnabledRFalse)
 	{
-		REAL temp = 0.0f;
-		if (fractal->transformCommon.angleDegC != 0.0f)
+		REAL temp = 0.0;
+		if (fractal->transformCommon.angleDegC != 0.0)
 		{
 			temp = z.x;
 			z.x = z.x * fractal->transformCommon.cosC - z.y * fractal->transformCommon.sinC;
 			z.y = temp * fractal->transformCommon.sinC + z.y * fractal->transformCommon.cosC;
 		}
-		if (fractal->transformCommon.angleDegB != 0.0f)
+		if (fractal->transformCommon.angleDegB != 0.0)
 		{
 			temp = z.z;
 			z.z = z.z * fractal->transformCommon.cosB - z.x * fractal->transformCommon.sinB;
 			z.x = temp * fractal->transformCommon.sinB + z.x * fractal->transformCommon.cosB;
 		}
-		if (fractal->transformCommon.angleDegA != 0.0f)
+		if (fractal->transformCommon.angleDegA != 0.0)
 		{
 			temp = z.y;
 			z.y = z.y * fractal->transformCommon.cosA - z.z * fractal->transformCommon.sinA;
@@ -94,7 +94,7 @@ REAL4 TransfDIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	if (fractal->foldColor.auxColorEnabled && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		if (fractal->foldColor.auxColorEnabledA)
 			if (colDist != aux->dist) colorAdd += fractal->foldColor.difs1;
 
@@ -111,7 +111,7 @@ REAL4 TransfDIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExte
 										* (fabs(zCol.z) - fractal->transformCommon.additionConstant111.z);
 			if (rrCol > fractal->transformCommon.minR2p25)
 				colorAdd +=
-					fractal->foldColor.difs0000.w * (rrCol - fractal->transformCommon.minR2p25) / 100.0f;
+					fractal->foldColor.difs0000.w * (rrCol - fractal->transformCommon.minR2p25) / 100.0;
 		}
 		aux->color += colorAdd;
 	}

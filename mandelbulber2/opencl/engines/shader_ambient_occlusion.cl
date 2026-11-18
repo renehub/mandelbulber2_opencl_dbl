@@ -33,14 +33,14 @@
  */
 
 #ifdef AO_MODE_MULTIPLE_RAYS
-float3 AmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderData,
+REAL3 AmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParam)
 {
-	float3 AO = 0.0f;
+	REAL3 AO = 0.0;
 
-	float start_dist = input->distThresh;
-	float end_dist = input->delta / consts->params.resolution;
-	float intense;
+	REAL start_dist = input->distThresh;
+	REAL end_dist = input->delta / consts->params.resolution;
+	REAL intense;
 
 #ifndef MONTE_CARLO
 	for (int i = 0; i < renderData->AOVectorsCount; i++)
@@ -50,14 +50,14 @@ float3 AmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderDa
 #endif
 		sVectorsAroundCl v = renderData->AOVectors[i];
 
-		float dist;
+		REAL dist;
 
-		float opacity = 0.0f;
-		float shadowTemp = 1.0f;
+		REAL opacity = 0.0;
+		REAL shadowTemp = 1.0;
 
-		for (float r = start_dist; r < end_dist; r += dist * 2.0f)
+		for (REAL r = start_dist; r < end_dist; r += dist * 2.0)
 		{
-			float3 point2 = input->point + v.v * r;
+			REAL3 point2 = input->point + v.v * r;
 
 			calcParam->distThresh = input->distThresh;
 			formulaOut outF;
@@ -65,7 +65,7 @@ float3 AmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderDa
 			dist = outF.distance;
 
 			// Apply per-object detailLevelMultiplier to dist_thresh dynamically
-			float dist_thresh;
+			REAL dist_thresh;
 			if (consts->params.iterFogEnabled)
 			{
 				dist_thresh = CalcDistThresh(point2, consts);
@@ -82,15 +82,15 @@ float3 AmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderDa
 
 #ifdef ITER_FOG
 			opacity =
-				IterOpacity(dist * 2.0f, outF.iters, consts->params.N, consts->params.iterFogOpacityTrim,
+				IterOpacity(dist * 2.0, outF.iters, consts->params.N, consts->params.iterFogOpacityTrim,
 					consts->params.iterFogOpacityTrimHigh, consts->params.iterFogOpacity);
 #endif
 
 			// #if (defined(VOLUMETRIC_FOG) || defined(DIST_FOG_SHADOWS))
 			//			if (consts->params.distanceFogShadows)
 			//			{
-			//				float distanceShifted;
-			//				opacity += DistanceFogOpacity(dist * 2.0f, dist,
+			//				REAL distanceShifted;
+			//				opacity += DistanceFogOpacity(dist * 2.0, dist,
 			// consts->params.volFogDistanceFromSurface, 					consts->params.volFogDistanceFactor,
 			// consts->params.volFogDensity, &distanceShifted);
 			//			}
@@ -98,10 +98,10 @@ float3 AmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderDa
 
 			shadowTemp -= opacity * (end_dist - r) / end_dist;
 
-			if (dist < dist_thresh || shadowTemp < 0.0f)
+			if (dist < dist_thresh || shadowTemp < 0.0)
 			{
 				shadowTemp -= (end_dist - r) / end_dist;
-				if (shadowTemp < 0.0f) shadowTemp = 0.0f;
+				if (shadowTemp < 0.0) shadowTemp = 0.0;
 				break;
 			}
 		}

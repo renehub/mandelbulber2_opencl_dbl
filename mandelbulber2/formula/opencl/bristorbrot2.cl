@@ -17,7 +17,7 @@
 
 REAL4 Bristorbrot2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	REAL4 zOrig = z;
 	REAL4 zz = z * z;
@@ -30,17 +30,17 @@ REAL4 Bristorbrot2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	if (fractal->buffalo.preabsz) zOrig.z = zFabs.z;
 
 	// Bristorbrot V2 formula
-	REAL signT = 1.0f; // signT as "sign" is an operation   sign()
+	REAL signT = 1.0; // signT as "sign" is an operation   sign()
 
 	// conditional operation which can create cuts
 	if (fractal->transformCommon.functionEnabledFalse && zz.z >= zz.y)
-		signT = -1.0f; // creates fractal surface modification 2019
+		signT = -1.0; // creates fractal surface modification 2019
 
-	// is preabs is used on z.x, it will be !< 0.0f
-	if (!fractal->buffalo.preabsy && fractal->transformCommon.functionEnabledxFalse && zOrig.x < 0.0f)
+	// is preabs is used on z.x, it will be !< 0.0
+	if (!fractal->buffalo.preabsy && fractal->transformCommon.functionEnabledxFalse && zOrig.x < 0.0)
 		signT = -signT;
 
-	// flips signT but same as using -1.0f scales
+	// flips signT but same as using -1.0 scales
 	if (fractal->transformCommon.functionEnabledAwFalse) signT = -signT;
 
 	REAL tmpy = z.y;
@@ -49,8 +49,8 @@ REAL4 Bristorbrot2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	if (fractal->transformCommon.functionEnabledzFalse) tmpz = zFabs.z;
 
 	zNew.x = zz.x - zz.y - zz.z;
-	zNew.y = zOrig.y * (zOrig.x * 2.0f - tmpz * signT * fractal->transformCommon.scaleB1);
-	zNew.z = zOrig.z * (zOrig.x * 2.0f + tmpy * signT * fractal->transformCommon.scaleC1);
+	zNew.y = zOrig.y * (zOrig.x * 2.0 - tmpz * signT * fractal->transformCommon.scaleB1);
+	zNew.z = zOrig.z * (zOrig.x * 2.0 + tmpy * signT * fractal->transformCommon.scaleC1);
 	z = zNew;
 
 	// post abs

@@ -18,8 +18,8 @@ REAL4 IdesIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	(void)aux;
 
-	if (fabs(z.x) < 2.5f) z.x = z.x * .9f;
-	if (fabs(z.z) < 2.5f) z.z = z.z * .9f;
+	if (fabs(z.x) < 2.5) z.x = z.x * .9;
+	if (fabs(z.z) < 2.5) z.z = z.z * .9;
 
 	REAL4 z2 = z * z;
 	REAL4 newZ;

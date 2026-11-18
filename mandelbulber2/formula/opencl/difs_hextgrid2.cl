@@ -19,7 +19,7 @@
 
 REAL4 DIFSHextgrid2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	// sphere inversion
 	if (fractal->transformCommon.sphereInversionEnabledFalse
@@ -40,9 +40,9 @@ REAL4 DIFSHextgrid2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			&& aux->i < fractal->transformCommon.stopIterationsC1)
 	{
 		REAL Tp = fractal->transformCommon.offset2;
-		z.x = fmod(fabs(z.x) + Tp, 2.0f * Tp) - Tp;
+		z.x = fmod(fabs(z.x) + Tp, 2.0 * Tp) - Tp;
 		Tp = fractal->transformCommon.offsetA2;
-		z.y = fmod(fabs(z.y) + Tp, 2.0f * Tp) - Tp;
+		z.y = fmod(fabs(z.y) + Tp, 2.0 * Tp) - Tp;
 	}
 
 	// scale
@@ -84,21 +84,21 @@ REAL4 DIFSHextgrid2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 			&& aux->i < fractal->transformCommon.stopIterations)
 	{
 		REAL size = fractal->transformCommon.scale1;
-		REAL hexD = 0.0f;
+		REAL hexD = 0.0;
 		zc.z /= fractal->transformCommon.scaleF1;
 
-		REAL cosPi6 = native_cos(M_PI_F / 6.0f);
-		REAL yFloor = fabs(zc.y - size * floor(zc.y / size + 0.5f));
-		REAL xFloor = fabs(zc.x - size * 1.5f / cosPi6 * floor(zc.x / size / 1.5f * cosPi6 + 0.5f));
-		REAL gridMax = max(yFloor, xFloor * cosPi6 + yFloor * native_sin(M_PI_F / 6.0f));
-		REAL gridMin = min(gridMax - size * 0.5f, yFloor);
+		REAL cosPi6 = native_cos(M_PI_F / 6.0);
+		REAL yFloor = fabs(zc.y - size * floor(zc.y / size + 0.5));
+		REAL xFloor = fabs(zc.x - size * 1.5 / cosPi6 * floor(zc.x / size / 1.5 * cosPi6 + 0.5));
+		REAL gridMax = max(yFloor, xFloor * cosPi6 + yFloor * native_sin(M_PI_F / 6.0));
+		REAL gridMin = min(gridMax - size * 0.5, yFloor);
 		if (!fractal->transformCommon.functionEnabledJFalse)
 			hexD = native_sqrt(gridMin * gridMin + zc.z * zc.z);
 		else
 			hexD = max(fabs(gridMin), fabs(zc.z));
 		hexD -= fractal->transformCommon.offset0005;
 
-		aux->dist = min(aux->dist, hexD / (aux->DE + 1.0f));
+		aux->dist = min(aux->dist, hexD / (aux->DE + 1.0));
 	}
 
 	// aux->color

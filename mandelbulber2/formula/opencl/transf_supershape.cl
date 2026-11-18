@@ -58,7 +58,7 @@ REAL4 TransfSupershapeIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	else
 		r1 = pow(t1 + t2, fractal->transformCommon.constantMultiplierB111.z);
 
-	if (!fractal->transformCommon.functionEnabledFFalse) r1 = 1.0f / r1;
+	if (!fractal->transformCommon.functionEnabledFFalse) r1 = 1.0 / r1;
 
 	r1 = r1 * fractal->transformCommon.radius1;
 

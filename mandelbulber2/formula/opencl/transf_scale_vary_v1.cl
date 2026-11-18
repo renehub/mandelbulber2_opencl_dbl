@@ -25,7 +25,7 @@ REAL4 TransfScaleVaryV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		int iterationRange =
 			fractal->transformCommon.stopIterations - fractal->transformCommon.startIterations250;
 		int currentIteration = (aux->i - fractal->transformCommon.startIterations250);
-		tempVC += fractal->transformCommon.offset0 * (1.0f * currentIteration) / iterationRange;
+		tempVC += fractal->transformCommon.offset0 * (1.0 * currentIteration) / iterationRange;
 	}
 	if (aux->i >= fractal->transformCommon.stopIterations)
 	{

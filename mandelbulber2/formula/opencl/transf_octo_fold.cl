@@ -16,9 +16,9 @@
 
 REAL4 TransfOctoFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	if (z.x + z.y < 0.0f) z = (REAL4){-z.y, -z.x, z.z, z.w};
+	if (z.x + z.y < 0.0) z = (REAL4){-z.y, -z.x, z.z, z.w};
 
-	if (z.x + z.z < 0.0f) // z.xz = -z.zx;
+	if (z.x + z.z < 0.0) // z.xz = -z.zx;
 		z = (REAL4){-z.z, z.y, -z.x, z.w};
 
 	if (z.x < z.y) // z.xy = z.yx;
@@ -29,7 +29,7 @@ REAL4 TransfOctoFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 
 	z.x = fabs(z.x);
 	z = z * fractal->transformCommon.scale2
-			- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0f);
+			- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0);
 
 	if (fractal->analyticDE.enabled)
 	{

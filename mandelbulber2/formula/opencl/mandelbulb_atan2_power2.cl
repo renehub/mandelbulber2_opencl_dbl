@@ -15,7 +15,7 @@
 
 REAL4 MandelbulbAtan2Power2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	if (fractal->buffalo.preabsx) z.x = fabs(z.x);
 	if (fractal->buffalo.preabsy) z.y = fabs(z.y);
@@ -28,9 +28,9 @@ REAL4 MandelbulbAtan2Power2Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	REAL phi = atan2(z.y, z.x) * fractal->transformCommon.scale1;
 
 	REAL rr = dot(z, z);
-	REAL sinth = native_sin(2.0f * theta1);
-	z.x = sinth * native_cos(2.0f * phi);
-	z.y = sinth * native_sin(2.0f * phi);
+	REAL sinth = native_sin(2.0 * theta1);
+	z.x = sinth * native_cos(2.0 * phi);
+	z.y = sinth * native_sin(2.0 * phi);
 	z.z = -native_cos(theta1 + theta2);
 	z *= rr;
 

@@ -17,8 +17,8 @@
 
 REAL4 PseudoKleinianMod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL k = 0.0f;
-	REAL Dk = 1.0f;
+	REAL k = 0.0;
+	REAL Dk = 1.0;
 
 	for (int h = 0; h < fractal->transformCommon.int32; h++)
 	{
@@ -51,7 +51,7 @@ REAL4 PseudoKleinianMod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		{
 			z = fabs(z + fractal->transformCommon.additionConstant0777)
 					- fabs(z - fractal->transformCommon.additionConstant0777) - z;
-			k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0f);
+			k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0);
 			z *= k;
 			Dk *= k;
 		}
@@ -142,11 +142,11 @@ REAL4 PseudoKleinianMod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		REAL4 p = z;
 		REAL m;
 		temp = fractal->transformCommon.maxR2d1 / fractal->transformCommon.minR2p25;
-		REAL r2 = 0.0f;
-		REAL Dd = 1.0f;
-		for (int n = 0; n < fractal->transformCommon.int16 && r2 < 100.0f; n++)
+		REAL r2 = 0.0;
+		REAL Dd = 1.0;
+		for (int n = 0; n < fractal->transformCommon.int16 && r2 < 100.0; n++)
 		{
-			m = 1.0f;
+			m = 1.0;
 			p = fractal->transformCommon.additionConstant0555 - fabs(p);
 			r2 = dot(p, p);
 			if (r2 < fractal->transformCommon.minR2p25)
@@ -162,7 +162,7 @@ REAL4 PseudoKleinianMod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		if (!fractal->transformCommon.functionEnabledTFalse)
 			Dd = r / fabs(Dd);
 		else
-			Dd = 0.5f * r * log(r) / fabs(Dd);
+			Dd = 0.5 * r * log(r) / fabs(Dd);
 
 		if (!fractal->transformCommon.functionEnabledIFalse)
 			aux->DE0 =
@@ -179,7 +179,7 @@ REAL4 PseudoKleinianMod6Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		colorAdd += fractal->foldColor.difs0000.x * rxy;
 		colorAdd += fractal->foldColor.difs0000.y * k;
 		colorAdd += fractal->foldColor.difs0000.z * fabs(q.z);

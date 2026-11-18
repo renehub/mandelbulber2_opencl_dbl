@@ -62,10 +62,10 @@ REAL4 AmazingSurfKleinIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 		REAL rr = dot(z, z);
 		REAL MinRR = fractal->transformCommon.minR0;
-		REAL dividend = rr < MinRR ? MinRR : min(rr, 1.0f);
+		REAL dividend = rr < MinRR ? MinRR : min(rr, 1.0);
 
 		// scale
-		REAL useScale = 1.0f;
+		REAL useScale = 1.0;
 		useScale = (aux->actualScaleA + fractal->transformCommon.scale1) / dividend;
 		z *= useScale;
 		aux->DE = aux->DE * fabs(useScale) + fractal->analyticDE.offset1;
@@ -86,7 +86,7 @@ REAL4 AmazingSurfKleinIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 		if (fractal->foldColor.auxColorEnabledFalse)
 		{
-			REAL colorAdd = 0.0f;
+			REAL colorAdd = 0.0;
 			if (zCol.x != oldZ.x)
 				colorAdd += fractal->foldColor.difs0000.x
 										* (fabs(zCol.x) - fractal->transformCommon.additionConstant111.x);

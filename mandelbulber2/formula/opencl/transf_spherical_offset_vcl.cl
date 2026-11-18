@@ -17,8 +17,8 @@
 REAL4 TransfSphericalOffsetVCLIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL para = fractal->Cpara.para00;
-	REAL paraAdd = 0.0f;
-	REAL paraAddP0 = 0.0f;
+	REAL paraAdd = 0.0;
+	REAL paraAddP0 = 0.0;
 	// curvilinear mode
 	if (fractal->transformCommon.functionEnabled)
 	{
@@ -53,11 +53,11 @@ REAL4 TransfSphericalOffsetVCLIteration(REAL4 z, __global sFractalCl *fractal, s
 			if (fractal->Cpara.enabledCurves)
 			{
 				REAL paraIt;
-				if (lengthAB > 2.0f * fractal->Cpara.iterA) // stop  error, todo fix.
+				if (lengthAB > 2.0 * fractal->Cpara.iterA) // stop  error, todo fix.
 				{
-					REAL curve1 = (grade2 - grade1) / (4.0f * fractal->Cpara.iterA);
+					REAL curve1 = (grade2 - grade1) / (4.0 * fractal->Cpara.iterA);
 					REAL tempL = lengthAB - fractal->Cpara.iterA;
-					REAL curve2 = (grade3 - grade2) / (4.0f * tempL);
+					REAL curve2 = (grade3 - grade2) / (4.0 * tempL);
 					if (aux->i < 2 * fractal->Cpara.iterA)
 					{
 						paraIt = tempA - fabs(tempA - aux->i);
@@ -77,13 +77,13 @@ REAL4 TransfSphericalOffsetVCLIteration(REAL4 z, __global sFractalCl *fractal, s
 	if (fractal->Cpara.enabledParabFalse)
 	{ // parabolic = paraOffset + iter *slope + (iter *iter *scale)
 		paraAddP0 = fractal->Cpara.parabOffset0 + (aux->i * fractal->Cpara.parabSlope)
-								+ (aux->i * aux->i * 0.001f * fractal->Cpara.parabScale);
+								+ (aux->i * aux->i * 0.001 * fractal->Cpara.parabScale);
 		para += paraAddP0;
 	}
 	// para offset
 	para += fractal->transformCommon.offset0;
 
-	REAL div = 0.0f;
+	REAL div = 0.0;
 	// dot mode
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
@@ -95,11 +95,11 @@ REAL4 TransfSphericalOffsetVCLIteration(REAL4 z, __global sFractalCl *fractal, s
 	}
 
 	// using the parameter
-	z *= 1.0f + para / -div;
+	z *= 1.0 + para / -div;
 
 	// post scale
 	z *= fractal->transformCommon.scale;
-	aux->DE = aux->DE * fractal->transformCommon.scale + 1.0f;
+	aux->DE = aux->DE * fractal->transformCommon.scale + 1.0;
 
 	// DE tweak
 	aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset0;

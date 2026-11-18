@@ -20,7 +20,7 @@ REAL4 MengerSpongeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	z = fabs(z);
 
 	REAL temp;
-	REAL col = 0.0f;
+	REAL col = 0.0;
 	if (z.x < z.y)
 	{
 		temp = z.y;
@@ -50,9 +50,9 @@ REAL4 MengerSpongeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 
 	z *= fractal->transformCommon.scale3;
 
-	z.x -= 2.0f;
-	z.y -= 2.0f;
-	if (z.z > 1.0f) z.z -= 2.0f;
+	z.x -= 2.0;
+	z.y -= 2.0;
+	if (z.z > 1.0) z.z -= 2.0;
 
 	aux->DE *= fractal->transformCommon.scale3;
 	return z;

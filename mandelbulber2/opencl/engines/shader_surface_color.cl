@@ -32,31 +32,31 @@
  * surface color calculation
  */
 
-float3 GradientInterpolate(
-	int paletteIndex, float pos, bool smooth, int gradientSize, __global float4 *palette)
+REAL3 GradientInterpolate(
+	int paletteIndex, REAL pos, bool smooth, int gradientSize, __global float4 *palette)
 {
-	float3 color = 0.0f;
+	REAL3 color = 0.0;
 	// if last element then just copy color value (no interpolation)
 	if (paletteIndex == gradientSize - 1)
 	{
-		color = palette[paletteIndex - 1].xyz;
+		color = TO_REAL3(palette[paletteIndex - 1].xyz);
 	}
 	else
 	{
 		// interpolation
-		float3 color1 = palette[paletteIndex].xyz;
-		float pos1 = palette[paletteIndex].w;
-		float3 color2 = palette[paletteIndex + 1].xyz;
-		float pos2 = palette[paletteIndex + 1].w;
+		REAL3 color1 = TO_REAL3(palette[paletteIndex].xyz);
+		REAL pos1 = palette[paletteIndex].w;
+		REAL3 color2 = TO_REAL3(palette[paletteIndex + 1].xyz);
+		REAL pos2 = palette[paletteIndex + 1].w;
 
 		// relative delta
-		if (pos2 - pos1 > 0.0f)
+		if (pos2 - pos1 > 0.0)
 		{
-			float delta = (pos - pos1) / (pos2 - pos1);
+			REAL delta = (pos - pos1) / (pos2 - pos1);
 
-			if (smooth) delta = 0.5f * (1.0f - cos(delta * M_PI_F));
+			if (smooth) delta = 0.5 * (1.0 - cos(delta * M_PI_F));
 
-			float nDelta = 1.0f - delta;
+			REAL nDelta = 1.0 - delta;
 			color.s0 = color1.s0 * nDelta + color2.s0 * delta;
 			color.s1 = color1.s1 * nDelta + color2.s1 * delta;
 			color.s2 = color1.s2 * nDelta + color2.s2 * delta;
@@ -70,7 +70,7 @@ float3 GradientInterpolate(
 }
 
 int GradientIterator(
-	int paletteIndex, float colorPosition, int gradientSize, __global float4 *palette)
+	int paletteIndex, REAL colorPosition, int gradientSize, __global float4 *palette)
 {
 	int newIndex = paletteIndex;
 	while (newIndex < gradientSize - 1 && colorPosition > palette[newIndex + 1].s3)
@@ -80,50 +80,50 @@ int GradientIterator(
 	return newIndex;
 }
 
-float3 GetColorFromGradient(float position, bool smooth, int gradientSize, __global float4 *palette)
+REAL3 GetColorFromGradient(REAL position, bool smooth, int gradientSize, __global float4 *palette)
 {
 	int paletteIndex = GradientIterator(0, position, gradientSize, palette);
 	return GradientInterpolate(paletteIndex, position, smooth, gradientSize, palette);
 }
 
-float3 SurfaceColor(__constant sClInConstants *consts, sRenderData *renderData,
+REAL3 SurfaceColor(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParams, sClGradientsCollection *gradients)
 {
-	float3 out;
+	REAL3 out;
 	calcParams->distThresh = input->distThresh;
 	calcParams->detailSize = input->delta;
 
 	formulaOut fout;
-	fout.z = 0.0f;
+	fout.z = 0.0;
 	fout.iters = 0;
-	fout.distance = 0.0f;
-	fout.colorIndex = 0.0f;
+	fout.distance = 0.0;
+	fout.colorIndex = 0.0;
 	fout.maxiter = false;
 
 #ifdef USE_SURFACE_GRADIENT
-	gradients->surface = 1.0f;
+	gradients->surface = 1.0;
 #endif
 #ifdef USE_SPECULAR_GRADIENT
-	gradients->specular = 1.0f;
+	gradients->specular = 1.0;
 #endif
 #ifdef USE_DIFFUSE_GRADIENT
-	gradients->diffuse = 1.0f;
+	gradients->diffuse = 1.0;
 #endif
 #ifdef USE_LUMINOSITY_GRADIENT
-	gradients->luminosity = 0.0f;
+	gradients->luminosity = 0.0;
 #endif
 #ifdef USE_ROUGHNESS_GRADIENT
-	gradients->roughness = 1.0f;
+	gradients->roughness = 1.0;
 #endif
 #ifdef USE_REFLECTANCE_GRADIENT
-	gradients->reflectance = 1.0f;
+	gradients->reflectance = 1.0;
 #endif
 #ifdef USE_TRANSPARENCY_GRADIENT
-	gradients->transparency = 1.0f;
+	gradients->transparency = 1.0;
 #endif
 
-	float3 pointTemp = input->point;
-	float3 color = (float3){1.0f, 1.0f, 1.0f};
+	REAL3 pointTemp = input->point;
+	REAL3 color = (REAL3){1.0, 1.0, 1.0};
 
 #if (defined(BOOLEAN_OPERATORS) || defined(USE_PRIMITIVES)) && defined(FULL_ENGINE)
 	enumObjectTypeCl objectType = renderData->objectsData[input->objectId].objectType;
@@ -138,16 +138,16 @@ float3 SurfaceColor(__constant sClInConstants *consts, sRenderData *renderData,
 			{
 				int formulaIndex = input->objectId;
 
-				float3 pointForFractal =
+				REAL3 pointForFractal =
 					input->hasTransformedPoint ? input->transformedPoint : input->point;
 
 				fout = Fractal(consts, pointForFractal, calcParams, calcModeColouring, input->material,
 					formulaIndex, renderData, input->sequenceIndex, input->transformedPoint, input->hasTransformedPoint);
-				float nCol = fmod(fabs(fout.colorIndex), 248.0f * 256.0f);
+				REAL nCol = fmod(fabs(fout.colorIndex), 248.0 * 256.0);
 
-				float colorPosition = fmod(
-					nCol / 256.0f / 10.0f * input->material->coloring_speed + input->material->paletteOffset,
-					1.0f);
+				REAL colorPosition = fmod(
+					nCol / 256.0 / 10.0 * input->material->coloring_speed + input->material->paletteOffset,
+					1.0);
 
 #ifdef USE_SURFACE_GRADIENT
 				if (input->material->surfaceGradientEnable)
@@ -230,12 +230,12 @@ float3 SurfaceColor(__constant sClInConstants *consts, sRenderData *renderData,
 		}
 		case objNone:
 		{
-			color = 0.0f;
+			color = 0.0;
 		}
 	}
 #endif
 
-	out = (float3){color.x, color.y, color.z};
+	out = (REAL3){color.x, color.y, color.z};
 
 	return out;
 }

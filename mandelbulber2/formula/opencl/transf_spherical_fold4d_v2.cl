@@ -16,8 +16,8 @@
 
 REAL4 TransfSphericalFold4dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL rrCol = 0.0f;
-	REAL rr = 0.0f;
+	REAL rrCol = 0.0;
+	REAL rr = 0.0;
 	z += fractal->transformCommon.offset0000;
 	if (fractal->transformCommon.functionEnabledBxFalse)
 	{

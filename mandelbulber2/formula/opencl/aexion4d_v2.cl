@@ -28,7 +28,7 @@ REAL4 Aexion4dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		aux->const_c = temp * fractal->transformCommon.scale1111;
 		t = length(temp);
 		if (!fractal->transformCommon.functionEnabledAFalse)
-			z = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+			z = (REAL4){0.0, 0.0, 0.0, 0.0};
 		else
 		{
 			z = temp;
@@ -36,12 +36,12 @@ REAL4 Aexion4dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		}
 		aux->r = t;
 	}
-	aux->DE = aux->DE * 2.0f * aux->r + 1.0f;
-	t = 2.0f * z.w * z.z;
+	aux->DE = aux->DE * 2.0 * aux->r + 1.0;
+	t = 2.0 * z.w * z.z;
 	temp.x = z.x * z.x - z.y * z.y;
 	temp.y = t - temp.x;
 	temp.x += t;
-	t = 2.0f * z.x * z.y;
+	t = 2.0 * z.x * z.y;
 	temp.z = z.z * z.z - z.w * z.w;
 	temp.w = t - temp.z;
 	temp.z += t;

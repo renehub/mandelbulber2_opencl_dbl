@@ -18,7 +18,7 @@ REAL4 TransfScale3dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	z *= fractal->transformCommon.scale3D111;
 
 	if (!fractal->analyticDE.enabledFalse)
-		aux->DE = aux->DE * length(z) / aux->r + 1.0f;
+		aux->DE = aux->DE * length(z) / aux->r + 1.0;
 	else
 		aux->DE =
 			aux->DE * length(z) / aux->r * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;

@@ -15,7 +15,7 @@
 
 REAL4 MandelbulbEyeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	// pre abs
 	if (fractal->buffalo.preabsx) z.x = fabs(z.x);
@@ -31,7 +31,7 @@ REAL4 MandelbulbEyeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	temp = theta1 + theta2;
 
 	REAL phi1 = atan2(z.y, z.x);
-	REAL phi2 = 0.0f;
+	REAL phi2 = 0.0;
 	if (!fractal->transformCommon.functionEnabledFalse)
 		phi2 = atan2(-z.y, z.x);
 	else

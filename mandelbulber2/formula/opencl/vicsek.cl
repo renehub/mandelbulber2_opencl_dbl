@@ -15,8 +15,8 @@
 
 REAL4 VicsekIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 
@@ -25,20 +25,20 @@ REAL4 VicsekIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 			&& aux->i >= fractal->transformCommon.startIterationsE
 			&& aux->i < fractal->transformCommon.stopIterationsE)
 	{
-		if (z.x + z.y < 0.0f) z = (REAL4){-z.y, -z.x, z.z, z.w};
+		if (z.x + z.y < 0.0) z = (REAL4){-z.y, -z.x, z.z, z.w};
 
-		if (z.x + z.z < 0.0f) // z.xz = -z.zx;
+		if (z.x + z.z < 0.0) // z.xz = -z.zx;
 			z = (REAL4){-z.z, z.y, -z.x, z.w};
 
-		if (z.x - z.y < 0.0f) // z.xy = z.yx;
+		if (z.x - z.y < 0.0) // z.xy = z.yx;
 			z = (REAL4){z.y, z.x, z.z, z.w};
 
-		if (z.x - z.z < 0.0f) // z.xz = z.zx;
+		if (z.x - z.z < 0.0) // z.xz = z.zx;
 			z = (REAL4){z.z, z.y, z.x, z.w};
 
 		z.x = fabs(z.x);
 		z = z * fractal->transformCommon.scale2
-				- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0f);
+				- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0);
 
 		aux->DE *= fractal->transformCommon.scale2;
 	}
@@ -50,7 +50,7 @@ REAL4 VicsekIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	{
 		REAL rr = dot(z, z);
 		rrCol = rr; // test ooooooooooooooooooooooooooooooooo
-		// if (r2 < 1e-21f) r2 = 1e-21f;
+		// if (r2 < 1e-21) r2 = 1e-21;
 		if (rr < fractal->transformCommon.minR2p25)
 		{
 			REAL tglad_factor1 = fractal->transformCommon.maxMinR2factor;
@@ -77,19 +77,19 @@ REAL4 VicsekIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	{
 		zCol = z; // test ooooooooooooooooooooooooooooooooo
 		z = fabs(z);
-		if (z.x - z.y < 0.0f)
+		if (z.x - z.y < 0.0)
 		{
 			REAL temp = z.y;
 			z.y = z.x;
 			z.x = temp;
 		}
-		if (z.x - z.z < 0.0f)
+		if (z.x - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.x;
 			z.x = temp;
 		}
-		if (z.y - z.z < 0.0f)
+		if (z.y - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.y;
@@ -99,9 +99,9 @@ REAL4 VicsekIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		aux->DE *= fractal->transformCommon.scale3;
 
 		REAL4 limit = fractal->transformCommon.offset111;
-		if (z.x > limit.x * 0.5f) z.x -= limit.x * fractal->transformCommon.scaleA1;
-		if (z.y > limit.y * 0.5f) z.y -= limit.y;
-		if (z.z > limit.z) z.z -= 2.0f * limit.z;
+		if (z.x > limit.x * 0.5) z.x -= limit.x * fractal->transformCommon.scaleA1;
+		if (z.y > limit.y * 0.5) z.y -= limit.y;
+		if (z.z > limit.z) z.z -= 2.0 * limit.z;
 		z.x += fractal->transformCommon.offset0;
 		zCol = z; // test ooooooooooooooooooooooooooooooooo
 	}

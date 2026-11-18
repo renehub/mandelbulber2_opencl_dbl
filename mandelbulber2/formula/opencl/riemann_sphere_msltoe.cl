@@ -21,29 +21,29 @@ REAL4 RiemannSphereMsltoeIteration(REAL4 z, __global sFractalCl *fractal, sExten
 		z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 
 	REAL r = aux->r;
-	// if (r < 1e-21f) r = 1e-21f;
+	// if (r < 1e-21) r = 1e-21;
 	z *= fractal->transformCommon.scale / r;
 
-	REAL q = 1.0f / (1.0f - z.z);
+	REAL q = 1.0 / (1.0 - z.z);
 	REAL s = z.x * q;
 	REAL t = z.y * q;
 
-	REAL p = 1.0f + s * s + t * t;
+	REAL p = 1.0 + s * s + t * t;
 
 	s = fabs(native_sin(M_PI_F * s + fractal->transformCommon.offsetA0));
 	t = fabs(native_sin(M_PI_F * t + fractal->transformCommon.offsetB0));
 
 	r *= r;
-	// if (r < 1e-21f)
-	//	r = 1e-21f;
+	// if (r < 1e-21)
+	//	r = 1e-21;
 
 	if (p > 36) p = 36; // problem with pow()
-	r = -0.25f + pow(r, p);
+	r = -0.25 + pow(r, p);
 
-	z.x = 2.0f * s;
-	z.y = 2.0f * t;
-	z.z = -1.0f + s * s + t * t;
-	z *= r / (1.0f + s * s + t * t);
+	z.x = 2.0 * s;
+	z.y = 2.0 * t;
+	z.z = -1.0 + s * s + t * t;
+	z *= r / (1.0 + s * s + t * t);
 
 	z += fractal->transformCommon.additionConstant000;
 	return z;

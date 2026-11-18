@@ -29,12 +29,12 @@ REAL4 HypercomplexV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	REAL4 dd = fractal->transformCommon.constantMultiplier1220;
 	dd.w = fractal->transformCommon.scale2;
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	dd.x = z.x * z.x * dd.x - z.y * z.y - z.z * z.z - z.w * z.w;
-	dd.y = 2.0f * z.x * z.y - dd.y * z.w * z.z;
-	dd.z = 2.0f * z.x * z.z - dd.z * z.y * z.w;
-	dd.w = 2.0f * z.x * z.w - dd.w * z.z * z.y;
+	dd.y = 2.0 * z.x * z.y - dd.y * z.w * z.z;
+	dd.z = 2.0 * z.x * z.z - dd.z * z.y * z.w;
+	dd.w = 2.0 * z.x * z.w - dd.w * z.z * z.y;
 	z = dd;
 
 	// offset (Julia)

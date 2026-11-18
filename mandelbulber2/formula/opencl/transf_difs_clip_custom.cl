@@ -23,9 +23,9 @@ REAL4 TransfDIFSClipCustomIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		REAL4 zc = z;
 		zc += fractal->transformCommon.offsetA000;
 		zc = fabs(zc) - fractal->transformCommon.additionConstant111;
-		zc.x = max(zc.x, 0.0f);
-		zc.y = max(zc.y, 0.0f);
-		zc.z = max(zc.z, 0.0f);
+		zc.x = max(zc.x, 0.0);
+		zc.y = max(zc.y, 0.0);
+		zc.z = max(zc.z, 0.0);
 		REAL zcd = length(zc) * fractal->transformCommon.scale1 - fractal->transformCommon.offsetB0;
 		if (!fractal->transformCommon.functionEnabledNFalse)
 		{
@@ -46,7 +46,7 @@ REAL4 TransfDIFSClipCustomIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	{
 		c.y = fabs(c.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int6;
-		psi = fabs(fmod(atan2(c.y, c.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(c.y, c.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(c.x * c.x + c.y * c.y);
 		c.x = native_cos(psi) * len;
 		c.y = native_sin(psi) * len;
@@ -60,7 +60,7 @@ REAL4 TransfDIFSClipCustomIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	c += fractal->transformCommon.offset000;
 	c = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, c);
 
-	REAL dst = 0.0f;
+	REAL dst = 0.0;
 	if (fractal->transformCommon.functionEnabledBx)
 	{
 		REAL4 g = fabs(c) - fractal->transformCommon.offsetC111;
@@ -78,7 +78,7 @@ REAL4 TransfDIFSClipCustomIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		}
 	}
 
-	REAL dst1 = 0.0f;
+	REAL dst1 = 0.0;
 	if (fractal->transformCommon.functionEnabledBFalse) // sphere
 	{
 
@@ -119,7 +119,7 @@ REAL4 TransfDIFSClipCustomIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	// aux->color
 	if (fractal->foldColor.auxColorEnabledFalse)
 	{
-		REAL addColor = 0.0f;
+		REAL addColor = 0.0;
 		if (dst > aux->dist) addColor += fractal->foldColor.difs0000.x;
 		if (dst1 > aux->dist) addColor += fractal->foldColor.difs0000.y;
 

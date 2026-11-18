@@ -26,10 +26,10 @@ REAL4 TransfPolyFoldSymMultiIteration(REAL4 z, __global sFractalCl *fractal, sEx
 
 	int order = fractal->transformCommon.int6;
 	REAL div2PI = (REAL)order * M_PI_2x_INV_F;
-	REAL temp = 0.0f;
-	REAL sAng = 0.0f;
-	REAL cAng = 0.0f;
-	REAL angle = 0.0f;
+	REAL temp = 0.0;
+	REAL sAng = 0.0;
+	REAL cAng = 0.0;
+	REAL angle = 0.0;
 	int sector;
 	if (fractal->transformCommon.functionEnabledCx)
 	{

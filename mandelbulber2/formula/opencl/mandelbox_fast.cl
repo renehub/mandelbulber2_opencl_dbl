@@ -18,7 +18,7 @@
 
 REAL4 MandelboxFastIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 ones = (REAL4){1.0f, 1.0f, 1.0f, 1.0f};
+	REAL4 ones = (REAL4){1.0, 1.0, 1.0, 1.0};
 	z = fabs(z + ones) - fabs(z - ones) - z;
 
 	REAL r2 = dot(z, z);
@@ -38,6 +38,6 @@ REAL4 MandelboxFastIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	if (fractal->mandelbox.mainRotationEnabled) z = Matrix33MulFloat4(fractal->mandelbox.mainRot, z);
 
 	z = z * fractal->mandelbox.scale;
-	aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0f;
+	aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0;
 	return z;
 }

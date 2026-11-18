@@ -22,7 +22,7 @@ REAL4 TransfSurfBoxFoldV2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 {
 	(void)aux;
 
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	REAL4 foldMod = fractal->transformCommon.offset222;
 	REAL4 fold = fractal->transformCommon.additionConstant111;

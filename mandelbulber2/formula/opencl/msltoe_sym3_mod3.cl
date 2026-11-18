@@ -18,9 +18,9 @@
 REAL4 MsltoeSym3Mod3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 	REAL4 z1 = z;
-	REAL psi = atan2(z.z, z.y) + M_PI_F * 2.0f;
+	REAL psi = atan2(z.z, z.y) + M_PI_F * 2.0;
 	REAL psi2 = 0;
 	while (psi > M_PI_8_F)
 	{
@@ -35,15 +35,15 @@ REAL4 MsltoeSym3Mod3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	z.z = z1.z;
 	REAL4 zs = z * z;
 	REAL zs2 = zs.x + zs.y;
-	// if (zs2 < 1e-21f)
-	//	zs2 = 1e-21f;
+	// if (zs2 < 1e-21)
+	//	zs2 = 1e-21;
 	REAL zs3 =
 		(zs2 + zs.z) + fractal->transformCommon.scale0 * fractal->transformCommon.scale0 * zs.y * zs.z;
-	REAL zsd = (1.0f - zs.z / zs3);
+	REAL zsd = (1.0 - zs.z / zs3);
 
 	z1.x = (zs.x - zs.y) * zsd;
-	z1.y = (2.0f * z.x * z.y) * zsd * fractal->transformCommon.scale; // scaling y;
-	z1.z = 2.0f * z.z * native_sqrt(zs2);
+	z1.y = (2.0 * z.x * z.y) * zsd * fractal->transformCommon.scale; // scaling y;
+	z1.z = 2.0 * z.z * native_sqrt(zs2);
 	z.x = z1.x;
 	z.y = z1.y * cs + z1.z * sn;
 	z.z = -z1.y * sn + z1.z * cs;
@@ -61,9 +61,9 @@ REAL4 MsltoeSym3Mod3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		z.z += sign(z.z) * tempFAB.z;
 	}
 	REAL lengthTempZ = -length(z); // spherical offset
-	// if (lengthTempZ > -1e-21f)
-	//	lengthTempZ = -1e-21f;   //  z is neg.)
-	z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+	// if (lengthTempZ > -1e-21)
+	//	lengthTempZ = -1e-21;   //  z is neg.)
+	z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 	z *= fractal->transformCommon.scale1;
 	aux->DE *= fabs(fractal->transformCommon.scale1);
 
@@ -72,21 +72,21 @@ REAL4 MsltoeSym3Mod3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i < fractal->transformCommon.stopIterationsA)
 	{
 		aux->r = length(z);
-		aux->DE = aux->DE * 2.0f * aux->r;
+		aux->DE = aux->DE * 2.0 * aux->r;
 		z = (REAL4){z.x * z.x - z.y * z.y - z.z * z.z, z.x * z.y, z.x * z.z, z.w};
 		if (fractal->analyticDE.enabledFalse)
 		{
 			REAL4 temp = z;
 			REAL tempL = length(temp);
-			z *= (REAL4){1.0f, 2.0f, 2.0f, 1.0f};
-			// if (tempL < 1e-21f)
-			//	tempL = 1e-21f;
+			z *= (REAL4){1.0, 2.0, 2.0, 1.0};
+			// if (tempL < 1e-21)
+			//	tempL = 1e-21;
 			REAL avgScale = length(z) / tempL;
 			aux->DE *= avgScale;
 		}
 		else
 		{
-			z *= (REAL4){1.0f, 2.0f, 2.0f, 1.0f};
+			z *= (REAL4){1.0, 2.0, 2.0, 1.0};
 		}
 	}
 	return z;

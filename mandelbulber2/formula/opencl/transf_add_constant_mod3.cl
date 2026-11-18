@@ -15,7 +15,7 @@
 
 REAL4 TransfAddConstantMod3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 signs = (REAL4){1.0f, 1.0f, 1.0f, 1.0f};
+	REAL4 signs = (REAL4){1.0, 1.0, 1.0, 1.0};
 	signs.x *= sign(aux->const_c.x);
 	signs.y *= sign(aux->const_c.y);
 	signs.z *= sign(aux->const_c.z);
@@ -38,7 +38,7 @@ REAL4 TransfAddConstantMod3Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	REAL4 offset1 = fractal->transformCommon.offset000;
 	if (fractal->transformCommon.functionEnabledCFalse) offset1 *= signs;
 
-	REAL m = (1.0f - fractal->transformCommon.radius1 / r) * fractal->transformCommon.scale1;
+	REAL m = (1.0 - fractal->transformCommon.radius1 / r) * fractal->transformCommon.scale1;
 
 	if (r > fractal->transformCommon.radius1)
 	{

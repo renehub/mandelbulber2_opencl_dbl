@@ -33,7 +33,7 @@ REAL4 TransfDIFSHeartIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	{
 		zc.y = fabs(zc.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int8Z;
-		psi = fabs(fmod(atan2(zc.y, zc.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(zc.y, zc.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(zc.y * zc.y + zc.x * zc.x);
 		if (!fractal->transformCommon.functionEnabledEFalse)
 		{

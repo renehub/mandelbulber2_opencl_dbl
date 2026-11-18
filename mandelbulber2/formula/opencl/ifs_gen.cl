@@ -48,7 +48,7 @@ REAL4 IfsGenIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		z += fractal->transformCommon.offset000;
 
 	// spherical fold
-	REAL m = 1.0f;
+	REAL m = 1.0;
 	if (fractal->transformCommon.functionEnabledSFalse
 			&& aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)

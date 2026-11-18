@@ -20,7 +20,7 @@ REAL4 TransfSphericalFoldIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	z += fractal->mandelbox.offset;
 	z *= fractal->transformCommon.scale;
 
-	// if (r2 < 1e-21f) r2 = 1e-21f;
+	// if (r2 < 1e-21) r2 = 1e-21;
 	if (r2 < fractal->mandelbox.mR2)
 	{
 		z *= fractal->mandelbox.mboxFactor1;
@@ -43,7 +43,7 @@ REAL4 TransfSphericalFoldIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	z -= fractal->mandelbox.offset;
 	// Analytic DE tweak
 	if (!fractal->analyticDE.enabledFalse)
-		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0f;
+		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0;
 	else
 		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) * fractal->analyticDE.scale1
 							+ fractal->analyticDE.offset0;

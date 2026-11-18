@@ -30,21 +30,21 @@ REAL4 MandelbulbPow2V1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			&& aux->i < fractal->transformCommon.stopIterationsB)
 	{
 		REAL m2 = z.x * z.x + z.z * z.z;
-		aux->DE = aux->DE * 2.0f * native_sqrt(m2 + z.y * z.y) + 1.0f;
-		if (m2 == 0.0f)
+		aux->DE = aux->DE * 2.0 * native_sqrt(m2 + z.y * z.y) + 1.0;
+		if (m2 == 0.0)
 		{
 			z.x = -z.y * z.y;
-			z.y = 0.0f;
+			z.y = 0.0;
 		}
 		else
 		{
 			REAL temp = -(m2 - z.y * z.y);
 
-			z.y = 2.0f * native_sqrt(m2) * z.y;
-			// if (fractal->transformCommon.functionEnabledAFalse && z.y < 0.0f) z.x = -z.x;
-			// if (fractal->transformCommon.functionEnabledBFalse && z.x < 0.0f) z.y = -z.y;
+			z.y = 2.0 * native_sqrt(m2) * z.y;
+			// if (fractal->transformCommon.functionEnabledAFalse && z.y < 0.0) z.x = -z.x;
+			// if (fractal->transformCommon.functionEnabledBFalse && z.x < 0.0) z.y = -z.y;
 			m2 = temp / m2;
-			temp = 2.0f * z.x * z.z * m2;
+			temp = 2.0 * z.x * z.z * m2;
 			z.z = (z.z * z.z - z.x * z.x) * m2;
 			if (!fractal->transformCommon.functionEnabledBFalse)
 				z.x = temp;
@@ -52,10 +52,10 @@ REAL4 MandelbulbPow2V1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				z.x = -temp;
 			if (fractal->transformCommon.functionEnabledDFalse)
 			{
-				if (fractal->transformCommon.functionEnabledCFalse) aux->pos_neg *= -1.0f;
+				if (fractal->transformCommon.functionEnabledCFalse) aux->pos_neg *= -1.0;
 				z.y *= aux->pos_neg;
 
-				aux->pos_neg *= -1.0f;
+				aux->pos_neg *= -1.0;
 			}
 		}
 	}
@@ -65,22 +65,22 @@ REAL4 MandelbulbPow2V1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			&& aux->i < fractal->transformCommon.stopIterationsC)
 	{
 		REAL m2 = z.y * z.y + z.x * z.x;
-		aux->DE = aux->DE * 2.0f * native_sqrt(m2 + z.z * z.z) + 1.0f;
+		aux->DE = aux->DE * 2.0 * native_sqrt(m2 + z.z * z.z) + 1.0;
 
-		if (m2 == 0.0f)
+		if (m2 == 0.0)
 		{
 			z.y = -z.z * z.z;
-			z.z = 0.0f;
+			z.z = 0.0;
 		}
 		else
 		{
 			REAL temp = m2 - z.z * z.z;
-			z.z = 2.0f * native_sqrt(m2) * z.z;
-			//	if (fractal->transformCommon.functionEnabledAFalse && z.x < 0.0f) z.z = -z.z;
-			//	if (fractal->transformCommon.functionEnabledBFalse && z.z < 0.0f) z.x = -z.x;
+			z.z = 2.0 * native_sqrt(m2) * z.z;
+			//	if (fractal->transformCommon.functionEnabledAFalse && z.x < 0.0) z.z = -z.z;
+			//	if (fractal->transformCommon.functionEnabledBFalse && z.z < 0.0) z.x = -z.x;
 
 			m2 = temp / m2;
-			temp = 2.0f * z.y * z.x * m2;
+			temp = 2.0 * z.y * z.x * m2;
 			z.y = (z.y * z.y - z.x * z.x) * m2;
 
 			if (!fractal->transformCommon.functionEnabledAFalse)
@@ -90,9 +90,9 @@ REAL4 MandelbulbPow2V1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 			if (fractal->transformCommon.functionEnabledFFalse)
 			{
-				if (fractal->transformCommon.functionEnabledEFalse) aux->pos_neg *= -1.0f;
+				if (fractal->transformCommon.functionEnabledEFalse) aux->pos_neg *= -1.0;
 				z.z *= aux->pos_neg;
-				aux->pos_neg *= -1.0f;
+				aux->pos_neg *= -1.0;
 			}
 		}
 	}

@@ -22,20 +22,20 @@ REAL4 MandelbarV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		if (fractal->transformCommon.functionEnabledAyFalse) z.y = fabs(z.y);
 		if (fractal->transformCommon.functionEnabledAzFalse) z.z = fabs(z.z);
 	}
-	REAL temp = 0.0f;
+	REAL temp = 0.0;
 	REAL m2 = z.x * z.x + z.y * z.y;
-	aux->DE = aux->DE * 2.0f * native_sqrt(m2 + z.z * z.z) + 1.0f;
-	if (m2 == 0.0f)
+	aux->DE = aux->DE * 2.0 * native_sqrt(m2 + z.z * z.z) + 1.0;
+	if (m2 == 0.0)
 	{
 		z.y = -z.z * z.z;
-		z.z = 0.0f;
+		z.z = 0.0;
 	}
 	else
 	{
 		temp = m2 - z.z * z.z;
-		z.z = 2.0f * native_sqrt(m2) * z.z;
+		z.z = 2.0 * native_sqrt(m2) * z.z;
 		m2 = temp / m2;
-		temp = 2.0f * z.x * z.y * m2;
+		temp = 2.0 * z.x * z.y * m2;
 		z.y = (z.y * z.y - z.x * z.x) * m2;
 
 		if (fractal->transformCommon.functionEnabledM
@@ -105,7 +105,7 @@ REAL4 MandelbarV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		// last two z lengths
 		if (fractal->foldColor.auxColorEnabledAFalse)
 		{
-			REAL lastVec = 0.0f;
+			REAL lastVec = 0.0;
 			REAL4 oldPt = aux->old_z;
 			REAL lastZ = length(oldPt); // aux->old_r;
 			REAL newZ = length(z);
@@ -135,13 +135,13 @@ REAL4 MandelbarV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	{
 		REAL r = length(z);
 		REAL rLn = r / aux->DE;
-		//	REAL rLg = 0.5f * log(r) * r / aux->DE;
+		//	REAL rLg = 0.5 * log(r) * r / aux->DE;
 
-		REAL rLg = 0.0f;
-		if (r > 1.0f) rLg = 0.5f * log(r) * r / aux->DE;
+		REAL rLg = 0.0;
+		if (r > 1.0) rLg = 0.5 * log(r) * r / aux->DE;
 
 		aux->dist =
-			rLn * (1.0f - fractal->transformCommon.scaleB1) + rLg * fractal->transformCommon.scaleB1;
+			rLn * (1.0 - fractal->transformCommon.scaleB1) + rLg * fractal->transformCommon.scaleB1;
 	}
 	return z;
 }

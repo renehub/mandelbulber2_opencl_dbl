@@ -17,17 +17,17 @@
 
 REAL4 ModulusMandelbulbIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	// if (aux->r < 1e-21f) aux->r = 1e-21f;
+	// if (aux->r < 1e-21) aux->r = 1e-21;
 	REAL th0 = asin(z.z / aux->r) + fractal->bulb.betaAngleOffset;
 	REAL ph0 = atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset;
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
+	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
 	REAL th = th0 * fractal->bulb.power;
 	REAL ph = ph0 * fractal->bulb.power;
 	REAL cth = native_cos(th);
-	aux->DE = (rp * aux->DE) * fractal->bulb.power + 1.0f;
+	aux->DE = (rp * aux->DE) * fractal->bulb.power + 1.0;
 	rp *= aux->r;
 	z.x = cth * native_cos(ph) * rp;
-	z.y = fmod(cth * native_sin(ph) * rp, 2.0f);
+	z.y = fmod(cth * native_sin(ph) * rp, 2.0);
 	z.z = native_sin(th) * rp;
 	return z;
 }

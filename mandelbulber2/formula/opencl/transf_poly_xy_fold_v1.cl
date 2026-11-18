@@ -25,7 +25,7 @@ REAL4 TransfPolyXYFoldV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		if (fractal->transformCommon.functionEnabledzFalse) z.z = fabs(z.z);
 		z += fractal->transformCommon.offset000;
 		REAL psi = M_PI_F / fractal->transformCommon.int8X;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.y * z.y + z.x * z.x);
 		REAL cz = native_cos(psi) * len;
 		REAL sz = native_sin(psi) * len;

@@ -17,13 +17,13 @@
 REAL4 MandelboxVaryScale4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	aux->actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 
-	REAL paraAddP0 = 0.0f;
+	REAL paraAddP0 = 0.0;
 	if (fractal->Cpara.enabledParabFalse)
 	{ // parabolic = paraOffset + iter *slope + (iter *iter *scale)
 		paraAddP0 = fractal->Cpara.parabOffset0 + (aux->i * fractal->Cpara.parabSlope)
-								+ (aux->i * aux->i * 0.001f * fractal->Cpara.parabScale);
+								+ (aux->i * aux->i * 0.001 * fractal->Cpara.parabScale);
 		z.w += paraAddP0;
 	}
 
@@ -45,13 +45,13 @@ REAL4 MandelboxVaryScale4dIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		m = aux->actualScale / (fractal->mandelboxVary4D.minR * fractal->mandelboxVary4D.minR);
 		aux->color += fractal->mandelbox.color.factorSp1;
 	}
-	else if (rr < 1.0f)
+	else if (rr < 1.0)
 	{
 		m = aux->actualScale / rr;
 		aux->color += fractal->mandelbox.color.factorSp2;
 	}
 	z *= m;
-	aux->DE = aux->DE * fabs(m) + 1.0f;
+	aux->DE = aux->DE * fabs(m) + 1.0;
 
 	// 6 plane rotation
 	if (fractal->transformCommon.functionEnabledRFalse

@@ -24,9 +24,9 @@ REAL4 TransfBoxOffsetIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
 		REAL tempL = length(temp);
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
-		aux->DE = aux->DE * avgScale + 1.0f;
+		aux->DE = aux->DE * avgScale + 1.0;
 	}
 	return z;
 }

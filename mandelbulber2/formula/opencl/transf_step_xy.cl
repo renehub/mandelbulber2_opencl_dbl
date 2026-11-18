@@ -16,22 +16,22 @@
 REAL4 TransfStepXYIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 zc = (z);
-	REAL4 colVec = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 colVec = (REAL4){0.0, 0.0, 0.0, 0.0};
 	zc *= fractal->transformCommon.scale3D111;
 
-	REAL Step = zc.y - 2.0f * floor(zc.y / 2.0f);
+	REAL Step = zc.y - 2.0 * floor(zc.y / 2.0);
 
-	if (Step > 1.0f)
+	if (Step > 1.0)
 	{
 		zc.x += fractal->transformCommon.offset05;
-		colVec.x += 1.0f;
+		colVec.x += 1.0;
 	}
 	else
-		colVec.y += 1.0f;
+		colVec.y += 1.0;
 
-	Step = zc.x - 2.0f * floor(zc.x / 2.0f);
+	Step = zc.x - 2.0 * floor(zc.x / 2.0);
 
-	if (Step > 1.0f) colVec.z += 1.0f;
+	if (Step > 1.0) colVec.z += 1.0;
 
 	if (fractal->transformCommon.functionEnabledAxFalse)
 	{
@@ -48,9 +48,9 @@ REAL4 TransfStepXYIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	{
 		REAL4 boxSize = fractal->transformCommon.offset111;
 		zc = fabs(zc) - boxSize;
-		zc.x = max(zc.x, 0.0f);
-		zc.y = max(zc.y, 0.0f);
-		zc.z = max(zc.z, 0.0f);
+		zc.x = max(zc.x, 0.0);
+		zc.y = max(zc.y, 0.0);
+		zc.z = max(zc.z, 0.0);
 		REAL zcd;
 		if (!fractal->transformCommon.functionEnabledAzFalse)
 			zcd = length(zc);
@@ -58,7 +58,7 @@ REAL4 TransfStepXYIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 			zcd = max(max(zc.x, zc.y), zc.z);
 		zcd -= fractal->transformCommon.offset0;
 
-		aux->dist = min(aux->dist, zcd / (aux->DE + 1.0f));
+		aux->dist = min(aux->dist, zcd / (aux->DE + 1.0));
 	}
 
 	if (fractal->analyticDE.enabled)

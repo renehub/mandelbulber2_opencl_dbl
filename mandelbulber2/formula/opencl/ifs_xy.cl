@@ -48,7 +48,7 @@ REAL4 IfsXYIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 	{
 		z.x = fabs(z.x);
 		REAL psi = M_PI_F / fractal->transformCommon.int3;
-		psi = fabs(fmod(atan(z.y / z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan(z.y / z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -98,7 +98,7 @@ REAL4 IfsXYIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 		}
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
@@ -107,7 +107,7 @@ REAL4 IfsXYIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 		z *= useScale;
 
 		if (!fractal->analyticDE.enabledFalse)
-			aux->DE = aux->DE * fabs(useScale) + 1.0f;
+			aux->DE = aux->DE * fabs(useScale) + 1.0;
 		else
 			aux->DE = aux->DE * fabs(useScale) * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 

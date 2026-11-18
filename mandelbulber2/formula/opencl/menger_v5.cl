@@ -36,14 +36,14 @@ REAL4 MengerV5Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 			&& aux->i >= fractal->transformCommon.startIterationsE
 			&& aux->i < fractal->transformCommon.stopIterationsE)
 	{
-		if (z.x + z.y < 0.0f) z = (REAL4){-z.y, -z.x, z.z, z.w};
-		if (z.x + z.z < 0.0f) z = (REAL4){-z.z, z.y, -z.x, z.w};
-		if (z.x - z.y < 0.0f) z = (REAL4){z.y, z.x, z.z, z.w};
-		if (z.x - z.z < 0.0f) z = (REAL4){z.z, z.y, z.x, z.w};
+		if (z.x + z.y < 0.0) z = (REAL4){-z.y, -z.x, z.z, z.w};
+		if (z.x + z.z < 0.0) z = (REAL4){-z.z, z.y, -z.x, z.w};
+		if (z.x - z.y < 0.0) z = (REAL4){z.y, z.x, z.z, z.w};
+		if (z.x - z.z < 0.0) z = (REAL4){z.z, z.y, z.x, z.w};
 
 		z.x = fabs(z.x);
 		z = z * fractal->transformCommon.scale2
-				- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0f);
+				- fractal->transformCommon.offset100 * (fractal->transformCommon.scale2 - 1.0);
 
 		aux->DE *= fractal->transformCommon.scale2;
 	}
@@ -117,7 +117,7 @@ REAL4 MengerV5Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 		}
 		aux->DE = aux->DE * useScale + fractal->analyticDE.offset0;
 
-		REAL sc1 = useScale - 1.0f;
+		REAL sc1 = useScale - 1.0;
 		REAL sc2 = sc1 / useScale;
 		z.y -= fractal->transformCommon.offset1105.z * sc2;
 		z.y = fractal->transformCommon.offset1105.z * sc2 - fabs(z.y);

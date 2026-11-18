@@ -18,7 +18,7 @@
 
 REAL4 BenesiPineTreeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->r * aux->DE * 2.0f + 1.0f;
+	aux->DE = aux->r * aux->DE * 2.0 + 1.0;
 
 	REAL4 temp = z;
 
@@ -26,16 +26,16 @@ REAL4 BenesiPineTreeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	REAL t = z.y + z.z;
 	z.x -= t;
 
-	if (t > 0.0f)
+	if (t > 0.0)
 	{
-		temp.x = 2.0f * temp.x / native_sqrt(t);
+		temp.x = 2.0 * temp.x / native_sqrt(t);
 		z.z = temp.x * (z.y - z.z);
-		z.y = 2.0f * temp.x * temp.y * temp.z;
+		z.y = 2.0 * temp.x * temp.y * temp.z;
 	}
 	else
 	{
 		z.z = z.y - z.z;
-		z.y = 2.0f * temp.y * temp.z;
+		z.y = 2.0 * temp.y * temp.z;
 	}
 
 	z.x += aux->const_c.x * fractal->transformCommon.constantMultiplier100.x;

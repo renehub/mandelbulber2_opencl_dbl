@@ -29,7 +29,7 @@ REAL4 MengerV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -57,21 +57,21 @@ REAL4 MengerV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 	if (aux->i >= fractal->transformCommon.startIterations
 			&& aux->i < fractal->transformCommon.stopIterations1)
 	{
-		REAL rr = 0.0f;
-		REAL4 ptFive = (REAL4){0.5f, 0.5f, 0.5f, 0.0f};
-		REAL4 onePtFive = (REAL4){1.5f, 1.5f, 1.5f, 0.0f};
-		zc = zc * 0.5f + ptFive;
+		REAL rr = 0.0;
+		REAL4 ptFive = (REAL4){0.5, 0.5, 0.5, 0.0};
+		REAL4 onePtFive = (REAL4){1.5, 1.5, 1.5, 0.0};
+		zc = zc * 0.5 + ptFive;
 		REAL4 pp = fabs(zc - ptFive) - ptFive;
 		REAL modOff = fractal->transformCommon.offset3;
 		aux->DE += fractal->transformCommon.offsetA0;
 		aux->DE0 = max(pp.x, max(pp.y, pp.z));
 		int count = fractal->transformCommon.int8X;
-		for (int k = 0; k < count && rr < 10.0f; k++)
+		for (int k = 0; k < count && rr < 10.0; k++)
 		{
 			REAL pax = fmod(modOff * zc.x * aux->DE, modOff);
 			REAL pay = fmod(modOff * zc.y * aux->DE, modOff);
 			REAL paz = fmod(modOff * zc.z * aux->DE, modOff);
-			REAL4 pa = (REAL4){pax, pay, paz, 0.0f};
+			REAL4 pa = (REAL4){pax, pay, paz, 0.0};
 
 			pp = ptFive - fabs(pa - onePtFive) + fractal->transformCommon.offsetA000;
 			rr = dot(pp, pp);
@@ -103,7 +103,7 @@ REAL4 MengerV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 				e = length(z);
 			else
 				e = length(zc);
-			e = clamp(e - 1.0f, 0.0f, 100.0f);
+			e = clamp(e - 1.0, 0.0, 100.0);
 			aux->dist = max(aux->DE0, e);
 		}
 		aux->dist *= fractal->analyticDE.scale1;

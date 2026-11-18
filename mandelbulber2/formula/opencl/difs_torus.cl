@@ -55,7 +55,7 @@ REAL4 DIFSTorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -107,13 +107,13 @@ REAL4 DIFSTorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		z.y -= fractal->transformCommon.offsetF2;
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 		// scale vary
 		if (fractal->transformCommon.functionEnabledKFalse
 				&& aux->i >= fractal->transformCommon.startIterationsK
@@ -193,7 +193,7 @@ REAL4 DIFSTorusIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			REAL absY = fabs(zc.y);
 			lenY += absY * fractal->transformCommon.scaleA0;
 		}
-		REAL3 q = (REAL3){max(fabs(zc.y) - lenY, 0.0f), max(fabs(zc.x) - lenX, 0.0f), zc.z};
+		REAL3 q = (REAL3){max(fabs(zc.y) - lenY, 0.0), max(fabs(zc.x) - lenX, 0.0), zc.z};
 		REAL streD = native_sqrt(q.x * q.x + q.y * q.y) - fractal->transformCommon.offsetR1;
 		streD = native_sqrt(streD * streD + q.z * q.z) - fractal->transformCommon.offsetA05;
 		aux->dist = min(aux->dist, streD / aux->DE);

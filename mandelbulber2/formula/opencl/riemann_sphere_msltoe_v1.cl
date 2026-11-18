@@ -19,20 +19,20 @@
 REAL4 RiemannSphereMsltoeV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL r = aux->r;
-	// if (r < 1e-21f) r = 1e-21f;
+	// if (r < 1e-21) r = 1e-21;
 	z *= fractal->transformCommon.scale / r;
-	REAL q = 1.0f / (1.0f - z.z);
+	REAL q = 1.0 / (1.0 - z.z);
 	REAL4 t3;
 	t3.x = z.x * q;
 	t3.y = z.y * q;
 
-	t3.z = (r - 1.5f) * (1.0f + t3.x * t3.x + t3.y * t3.y);
+	t3.z = (r - 1.5) * (1.0 + t3.x * t3.x + t3.y * t3.y);
 
 	if (fractal->transformCommon.rotationEnabled)
 		t3 = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, t3);
 
-	t3.x = t3.x - floor(t3.x + 0.5f);
-	t3.y = t3.y - floor(t3.y + 0.5f);
+	t3.x = t3.x - floor(t3.x + 0.5);
+	t3.y = t3.y - floor(t3.y + 0.5);
 	t3.w = z.w;
 
 	z = t3 * fractal->transformCommon.constantMultiplier441;
@@ -41,7 +41,7 @@ REAL4 RiemannSphereMsltoeV1Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 
 	if (fractal->analyticDE.enabled)
 	{
-		aux->DE *= 4.0f * fractal->transformCommon.scale * length(z) / r;
+		aux->DE *= 4.0 * fractal->transformCommon.scale * length(z) / r;
 		aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 	}
 	return z;

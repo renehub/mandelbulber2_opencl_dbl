@@ -26,26 +26,26 @@ REAL4 RiemannBulbMsltoeMod2Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	{
 		if (fractal->transformCommon.functionEnabled)
 			// smooth inside
-			z *= radius2 * ((rr * 0.1f) + 0.4f) * 1.18f * fractal->transformCommon.scaleA1 / rr;
+			z *= radius2 * ((rr * 0.1) + 0.4) * 1.18 * fractal->transformCommon.scaleA1 / rr;
 		else
 		{
 			z *= fractal->transformCommon.constantMultiplier111;
 		}
-	} // if internal smooth function disabled, then z = z * scale, default vect3(1f,1,1)
+	} // if internal smooth function disabled, then z = z * scale, default vect3(1,1,1)
 	else
 	{
-		// 1st scale variable, default vect3 (1.7f, 1.7f, 1.7f),
+		// 1st scale variable, default vect3 (1.7, 1.7, 1.7),
 		z *= fractal->transformCommon.constantMultiplier222;
 		REAL shift = fractal->transformCommon.offset1;
-		// r1 = length^2,  //  + 1e-030f
+		// r1 = length^2,  //  + 1e-030
 		REAL r1 = z.x * z.x + (z.y - shift) * (z.y - shift) + z.z * z.z;
 		// inversions by length^2
 		z.x = z.x / r1;
 		z.y = (z.y - shift) / r1;
 		z.z = z.z / r1;
-		// 2nd scale variable , default = REAL (3.0f)
+		// 2nd scale variable , default = REAL (3.0)
 		z *= fractal->transformCommon.scale3;
-		// y offset variable, default = REAL (1.9f);
+		// y offset variable, default = REAL (1.9);
 		z.y = z.y + fractal->transformCommon.offset105;
 		if (fractal->transformCommon.functionEnabledx)
 		{

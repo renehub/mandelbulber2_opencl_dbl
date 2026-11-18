@@ -21,7 +21,7 @@ REAL4 CollatzModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 	REAL4 constantMult = (REAL4){fractal->transformCommon.constantMultiplierB111.x,
 		fractal->transformCommon.constantMultiplierB111.y,
-		fractal->transformCommon.constantMultiplierB111.z, 0.0f};
+		fractal->transformCommon.constantMultiplierB111.z, 0.0};
 
 	z = constantMult + fractal->transformCommon.scale4 * z
 			- (fractal->transformCommon.constantMultiplier111 + fractal->transformCommon.scale2 * z)
@@ -30,7 +30,7 @@ REAL4 CollatzModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 	z *= fractal->transformCommon.scale025;
 
-	aux->DE = aux->DE * 4.0f * fractal->analyticDE.scale1 + 1.0f;
+	aux->DE = aux->DE * 4.0 * fractal->analyticDE.scale1 + 1.0;
 
 	if (fractal->transformCommon.addCpixelEnabledFalse)
 	{

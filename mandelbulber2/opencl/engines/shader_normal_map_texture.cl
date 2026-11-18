@@ -34,26 +34,26 @@
 
 #ifdef USE_TEXTURES
 #ifdef USE_NORMAL_MAP_TEXTURE
-float3 NormalMapShader(sShaderInputDataCl *input, sRenderData *renderData,
+REAL3 NormalMapShader(sShaderInputDataCl *input, sRenderData *renderData,
 	__global sObjectDataCl *objectData, int textureIndex)
 {
 	if (textureIndex >= 0)
 	{
-		float3 textureVectorX = 0.0f;
-		float3 textureVectorY = 0.0f;
-		float3 shaderPoint = input->point;
-		float2 texturePoint = TextureMapping(
+		REAL3 textureVectorX = 0.0;
+		REAL3 textureVectorY = 0.0;
+		REAL3 shaderPoint = input->point;
+		REAL2 texturePoint = TextureMapping(
 			shaderPoint, input->normal, objectData, input->material, &textureVectorX, &textureVectorY);
 
-		texturePoint += (float2){0.5f, 0.5f};
+		texturePoint += (REAL2){0.5, 0.5};
 
-		float3 n = input->normal;
+		REAL3 n = input->normal;
 		// tangent vectors:
-		float3 t = cross(n, textureVectorX);
+		REAL3 t = cross(n, textureVectorX);
 		if (length(t) < 1e-15) return input->normal;
 		t = normalize(t);
 
-		float3 b = cross(n, textureVectorY);
+		REAL3 b = cross(n, textureVectorY);
 		if (length(b) < 1e-15) return input->normal;
 		b = normalize(b);
 
@@ -66,44 +66,44 @@ float3 NormalMapShader(sShaderInputDataCl *input, sRenderData *renderData,
 		int2 textureSize = renderData->textureSizes[textureIndex];
 		__global uchar4 *texture = renderData->textures[textureIndex];
 
-		float3 texNormal;
+		REAL3 texNormal;
 
 		if (!input->material->normalMapTextureFromBumpmap)
 		{
-			float3 pixel =
-				BicubicInterpolation(texturePoint.x, texturePoint.y, texture, textureSize.x, textureSize.y);
+			REAL3 pixel = TO_REAL3(
+				BicubicInterpolation(texturePoint.x, texturePoint.y, texture, textureSize.x, textureSize.y));
 
-			texNormal = (float3){pixel.s0 * 2.0f - 1.0f, pixel.s1 * 2.0f - 1.0f, pixel.s2};
+			texNormal = (REAL3){pixel.s0 * 2.0 - 1.0, pixel.s1 * 2.0 - 1.0, pixel.s2};
 			texNormal.x *= -input->material->normalMapTextureHeight;
 			texNormal.y *= -input->material->normalMapTextureHeight;
-			if (input->material->normalMapTextureInvertGreen) texNormal.y *= -1.0f;
+			if (input->material->normalMapTextureInvertGreen) texNormal.y *= -1.0;
 
 			texNormal = normalize(texNormal);
 		}
 #ifdef USE_NORMAL_MAP_BUMP_TEXTURE
 		else
 		{
-			float m[3][3];
+			REAL m[3][3];
 			for (int y = 0; y <= 2; y++)
 			{
 				for (int x = 0; x <= 2; x++)
 				{
 					int texturePointAddress =
-						TexturePixelAddress(texturePoint, textureSize, (int2){x - 1, y - 1});
+						TexturePixelAddress(convert_float2(texturePoint), textureSize, (int2){x - 1, y - 1});
 					uchar4 pixel = texture[texturePointAddress];
-					m[x][y] = pixel.s0 / 256.0f;
+					m[x][y] = pixel.s0 / 256.0;
 				}
 			}
 			texNormal.x = input->material->normalMapTextureHeight
-										* (m[2][2] - m[0][2] + 2.0f * (m[2][1] - m[0][1]) + m[2][0] - m[0][0]);
+										* (m[2][2] - m[0][2] + 2.0 * (m[2][1] - m[0][1]) + m[2][0] - m[0][0]);
 			texNormal.y = input->material->normalMapTextureHeight
-										* (m[0][0] - m[0][2] + 2.0f * (m[1][0] - m[1][2]) + m[2][0] - m[2][2]);
-			texNormal.z = 1.0f;
+										* (m[0][0] - m[0][2] + 2.0 * (m[1][0] - m[1][2]) + m[2][0] - m[2][2]);
+			texNormal.z = 1.0;
 			texNormal = normalize(texNormal);
 		}
 #endif
 
-		float3 normal = Matrix33MulFloat3(tbn, texNormal);
+		REAL3 normal = Matrix33MulFloat3(tbn, texNormal);
 		return normalize(normal);
 	}
 	else

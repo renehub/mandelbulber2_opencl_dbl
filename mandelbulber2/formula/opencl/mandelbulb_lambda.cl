@@ -39,7 +39,7 @@ REAL4 MandelbulbLambdaIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	REAL th0 = fractal->bulb.betaAngleOffset;
 	REAL ph0 = fractal->bulb.alphaAngleOffset;
 	REAL Pwr = fractal->bulb.power;
-	// if (aux->r < 1e-006f) aux->r = 1e-006f;
+	// if (aux->r < 1e-006) aux->r = 1e-006;
 	if (fractal->transformCommon.functionEnabledAFalse) z1.z = -z1.z;
 	th0 += asin(z1.z / aux->r);
 	ph0 += atan2(z1.y, z1.x);
@@ -47,23 +47,23 @@ REAL4 MandelbulbLambdaIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	REAL th = th0 * Pwr;
 	REAL ph = ph0 * Pwr;
 	REAL costh = native_cos(th);
-	z1 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0f};
+	z1 = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0};
 
-	// aux->DE = (rp * aux->DE) * Pwr + 1.0f;
+	// aux->DE = (rp * aux->DE) * Pwr + 1.0;
 	// rp *= aux->r;
 
 	z1 = z - z1;
 
 	// vec3 triMul(vec3 a, vec3 b) non-trig
 
-	if (lc.x > -1e-006f && lc.x < 1e-006f) lc.x = (lc.x > 0) ? 1e-006f : -1e-006f;
-	if (lc.y > -1e-006f && lc.y < 1e-006f) lc.y = (lc.y > 0) ? 1e-006f : -1e-006f;
+	if (lc.x > -1e-006 && lc.x < 1e-006) lc.x = (lc.x > 0) ? 1e-006 : -1e-006;
+	if (lc.y > -1e-006 && lc.y < 1e-006) lc.y = (lc.y > 0) ? 1e-006 : -1e-006;
 
 	REAL r1 = native_sqrt(z1.x * z1.x + z1.y * z1.y);
 	REAL r2 = native_sqrt(lc.x * lc.x + lc.y * lc.y);
 	REAL a = r1 * r2;
 	if (fractal->transformCommon.functionEnabledBFalse) z1.z = -z1.z;
-	a = 1.0f - z1.z * lc.z / a;
+	a = 1.0 - z1.z * lc.z / a;
 	z.x = a * (z1.x * lc.x - z1.y * lc.y);
 	z.y = a * (lc.x * z1.y + z1.x * lc.y);
 	z.z = r2 * z1.z + r1 * lc.z;
@@ -102,7 +102,7 @@ REAL4 MandelbulbLambdaIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	}
 
 	REAL bias = fractal->transformCommon.scaleC1;
-	aux->DE = max(aux->DE * bias, pow(aux->r, Pwr - 1.0f) * aux->DE * Pwr + 1.0f);
+	aux->DE = max(aux->DE * bias, pow(aux->r, Pwr - 1.0) * aux->DE * Pwr + 1.0);
 	aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset0;
 	return z;
 }

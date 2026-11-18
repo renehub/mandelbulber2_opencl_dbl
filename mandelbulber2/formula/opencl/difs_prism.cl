@@ -16,7 +16,7 @@
 
 REAL4 DIFSPrismIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	REAL4 boxFold = fractal->transformCommon.additionConstantA111;
 
@@ -56,7 +56,7 @@ REAL4 DIFSPrismIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -108,13 +108,13 @@ REAL4 DIFSPrismIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		z.y -= fractal->transformCommon.offsetF2;
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 		// scale vary
 		if (fractal->transformCommon.functionEnabledKFalse
 				&& aux->i >= fractal->transformCommon.startIterationsK
@@ -196,7 +196,7 @@ REAL4 DIFSPrismIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			face += tp * fractal->transformCommon.scaleB0;
 		}
 
-		REAL priD = max(fabs(zc.x) - len, max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5f, -zc.z) - face);
+		REAL priD = max(fabs(zc.x) - len, max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5, -zc.z) - face);
 
 		aux->dist = min(aux->dist, priD / aux->DE);
 	}

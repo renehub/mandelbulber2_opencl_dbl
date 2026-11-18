@@ -30,13 +30,13 @@ REAL4 TransfDIFSPolyhedraIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	// this block does not use z so could be inline precalc
 	REAL cospin = M_PI_F / (REAL)(Type);
 	cospin = native_cos(cospin);
-	REAL scospin = native_sqrt(0.75f - cospin * cospin);
-	REAL4 nc = (REAL4){-0.5f, -cospin, scospin, 0.0f};
-	REAL4 pab = (REAL4){0.0f, 0.0f, 1.0f, 0.0f};
-	REAL4 pbc = (REAL4){scospin, 0.0f, 0.5f, 0.0f};
+	REAL scospin = native_sqrt(0.75 - cospin * cospin);
+	REAL4 nc = (REAL4){-0.5, -cospin, scospin, 0.0};
+	REAL4 pab = (REAL4){0.0, 0.0, 1.0, 0.0};
+	REAL4 pbc = (REAL4){scospin, 0.0, 0.5, 0.0};
 	temp = length(pbc);
 	pbc = pbc / temp;
-	REAL4 pca = (REAL4){0.0f, scospin, cospin, 0.0f};
+	REAL4 pca = (REAL4){0.0, scospin, cospin, 0.0};
 	temp = length(pca);
 	pca = pca / temp;
 
@@ -44,8 +44,8 @@ REAL4 TransfDIFSPolyhedraIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	temp = length(p);
 	p = p / temp;
 
-	REAL d = 10000.0f;
-	REAL4 colVec = (REAL4){1000.0f, 1000.0f, 1000.0f, 1000.0f};
+	REAL d = 10000.0;
+	REAL4 colVec = (REAL4){1000.0, 1000.0, 1000.0, 1000.0};
 	REAL4 zc = z * fractal->transformCommon.scale1;
 	aux->DE = aux->DE * fractal->transformCommon.scale1;
 
@@ -53,7 +53,7 @@ REAL4 TransfDIFSPolyhedraIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	{
 		zc.x = fabs(zc.x);
 		zc.y = fabs(zc.y);
-		REAL t = -2.0f * min(0.0f, dot(zc, nc));
+		REAL t = -2.0 * min(0.0, dot(zc, nc));
 		zc += t * nc;
 	}
 	REAL4 zcv = zc;
@@ -70,11 +70,11 @@ REAL4 TransfDIFSPolyhedraIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	if (!fractal->transformCommon.functionEnabledByFalse)
 	{ // Segments
 		zc -= p;
-		REAL4 temp4 = zc - min(0.0f, zc.x) * (REAL4){1.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 temp4 = zc - min(0.0, zc.x) * (REAL4){1.0, 0.0, 0.0, 0.0};
 		REAL dla = length(temp4);
-		temp4 = zc - min(0.0f, zc.y) * (REAL4){0.0f, 1.0f, 0.0f, 0.0f};
+		temp4 = zc - min(0.0, zc.y) * (REAL4){0.0, 1.0, 0.0, 0.0};
 		REAL dlb = length(temp4);
-		temp4 = zc - min(0.0f, dot(zc, nc)) * nc;
+		temp4 = zc - min(0.0, dot(zc, nc)) * nc;
 		REAL dlc = length(temp4);
 		REAL ds = min(min(dla, dlb), dlc) - SRadius;
 		colVec.y = ds;
@@ -117,11 +117,11 @@ REAL4 TransfDIFSPolyhedraIteration(REAL4 z, __global sFractalCl *fractal, sExten
 			colAdd += colVec.y;
 			colAdd += colVec.z;
 
-			colAdd = colAdd * 256.0f;
+			colAdd = colAdd * 256.0;
 		}
 		else
 		{
-			colAdd += min(min(colVec.x, colVec.y), colVec.z) * fractal->foldColor.difs1 * 1024.0f;
+			colAdd += min(min(colVec.x, colVec.y), colVec.z) * fractal->foldColor.difs1 * 1024.0;
 		}
 		if (!fractal->foldColor.auxColorEnabledBFalse)
 			aux->color = colAdd;

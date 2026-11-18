@@ -32,7 +32,7 @@ REAL4 TransfInitial4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		if (fractal->transformCommon.addCpixelEnabledFalse)
 			aux->const_c = z * fractal->transformCommon.scale1111;
 
-		if (fractal->transformCommon.functionEnabledAFalse) z = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		if (fractal->transformCommon.functionEnabledAFalse) z = (REAL4){0.0, 0.0, 0.0, 0.0};
 	}
 	// DE tweak
 	if (!fractal->analyticDE.enabledFalse) aux->DE = aux->DE * length(z) / aux->r;

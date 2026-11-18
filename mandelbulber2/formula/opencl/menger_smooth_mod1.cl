@@ -28,7 +28,7 @@ REAL4 MengerSmoothMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	{
 		z = fabs(z);
 		t = fractal->transformCommon.offset;
-		z += (REAL4){t, t, t, 0.0f};
+		z += (REAL4){t, t, t, 0.0};
 	}
 
 	REAL OffsetS = fractal->transformCommon.offset0005;

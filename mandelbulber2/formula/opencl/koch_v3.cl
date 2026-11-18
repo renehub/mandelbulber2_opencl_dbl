@@ -18,12 +18,12 @@
 
 REAL4 KochV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL beta = fractal->transformCommon.angle72 * M_PI_F / 360.0f;
+	REAL beta = fractal->transformCommon.angle72 * M_PI_F / 360.0;
 	REAL tc = tan(beta);
-	REAL tsq = native_sqrt(3.0f * tc * tc - 1.0f) * 0.25f;
+	REAL tsq = native_sqrt(3.0 * tc * tc - 1.0) * 0.25;
 
-	REAL4 fl1 = ((REAL4){1.0f, 0.0f, -2.0f * tsq, 0.0f});
-	fl1 = fl1 / native_sqrt(1.0f + 4.0f * tsq * tsq);
+	REAL4 fl1 = ((REAL4){1.0, 0.0, -2.0 * tsq, 0.0});
+	fl1 = fl1 / native_sqrt(1.0 + 4.0 * tsq * tsq);
 	tc = native_cos(beta);
 
 	REAL BDscale = fractal->transformCommon.scale4 * tc * tc;
@@ -49,7 +49,7 @@ REAL4 KochV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -62,22 +62,22 @@ REAL4 KochV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		}
 	}
 
-	// REAL Pid6 = M_PI_F / 6.0f;
+	// REAL Pid6 = M_PI_F / 6.0;
 	REAL CPid6 = SQRT_3_4_F; // cos(Pi / 6);
-	REAL SPid6 = -0.5f;			 // native_sin(Pi / 6);
-	REAL t = 2.0f * min(0.0f, z.x * CPid6 + z.y * SPid6);
+	REAL SPid6 = -0.5;			 // native_sin(Pi / 6);
+	REAL t = 2.0 * min(0.0, z.x * CPid6 + z.y * SPid6);
 	z.x -= t * CPid6;
 	z.y -= t * SPid6;
 	z.y = fabs(z.y);
 
 	// Koch curve fold
-	z.x -= 0.5f;
+	z.x -= 0.5;
 	z.z -= tsq;
-	t = 2.0f * min(0.0f, dot(z, fl1));
+	t = 2.0 * min(0.0, dot(z, fl1));
 	z -= t * fl1;
-	z.x += 0.5f;
+	z.x += 0.5;
 	z.z += tsq;
-	z.x -= 1.0f;
+	z.x -= 1.0;
 
 	// rotation
 	if (fractal->transformCommon.functionEnabledRFalse
@@ -90,8 +90,8 @@ REAL4 KochV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	// scale
 	z *= BDscale;
 	aux->DE *= BDscale;
-	z.x += 1.0f;
+	z.x += 1.0;
 
-	aux->dist = (length(z) - 3.0f) / aux->DE;
+	aux->dist = (length(z) - 3.0) / aux->DE;
 	return z;
 }

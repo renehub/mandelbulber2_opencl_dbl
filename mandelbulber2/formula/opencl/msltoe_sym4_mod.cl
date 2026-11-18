@@ -19,7 +19,7 @@ REAL4 MsltoeSym4ModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 {
 	REAL4 c = aux->const_c;
 	REAL4 oldZ = z;
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	if (fabs(z.x) < fabs(z.z) * fractal->transformCommon.constantMultiplier111.x)
 	{
@@ -46,16 +46,16 @@ REAL4 MsltoeSym4ModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		if (z.y != oldZ.y) aux->color += fractal->mandelbox.color.factor.y;
 		if (z.z != oldZ.z) aux->color += fractal->mandelbox.color.factor.z;
 	}
-	if (z.x * z.z < 0.0f) z.z = -z.z;
-	if (z.x * z.y < 0.0f) z.y = -z.y;
+	if (z.x * z.z < 0.0) z.z = -z.z;
+	if (z.x * z.y < 0.0) z.y = -z.y;
 
 	z *= fractal->transformCommon.scale3D111;
 	aux->DE *= length(z) / aux->r;
 
 	REAL4 temp = z;
 	temp.x = z.x * z.x - z.y * z.y - z.z * z.z;
-	temp.y = 2.0f * z.x * z.y;
-	temp.z = 2.0f * z.x * z.z;
+	temp.y = 2.0 * z.x * z.y;
+	temp.z = 2.0 * z.x * z.z;
 
 	z = temp + fractal->transformCommon.additionConstant000;
 
@@ -65,9 +65,9 @@ REAL4 MsltoeSym4ModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	}
 
 	REAL lengthTempZ = -length(z);
-	// if (lengthTempZ > -1e-21f)
-	//	lengthTempZ = -1e-21f;   //  z is neg.)
-	z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+	// if (lengthTempZ > -1e-21)
+	//	lengthTempZ = -1e-21;   //  z is neg.)
+	z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 	z *= fractal->transformCommon.scale1;
 	aux->DE *= fabs(fractal->transformCommon.scale1);
 

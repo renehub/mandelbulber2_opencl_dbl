@@ -22,7 +22,7 @@ REAL4 Sierpinski3dV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i >= fractal->transformCommon.startIterationsD
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
-		REAL rr = 1.0f;
+		REAL rr = 1.0;
 		z += fractal->transformCommon.offset000;
 		rr = dot(z, z);
 		z *= fractal->transformCommon.maxR2d1 / rr;
@@ -51,20 +51,20 @@ REAL4 Sierpinski3dV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	// Normal full tetra-fold
 	if (fractal->transformCommon.functionEnabled)
 	{
-		REAL temp = 0.0f;
-		if (z.x + z.y < 0.0f)
+		REAL temp = 0.0;
+		if (z.x + z.y < 0.0)
 		{
 			temp = -z.y;
 			z.y = -z.x;
 			z.x = temp;
 		}
-		if (z.x + z.z < 0.0f)
+		if (z.x + z.z < 0.0)
 		{
 			temp = -z.z;
 			z.z = -z.x;
 			z.x = temp;
 		}
-		if (z.y + z.z < 0.0f)
+		if (z.y + z.z < 0.0)
 		{
 			temp = -z.z;
 			z.z = -z.y;
@@ -75,19 +75,19 @@ REAL4 Sierpinski3dV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	// Reversed full tetra-fold
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
-		if (z.x - z.y < 0.0f)
+		if (z.x - z.y < 0.0)
 		{
 			REAL temp = z.y;
 			z.y = z.x;
 			z.x = temp;
 		}
-		if (z.x - z.z < 0.0f)
+		if (z.x - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.x;
 			z.x = temp;
 		}
-		if (z.y - z.z < 0.0f)
+		if (z.y - z.z < 0.0)
 		{
 			REAL temp = z.z;
 			z.z = z.y;

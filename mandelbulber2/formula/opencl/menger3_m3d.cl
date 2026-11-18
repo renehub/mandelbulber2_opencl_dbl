@@ -22,24 +22,24 @@ REAL4 Menger3M3dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 	REAL t;
 	t = z.x - z.y;
-	t = 0.5f * (t - fabs(t));
+	t = 0.5 * (t - fabs(t));
 	z.x = z.x - t;
 	z.y = z.y + t;
 
 	t = z.x - z.z;
-	t = 0.5f * (t - fabs(t));
+	t = 0.5 * (t - fabs(t));
 	z.z = z.z + t;
 	z.x = z.x - t;
 
 	t = z.y - z.z;
-	t = 0.5f * (t - fabs(t));
+	t = 0.5 * (t - fabs(t));
 	z.y = z.y - t;
 	z.z = z.z + t;
 
 	z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix2XYZ, z);
 
-	REAL sc1 = fractal->transformCommon.scale3 - 1.0f;
-	REAL sc2 = 0.5f * sc1 / fractal->transformCommon.scale3;
+	REAL sc1 = fractal->transformCommon.scale3 - 1.0;
+	REAL sc2 = 0.5 * sc1 / fractal->transformCommon.scale3;
 	z.z = z.z - fractal->transformCommon.offset111.z * sc2;
 	z.z = -fabs(z.z) + fractal->transformCommon.offset111.z * sc2;
 

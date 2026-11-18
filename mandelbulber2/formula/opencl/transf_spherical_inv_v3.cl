@@ -35,7 +35,7 @@ REAL4 TransfSphericalInvV3Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		z += fractal->transformCommon.offset000 + fractal->transformCommon.offsetA000;
 		REAL rr = dot(z, z);
 		REAL r = native_sqrt(rr);
-		REAL inv = 1.0f / rr;
+		REAL inv = 1.0 / rr;
 		z *= fractal->transformCommon.maxR2d1 * inv;
 		z -= fractal->transformCommon.offset000;
 

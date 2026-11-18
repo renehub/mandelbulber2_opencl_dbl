@@ -72,7 +72,7 @@ REAL4 TransfDIFSSupershapeV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 	else
 		r1 = pow(t1 + t2, fractal->transformCommon.constantMultiplierB111.z);
 
-	if (!fractal->transformCommon.functionEnabledFFalse) r1 = 1.0f / r1; // invert
+	if (!fractal->transformCommon.functionEnabledFFalse) r1 = 1.0 / r1; // invert
 
 	REAL4 zc = z;
 	REAL rb = native_sqrt(z.x * z.x + z.y * z.y);
@@ -87,7 +87,7 @@ REAL4 TransfDIFSSupershapeV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 	{
 		if (!fractal->transformCommon.functionEnabledNFalse)
 		{
-			rb = rb * (1.0f - fractal->transformCommon.scaleA0)
+			rb = rb * (1.0 - fractal->transformCommon.scaleA0)
 					 + fractal->transformCommon.offsetR0 * fractal->transformCommon.scaleA0;
 			xyR = rb - xyR;
 		}
@@ -113,10 +113,10 @@ REAL4 TransfDIFSSupershapeV2Iteration(REAL4 z, __global sFractalCl *fractal, sEx
 		cylR = cylR + (zc.z * zc.z * fractal->transformCommon.scaleB0);
 	}
 
-	cylR = max(cylR, 0.0f);
-	cylH = max(cylH, 0.0f);
+	cylR = max(cylR, 0.0);
+	cylH = max(cylH, 0.0);
 	REAL cylD = native_sqrt(cylR * cylR + cylH * cylH);
-	cylD = min(max(cylR, cylH), 0.0f) + cylD;
+	cylD = min(max(cylR, cylH), 0.0) + cylD;
 
 	REAL colDist = aux->dist;
 	aux->dist = min(aux->dist, cylD / (aux->DE + fractal->analyticDE.offset1));

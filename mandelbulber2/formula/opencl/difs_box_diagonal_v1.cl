@@ -16,7 +16,7 @@
 
 REAL4 DIFSBoxDiagonalV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	REAL4 boxFold = fractal->transformCommon.additionConstantA111;
 
@@ -71,13 +71,13 @@ REAL4 DIFSBoxDiagonalV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		z.y -= fractal->transformCommon.offsetF0;
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 
 		if (fractal->transformCommon.functionEnabledKFalse
 				&& aux->i >= fractal->transformCommon.startIterationsK
@@ -136,9 +136,9 @@ REAL4 DIFSBoxDiagonalV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			boxSize.y -= fractal->transformCommon.scaleA0 * zc.z;
 		}
 		zc = fabs(zc) - boxSize;
-		zc.x = max(zc.x, 0.0f);
-		zc.y = max(zc.y, 0.0f);
-		zc.z = max(zc.z, 0.0f);
+		zc.x = max(zc.x, 0.0);
+		zc.y = max(zc.y, 0.0);
+		zc.z = max(zc.z, 0.0);
 		REAL zcd = length(zc);
 
 		aux->dist = min(aux->dist, zcd / aux->DE);

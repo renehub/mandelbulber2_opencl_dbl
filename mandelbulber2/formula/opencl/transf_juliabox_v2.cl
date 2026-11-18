@@ -19,7 +19,7 @@
 
 REAL4 TransfJuliaboxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	REAL4 oldZ = z;
 	if (aux->i >= fractal->transformCommon.startIterationsB
@@ -49,8 +49,8 @@ REAL4 TransfJuliaboxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	}
 
 	// spherical fold
-	REAL rrCol = 0.0f;
-	REAL m = 1.0f;
+	REAL rrCol = 0.0;
+	REAL m = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
@@ -87,7 +87,7 @@ REAL4 TransfJuliaboxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				int iterationRange =
 					fractal->transformCommon.stopIterations - fractal->transformCommon.startIterations;
 				int currentIteration = (aux->i - fractal->transformCommon.startIterations);
-				tempVC += fractal->transformCommon.offset0 * (1.0f * currentIteration) / iterationRange;
+				tempVC += fractal->transformCommon.offset0 * (1.0 * currentIteration) / iterationRange;
 			}
 			if (aux->i >= fractal->transformCommon.stopIterations)
 			{
@@ -119,9 +119,9 @@ REAL4 TransfJuliaboxV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				&& aux->i < fractal->foldColor.stopIterationsA)
 		{
 			zCol = fabs(zCol - oldZ);
-			if (zCol.x > 0.0f) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
-			if (zCol.y > 0.0f) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
-			if (zCol.z > 0.0f) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
+			if (zCol.x > 0.0) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
+			if (zCol.y > 0.0) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
+			if (zCol.z > 0.0) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
 		}
 
 		if (aux->i >= fractal->transformCommon.startIterationsK

@@ -22,7 +22,7 @@ REAL4 AmazingSurfIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 {
 	// update aux->actualScale
 	aux->actualScale =
-		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0f);
+		fractal->mandelbox.scale + fractal->mandelboxVary4D.scaleVary * (fabs(aux->actualScale) - 1.0);
 
 	REAL4 c = aux->const_c;
 	z.x = fabs(z.x + fractal->transformCommon.additionConstant111.x)
@@ -36,22 +36,22 @@ REAL4 AmazingSurfIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		rr -= z.z * z.z;
 
 	REAL sqrtMinR = native_sqrt(fractal->transformCommon.minR05);
-	REAL dividend = rr < sqrtMinR ? sqrtMinR : min(rr, 1.0f);
+	REAL dividend = rr < sqrtMinR ? sqrtMinR : min(rr, 1.0);
 
 	/*if (rr < sqrtMinR)
 	{
 		aux->color += fractal->mandelbox.color.factorSp1;
 	}
-	else if (rr < 1.0f)
+	else if (rr < 1.0)
 	{
 		aux->color += fractal->mandelbox.color.factorSp2;
 	}*/
 	// use aux->actualScale
 	REAL m = aux->actualScale / dividend;
 
-	z *= (m - 1.0f) * fractal->transformCommon.scale1 + 1.0f;
-	// z *= m * fractal->transformCommon.scale1 + 1.0f * (1.0f - fractal->transformCommon.scale1);
-	aux->DE = aux->DE * fabs(m) + 1.0f;
+	z *= (m - 1.0) * fractal->transformCommon.scale1 + 1.0;
+	// z *= m * fractal->transformCommon.scale1 + 1.0 * (1.0 - fractal->transformCommon.scale1);
+	aux->DE = aux->DE * fabs(m) + 1.0;
 
 	if (fractal->transformCommon.addCpixelEnabledFalse)
 		z += (REAL4){c.y, c.x, c.z, c.w} * fractal->transformCommon.constantMultiplier111;

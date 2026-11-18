@@ -94,7 +94,7 @@ REAL4 TransfDIFSTubeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		zc.z = fabs(zc.z) - fractal->transformCommon.offsetF000.y;
 
 	/*		REAL psi = M_PI_F / fractal->transformCommon.int8Z;
-			psi = fabs(fmod(atan2(t, zc.z) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(t, zc.z) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(zc.z * zc.z + t *t);
 			zc.z = native_cos(psi) * len;
 			t = native_sin(psi) * len;
@@ -103,7 +103,7 @@ REAL4 TransfDIFSTubeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	if (fractal->transformCommon.functionEnabledCx) t = max(fabs(t), fabs(zc.z));
 	if (fractal->transformCommon.functionEnabledDFalse) t = native_sqrt(t * t + zc.z * zc.z);
 	if (fractal->transformCommon.functionEnabledEFalse)
-		t = max(fabs(t) * SQRT_3_4_F + zc.z * 0.5f, -zc.z);
+		t = max(fabs(t) * SQRT_3_4_F + zc.z * 0.5, -zc.z);
 	if (fractal->transformCommon.functionEnabledFFalse)
 	{
 		REAL zA = zc.z;
@@ -120,7 +120,7 @@ REAL4 TransfDIFSTubeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		if (fractal->transformCommon.functionEnabledCzFalse)
 			zB = -zB + fractal->transformCommon.offsetC0;
 
-		t = max(fabs(t) * SQRT_3_4_F + zA * 0.5f, zB);
+		t = max(fabs(t) * SQRT_3_4_F + zA * 0.5, zB);
 	}
 
 	t -= fractal->transformCommon.offset02;
@@ -134,10 +134,10 @@ REAL4 TransfDIFSTubeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 
 	REAL cylH = fabs(zc.y) - fractal->transformCommon.offsetA1;
 
-	cylR = max(cylR, 0.0f);
-	cylH = max(cylH, 0.0f);
+	cylR = max(cylR, 0.0);
+	cylH = max(cylH, 0.0);
 	REAL cylD = native_sqrt(cylR * cylR + cylH * cylH);
-	cylD = min(max(cylR, cylH), 0.0f) + cylD;
+	cylD = min(max(cylR, cylH), 0.0) + cylD;
 
 	REAL colDist = aux->dist;
 	aux->dist = min(aux->dist, cylD / (aux->DE + fractal->analyticDE.offset1));

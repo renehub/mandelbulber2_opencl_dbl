@@ -51,7 +51,7 @@ REAL4 TransfDIFSTorusV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	if (fractal->transformCommon.functionEnabledPFalse)
 		lenY += absZ.x * fractal->transformCommon.scaleC0;
 
-	REAL3 q = (REAL3){max(absZ.y - lenY, 0.0f), max(absZ.x - lenX, 0.0f), zc.z};
+	REAL3 q = (REAL3){max(absZ.y - lenY, 0.0), max(absZ.x - lenX, 0.0), zc.z};
 	q *= q;
 
 	REAL streD = native_sqrt(q.x + q.y) - fractal->transformCommon.offsetR1;
@@ -62,7 +62,7 @@ REAL4 TransfDIFSTorusV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		streD = max(fabs(streD), fabs(zc.z));
 
 	REAL colDist = aux->dist;
-	aux->dist = min(aux->dist, (streD - fractal->transformCommon.offsetA05) / (aux->DE + 1.0f));
+	aux->dist = min(aux->dist, (streD - fractal->transformCommon.offsetA05) / (aux->DE + 1.0));
 
 	if (fractal->foldColor.auxColorEnabledFalse && colDist != aux->dist
 			&& aux->i >= fractal->foldColor.startIterationsA

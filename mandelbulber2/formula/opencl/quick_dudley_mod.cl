@@ -16,7 +16,7 @@
 
 REAL4 QuickDudleyModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * 2.0f * aux->r * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
+	aux->DE = aux->DE * 2.0 * aux->r * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 
 	REAL x2 = z.x * z.x;
 	REAL y2 = z.y * z.y;

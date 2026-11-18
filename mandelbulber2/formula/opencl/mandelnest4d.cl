@@ -24,7 +24,7 @@ REAL4 Mandelnest4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		if (fractal->transformCommon.functionEnabledEFalse)
 		{
 			z = (REAL4){z.x, z.y, z.z, length(z)};
-			aux->DE += 0.5f;
+			aux->DE += 0.5;
 		}
 		if (fractal->transformCommon.functionEnabledFFalse)
 		{
@@ -93,7 +93,7 @@ REAL4 Mandelnest4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 
 	if (!fractal->transformCommon.functionEnabledAFalse)
 	{
-		rN = 1.0f / length(z);
+		rN = 1.0 / length(z);
 		z *= rN;
 		aux->DE *= rN;
 	}
@@ -107,7 +107,7 @@ REAL4 Mandelnest4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	if (fractal->transformCommon.addCpixelEnabledFalse) z += aux->const_c;
 
 	r = length(z);
-	aux->DE = aux->DE * Power * r + 1.0f;
+	aux->DE = aux->DE * Power * r + 1.0;
 
 	if (fractal->analyticDE.enabledFalse)
 	{
@@ -116,10 +116,10 @@ REAL4 Mandelnest4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	// aux->dist
 	if (fractal->transformCommon.functionEnabledDFalse)
 	{
-		if (r > 1.0f)
-			aux->DE0 = 0.5f * log(r) * r / (aux->DE);
+		if (r > 1.0)
+			aux->DE0 = 0.5 * log(r) * r / (aux->DE);
 		else
-			aux->DE0 = 0.0f;
+			aux->DE0 = 0.0;
 
 		if (aux->i <= fractal->transformCommon.startIterationsE)
 			aux->dist = min(aux->DE0, fractal->analyticDE.offset1);

@@ -32,19 +32,19 @@
  * calculation of combined highlights from plastic and metalic surfaces
  */
 
-float3 SpecularHighlightCombined(sShaderInputDataCl *input, sClCalcParams *calcParam,
-	float3 lightVector, float3 surfaceColor, sClGradientsCollection *gradients)
+REAL3 SpecularHighlightCombined(sShaderInputDataCl *input, sClCalcParams *calcParam,
+	REAL3 lightVector, REAL3 surfaceColor, sClGradientsCollection *gradients)
 {
-	float3 specular = 0.0f;
-	float3 specularPlastic = 0.0f;
+	REAL3 specular = 0.0;
+	REAL3 specularPlastic = 0.0;
 	if (input->material->specularPlasticEnable)
 	{
 		specularPlastic = SpecularHighlight(
-			input, calcParam, lightVector, input->material->specularWidth, 0.0f, gradients);
+			input, calcParam, lightVector, input->material->specularWidth, 0.0, gradients);
 		specularPlastic *= input->material->specular;
 	}
 
-	float3 specularMetallic = 0.0f;
+	REAL3 specularMetallic = 0.0;
 	if (input->material->metallic)
 	{
 		specularMetallic =

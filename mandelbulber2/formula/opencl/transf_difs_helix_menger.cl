@@ -19,7 +19,7 @@ REAL4 TransfDIFSHelixMengerIteration(REAL4 z, __global sFractalCl *fractal, sExt
 {
 	REAL temp;
 	REAL4 zc = z;
-	REAL addCol = 0.0f;
+	REAL addCol = 0.0;
 
 	zc *= fractal->transformCommon.scale2;
 	aux->DE *= fractal->transformCommon.scale2;
@@ -32,8 +32,8 @@ REAL4 TransfDIFSHelixMengerIteration(REAL4 z, __global sFractalCl *fractal, sExt
 	if (fractal->transformCommon.functionEnabledAx)
 	{
 		REAL Voff = fractal->transformCommon.offset4;
-		temp = zc.z - Voff * ang * fractal->transformCommon.int1 + Voff * 0.5f;
-		zc.z = temp - Voff * floor(temp / Voff) - Voff * 0.5f;
+		temp = zc.z - Voff * ang * fractal->transformCommon.int1 + Voff * 0.5;
+		zc.z = temp - Voff * floor(temp / Voff) - Voff * 0.5;
 	}
 	// stretch around helix
 	if (fractal->transformCommon.functionEnabledAy)
@@ -41,7 +41,7 @@ REAL4 TransfDIFSHelixMengerIteration(REAL4 z, __global sFractalCl *fractal, sExt
 		if (!fractal->transformCommon.functionEnabledAyFalse)
 		{
 			temp = fractal->transformCommon.scale16 * ang + fractal->transformCommon.offset1;
-			zc.x = temp - 2.0f * floor(temp * 0.5f) - 1.0f;
+			zc.x = temp - 2.0 * floor(temp * 0.5) - 1.0;
 		}
 		else
 			zc.x = fractal->transformCommon.offset1;
@@ -101,7 +101,7 @@ REAL4 TransfDIFSHelixMengerIteration(REAL4 z, __global sFractalCl *fractal, sExt
 	{
 		zc = fabs(zc);
 		zc = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, zc);
-		REAL col = 0.0f;
+		REAL col = 0.0;
 		if (zc.x < zc.y)
 		{
 			temp = zc.y;
@@ -127,17 +127,17 @@ REAL4 TransfDIFSHelixMengerIteration(REAL4 z, __global sFractalCl *fractal, sExt
 			addCol += col;
 		}
 
-		temp = fractal->transformCommon.scale3 - 1.0f;
+		temp = fractal->transformCommon.scale3 - 1.0;
 		REAL bz = temp * fractal->transformCommon.offsetA111.z + fractal->transformCommon.offsetA0;
 		zc = fractal->transformCommon.scale3 * zc - temp * fractal->transformCommon.offsetA111;
 		aux->DE = fractal->transformCommon.scale3 * (aux->DE + fractal->transformCommon.offsetB0);
-		if (zc.z < -0.5f * bz) zc.z += bz;
+		if (zc.z < -0.5 * bz) zc.z += bz;
 	}
 
 	REAL4 d = fabs(zc);
-	d.x = max(d.x - fractal->transformCommon.offsetA1, 0.0f);
-	d.y = max(d.y - fractal->transformCommon.offset01, 0.0f);
-	d.z = max(d.z - fractal->transformCommon.offsetp1, 0.0f);
+	d.x = max(d.x - fractal->transformCommon.offsetA1, 0.0);
+	d.y = max(d.y - fractal->transformCommon.offset01, 0.0);
+	d.z = max(d.z - fractal->transformCommon.offsetp1, 0.0);
 
 	REAL rDE;
 	if (!fractal->transformCommon.functionEnabledCFalse)
@@ -189,8 +189,8 @@ REAL4 TransfDIFSHelixMengerIteration(REAL4 z, __global sFractalCl *fractal, sExt
 		if (!fractal->transformCommon.functionEnabledGFalse)
 		{
 			ang =
-				(M_PI_F - 2.0f * fabs(atan(fractal->foldColor.difs1 * zc.y / zc.z))) * 4.0f * M_PI_2x_INV_F;
-			if (fmod(ang, 2.0f) < 1.0f)
+				(M_PI_F - 2.0 * fabs(atan(fractal->foldColor.difs1 * zc.y / zc.z))) * 4.0 * M_PI_2x_INV_F;
+			if (fmod(ang, 2.0) < 1.0)
 				addCol += fractal->foldColor.difs0000.z;
 			else
 				addCol += fractal->foldColor.difs0000.w;

@@ -21,8 +21,8 @@ REAL4 TransfMengerFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 {
 	if (fractal->transformCommon.functionEnabledx)
 	{
-		REAL col = 0.0f;
-		REAL temp = 0.0f;
+		REAL col = 0.0;
+		REAL temp = 0.0;
 		z = fabs(z + fractal->transformCommon.additionConstantA000);
 		if (z.x < z.y)
 		{
@@ -55,15 +55,15 @@ REAL4 TransfMengerFoldIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	if (fractal->transformCommon.functionEnabledy)
 	{ // menger scales and offsets
 		z *= fractal->transformCommon.scale3;
-		z.x -= 2.0f * fractal->transformCommon.constantMultiplier111.x;
-		z.y -= 2.0f * fractal->transformCommon.constantMultiplier111.y;
+		z.x -= 2.0 * fractal->transformCommon.constantMultiplier111.x;
+		z.y -= 2.0 * fractal->transformCommon.constantMultiplier111.y;
 		if (fractal->transformCommon.functionEnabled)
 		{
-			if (z.z > 1.0f) z.z -= 2.0f * fractal->transformCommon.constantMultiplier111.z;
+			if (z.z > 1.0) z.z -= 2.0 * fractal->transformCommon.constantMultiplier111.z;
 		}
 		else
 		{
-			z.z -= 2.0f * fractal->transformCommon.constantMultiplier111.z;
+			z.z -= 2.0 * fractal->transformCommon.constantMultiplier111.z;
 		}
 
 		if (fractal->analyticDE.enabled)

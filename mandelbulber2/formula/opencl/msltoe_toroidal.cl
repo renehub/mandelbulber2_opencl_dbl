@@ -25,13 +25,13 @@ REAL4 MsltoeToroidalIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	}
 
 	// Toroidal bulb
-	REAL r1 = fractal->transformCommon.minR05; // default 0.5f
+	REAL r1 = fractal->transformCommon.minR05; // default 0.5
 	REAL theta = atan2(z.y, z.x);
 	REAL x1 = r1 * native_cos(theta);
 	REAL y1 = r1 * native_sin(theta);
-	aux->r = (z.x - x1) * (z.x - x1) + (z.y - y1) * (z.y - y1) + z.z * z.z; //+ 1e-030f
+	aux->r = (z.x - x1) * (z.x - x1) + (z.y - y1) * (z.y - y1) + z.z * z.z; //+ 1e-030
 	REAL phi = asin(z.z / native_sqrt(aux->r));
-	REAL rp = pow(aux->r, fractal->transformCommon.pwr4); // default 4.0f
+	REAL rp = pow(aux->r, fractal->transformCommon.pwr4); // default 4.0
 
 	phi *= fractal->transformCommon.pwr8; // default 8
 	theta *= fractal->bulb.power;					// default 9 gives 8 symmetry
@@ -45,7 +45,7 @@ REAL4 MsltoeToroidalIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	// DEcalc
 	if (!fractal->analyticDE.enabledFalse)
 	{
-		aux->DE = rp * aux->DE * (fractal->transformCommon.pwr4 + 1.0f) + 1.0f;
+		aux->DE = rp * aux->DE * (fractal->transformCommon.pwr4 + 1.0) + 1.0;
 	}
 	else
 	{
@@ -57,8 +57,8 @@ REAL4 MsltoeToroidalIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	if (fractal->transformCommon.functionEnabledAxFalse) // spherical offset
 	{
 		REAL lengthTempZ = -length(z);
-		// if (lengthTempZ > -1e-21f) lengthTempZ = -1e-21f;   //  z is neg.)
-		z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+		// if (lengthTempZ > -1e-21) lengthTempZ = -1e-21;   //  z is neg.)
+		z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 		z *= fractal->transformCommon.scale;
 		aux->DE = aux->DE * fabs(fractal->transformCommon.scale);
 	}

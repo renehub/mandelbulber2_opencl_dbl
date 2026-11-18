@@ -16,8 +16,8 @@
 
 REAL4 MengerSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL sc1 = fractal->transformCommon.scale3 - 1.0f; // 3 - 1 = 2f, 2/3 = 0.6667f;
-	REAL sc2 = sc1 / fractal->transformCommon.scale3;	 //  8 - 1 = 7f, 7/8 = 0.89ish;
+	REAL sc1 = fractal->transformCommon.scale3 - 1.0; // 3 - 1 = 2, 2/3 = 0.6667;
+	REAL sc2 = sc1 / fractal->transformCommon.scale3;	 //  8 - 1 = 7, 7/8 = 0.89ish;
 	REAL OffsetS = fractal->transformCommon.offset0005;
 
 	// the closer to origin the greater the effect of OffsetSQ
@@ -27,17 +27,17 @@ REAL4 MengerSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	REAL t;
 
 	t = z.x - z.y;
-	t = 0.5f * (t - native_sqrt(t * t + OffsetS));
+	t = 0.5 * (t - native_sqrt(t * t + OffsetS));
 	z.x = z.x - t;
 	z.y = z.y + t;
 
 	t = z.x - z.z;
-	t = 0.5f * (t - native_sqrt(t * t + OffsetS));
+	t = 0.5 * (t - native_sqrt(t * t + OffsetS));
 	z.x = z.x - t;
 	z.z = z.z + t;
 
 	t = z.y - z.z;
-	t = 0.5f * (t - native_sqrt(t * t + OffsetS));
+	t = 0.5 * (t - native_sqrt(t * t + OffsetS));
 	z.y = z.y - t;
 	z.z = z.z + t;
 

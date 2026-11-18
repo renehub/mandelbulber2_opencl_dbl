@@ -32,9 +32,9 @@ REAL4 TransfBoxFold4dTgladIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		{
 			if (aux->i > fractal->transformCommon.startIterationsA)
 			{
-				limit.x *= (1.0f
-										 - 1.0f
-												 / (1.0f
+				limit.x *= (1.0
+										 - 1.0
+												 / (1.0
 														+ (aux->i - fractal->transformCommon.startIterationsA)
 																/ fractal->transformCommon.offset0000.x))
 									 * fractal->transformCommon.scale1111.x;
@@ -45,9 +45,9 @@ REAL4 TransfBoxFold4dTgladIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		{
 			if (aux->i > fractal->transformCommon.startIterationsB)
 			{
-				limit.y *= (1.0f
-										 - 1.0f
-												 / (1.0f
+				limit.y *= (1.0
+										 - 1.0
+												 / (1.0
 														+ (aux->i - fractal->transformCommon.startIterationsB)
 																/ fractal->transformCommon.offset0000.y))
 									 * fractal->transformCommon.scale1111.y;
@@ -58,9 +58,9 @@ REAL4 TransfBoxFold4dTgladIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		{
 			if (aux->i > fractal->transformCommon.startIterationsB)
 			{
-				limit.z *= (1.0f
-										 - 1.0f
-												 / (1.0f
+				limit.z *= (1.0
+										 - 1.0
+												 / (1.0
 														+ (aux->i - fractal->transformCommon.startIterationsC)
 																/ fractal->transformCommon.offset0000.z))
 									 * fractal->transformCommon.scale1111.z;
@@ -71,9 +71,9 @@ REAL4 TransfBoxFold4dTgladIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		{
 			if (aux->i > fractal->transformCommon.startIterationsB)
 			{
-				limit.w *= (1.0f
-										 - 1.0f
-												 / (1.0f
+				limit.w *= (1.0
+										 - 1.0
+												 / (1.0
 														+ (aux->i - fractal->transformCommon.startIterationsD)
 																/ fractal->transformCommon.offset0000.w))
 									 * fractal->transformCommon.scale1111.w;

@@ -23,17 +23,17 @@ REAL4 TransfAddExp2ZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		if (fractal->transformCommon.functionEnabledAx)
 		{
 			tempZ.x = fabs(z.x);
-			tempZ.x = exp2(tempZ.x * -fractal->transformCommon.constantMultiplier000.x) - 1.0f;
+			tempZ.x = exp2(tempZ.x * -fractal->transformCommon.constantMultiplier000.x) - 1.0;
 			z.x += sign(z.x) * tempZ.x;
 		}
 		else if (fractal->transformCommon.functionEnabledAxFalse)
 		{
 			tempZ.x = fabs(z.x);
-			tempZ.x = exp2(tempZ.x * -fractal->transformCommon.constantMultiplier000.x) - 1.0f;
+			tempZ.x = exp2(tempZ.x * -fractal->transformCommon.constantMultiplier000.x) - 1.0;
 			z.x -= sign(z.x) * tempZ.x;
 		}
 		else // no fabs
-			z.x += exp2(tempZ.x * fractal->transformCommon.constantMultiplier000.x) - 1.0f;
+			z.x += exp2(tempZ.x * fractal->transformCommon.constantMultiplier000.x) - 1.0;
 	}
 
 	if (fractal->transformCommon.functionEnabledy)
@@ -41,17 +41,17 @@ REAL4 TransfAddExp2ZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		if (fractal->transformCommon.functionEnabledAy)
 		{
 			tempZ.y = fabs(z.y);
-			tempZ.y = exp2(tempZ.y * -fractal->transformCommon.constantMultiplier000.y) - 1.0f;
+			tempZ.y = exp2(tempZ.y * -fractal->transformCommon.constantMultiplier000.y) - 1.0;
 			z.y += sign(z.y) * tempZ.y;
 		}
 		else if (fractal->transformCommon.functionEnabledAyFalse)
 		{
 			tempZ.y = fabs(z.y);
-			tempZ.y = exp2(tempZ.y * -fractal->transformCommon.constantMultiplier000.y) - 1.0f;
+			tempZ.y = exp2(tempZ.y * -fractal->transformCommon.constantMultiplier000.y) - 1.0;
 			z.y -= sign(z.y) * tempZ.y;
 		}
 		else
-			z.y += exp2(tempZ.y * fractal->transformCommon.constantMultiplier000.y) - 1.0f;
+			z.y += exp2(tempZ.y * fractal->transformCommon.constantMultiplier000.y) - 1.0;
 	}
 
 	if (fractal->transformCommon.functionEnabledz)
@@ -59,17 +59,17 @@ REAL4 TransfAddExp2ZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		if (fractal->transformCommon.functionEnabledAz)
 		{
 			tempZ.z = fabs(z.z);
-			tempZ.z = exp2(tempZ.z * -fractal->transformCommon.constantMultiplier000.z) - 1.0f;
+			tempZ.z = exp2(tempZ.z * -fractal->transformCommon.constantMultiplier000.z) - 1.0;
 			z.z += sign(z.z) * tempZ.z;
 		}
 		else if (fractal->transformCommon.functionEnabledAzFalse)
 		{
 			tempZ.z = fabs(z.z);
-			tempZ.z = exp2(tempZ.z * -fractal->transformCommon.constantMultiplier000.z) - 1.0f;
+			tempZ.z = exp2(tempZ.z * -fractal->transformCommon.constantMultiplier000.z) - 1.0;
 			z.z -= sign(z.z) * tempZ.z;
 		}
 		else
-			z.z += exp2(tempZ.z * fractal->transformCommon.constantMultiplier000.z) - 1.0f;
+			z.z += exp2(tempZ.z * fractal->transformCommon.constantMultiplier000.z) - 1.0;
 	}
 
 	// vector z version
@@ -80,9 +80,9 @@ REAL4 TransfAddExp2ZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		{
 			tempS = fabs(z);
 			REAL4 tempT = tempS * -fractal->transformCommon.scale0;
-			tempS.x = exp2(tempT.x) - 1.0f;
-			tempS.y = exp2(tempT.y) - 1.0f;
-			tempS.z = exp2(tempT.z) - 1.0f;
+			tempS.x = exp2(tempT.x) - 1.0;
+			tempS.y = exp2(tempT.y) - 1.0;
+			tempS.z = exp2(tempT.z) - 1.0;
 
 			z.x += sign(z.x) * tempS.x;
 			z.y += sign(z.y) * tempS.y;
@@ -92,9 +92,9 @@ REAL4 TransfAddExp2ZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		{
 			tempS = fabs(z);
 			REAL4 tempT = tempS * -fractal->transformCommon.scale0;
-			tempS.x = exp2(tempT.x) - 1.0f;
-			tempS.y = exp2(tempT.y) - 1.0f;
-			tempS.z = exp2(tempT.z) - 1.0f;
+			tempS.x = exp2(tempT.x) - 1.0;
+			tempS.y = exp2(tempT.y) - 1.0;
+			tempS.z = exp2(tempT.z) - 1.0;
 
 			z.x -= sign(z.x) * tempS.x;
 			z.y -= sign(z.y) * tempS.y;
@@ -103,13 +103,13 @@ REAL4 TransfAddExp2ZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		else
 		{
 			REAL4 tempR = z * fractal->transformCommon.scale0;
-			z.x += exp2(tempR.x) - 1.0f;
-			z.y += exp2(tempR.y) - 1.0f;
-			z.z += exp2(tempR.z) - 1.0f;
+			z.x += exp2(tempR.x) - 1.0;
+			z.y += exp2(tempR.y) - 1.0;
+			z.z += exp2(tempR.z) - 1.0;
 		}
 	}
 	if (fractal->transformCommon.functionEnabledByFalse)
-		aux->DE = aux->DE + exp2(aux->DE * -fractal->transformCommon.scale0) - 1.0f;
+		aux->DE = aux->DE + exp2(aux->DE * -fractal->transformCommon.scale0) - 1.0;
 	aux->DE *= fractal->analyticDE.scale1; // DE tweak
 	return z;
 }

@@ -57,11 +57,11 @@ REAL4 MandelbulbMulti2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	else
 		ph0 += atan(v.y / v.z);
 
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
+	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
 	REAL th = th0 * fractal->bulb.power * fractal->transformCommon.scaleA1;
 	REAL ph = ph0 * fractal->bulb.power * fractal->transformCommon.scaleB1;
 
-	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0f;
+	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 	rp *= aux->r;
 
 	if (fractal->transformCommon.functionEnabledxFalse)
@@ -69,14 +69,14 @@ REAL4 MandelbulbMulti2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		REAL sinth = th;
 		if (fractal->transformCommon.functionEnabledyFalse) sinth = th0;
 		sinth = native_sin(sinth);
-		z = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0f};
+		z = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0};
 	}
 	else
 	{ // sine mode ( default = V2.07))
 		REAL costh = th;
 		if (fractal->transformCommon.functionEnabledzFalse) costh = th0;
 		costh = native_cos(costh);
-		z = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0f};
+		z = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0};
 	}
 
 	if (fractal->transformCommon.functionEnabledKFalse)

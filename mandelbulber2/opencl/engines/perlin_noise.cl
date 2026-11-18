@@ -62,33 +62,33 @@
 
 #if defined(CLOUDS) || defined(USE_PERLIN_NOISE)
 
-float PrelinFade(float t)
+REAL PrelinFade(REAL t)
 {
-	return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
+	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
-float PerlinLerp(float t, float a, float b)
+REAL PerlinLerp(REAL t, REAL a, REAL b)
 {
 	return a + t * (b - a);
 }
 
-float PerlinGrad(uchar hash, float x, float y, float z)
+REAL PerlinGrad(uchar hash, REAL x, REAL y, REAL z)
 {
 	const uchar h = hash & 15;
-	const float u = h < 8 ? x : y;
-	const float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+	const REAL u = h < 8 ? x : y;
+	const REAL v = h < 4 ? y : h == 12 || h == 14 ? x : z;
 	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
-float PerlinWeight(int octaves)
+REAL PerlinWeight(int octaves)
 {
-	float amp = 1.0f;
-	float value = 0.0f;
+	REAL amp = 1.0;
+	REAL value = 0.0;
 
 	for (int i = 0; i < octaves; ++i)
 	{
 		value += amp;
-		amp /= 2.0f;
+		amp /= 2.0;
 	}
 
 	return value;
@@ -99,7 +99,7 @@ float PerlinWeight(int octaves)
 //	Noise [-1, 1]
 //
 
-float PerlinNoise3D(float x, float y, float z, __global uchar *p)
+REAL PerlinNoise3D(REAL x, REAL y, REAL z, __global uchar *p)
 {
 	int X = ((int)floor(x)) & 255;
 	int Y = ((int)floor(y)) & 255;
@@ -109,9 +109,9 @@ float PerlinNoise3D(float x, float y, float z, __global uchar *p)
 	y -= floor(y);
 	z -= floor(z);
 
-	float u = PrelinFade(x);
-	float v = PrelinFade(y);
-	float w = PrelinFade(z);
+	REAL u = PrelinFade(x);
+	REAL v = PrelinFade(y);
+	REAL w = PrelinFade(z);
 
 	int A = p[X] + Y;
 	int AA = p[A] + Z;
@@ -121,13 +121,13 @@ float PerlinNoise3D(float x, float y, float z, __global uchar *p)
 	int BB = p[B + 1] + Z;
 
 	return PerlinLerp(w,
-		PerlinLerp(v, PerlinLerp(u, PerlinGrad(p[AA], x, y, z), PerlinGrad(p[BA], x - 1.0f, y, z)),
-			PerlinLerp(u, PerlinGrad(p[AB], x, y - 1.0f, z), PerlinGrad(p[BB], x - 1.0f, y - 1.0f, z))),
+		PerlinLerp(v, PerlinLerp(u, PerlinGrad(p[AA], x, y, z), PerlinGrad(p[BA], x - 1.0, y, z)),
+			PerlinLerp(u, PerlinGrad(p[AB], x, y - 1.0, z), PerlinGrad(p[BB], x - 1.0, y - 1.0, z))),
 		PerlinLerp(v,
 			PerlinLerp(
-				u, PerlinGrad(p[AA + 1], x, y, z - 1.0f), PerlinGrad(p[BA + 1], x - 1.0f, y, z - 1.0f)),
-			PerlinLerp(u, PerlinGrad(p[AB + 1], x, y - 1.0f, z - 1.0f),
-				PerlinGrad(p[BB + 1], x - 1.0f, y - 1.0f, z - 1.0f))));
+				u, PerlinGrad(p[AA + 1], x, y, z - 1.0), PerlinGrad(p[BA + 1], x - 1.0, y, z - 1.0)),
+			PerlinLerp(u, PerlinGrad(p[AB + 1], x, y - 1.0, z - 1.0),
+				PerlinGrad(p[BB + 1], x - 1.0, y - 1.0, z - 1.0))));
 }
 
 ///////////////////////////////////////
@@ -136,24 +136,24 @@ float PerlinNoise3D(float x, float y, float z, __global uchar *p)
 //	* Return value can be outside the range [-1, 1]
 //
 
-float AccumulatedOctavePerlinNoise3D(
-	float x, float y, float z, float3 shift, int octaves, __global uchar *p)
+REAL AccumulatedOctavePerlinNoise3D(
+	REAL x, REAL y, REAL z, REAL3 shift, int octaves, __global uchar *p)
 {
-	float result = 0.0f;
-	float amp = 1.0f;
+	REAL result = 0.0;
+	REAL amp = 1.0;
 
 	for (int i = 0; i < octaves; ++i)
 	{
-		float3 shiftVector = shift * ((float)(octaves - i) / octaves + 1.13f) * 0.597f;
-		x -= shiftVector.x * 0.2f;
-		y -= shiftVector.y * 0.2f;
-		z -= shiftVector.z * 0.2f;
+		REAL3 shiftVector = shift * ((REAL)(octaves - i) / octaves + 1.13) * 0.597;
+		x -= shiftVector.x * 0.2;
+		y -= shiftVector.y * 0.2;
+		z -= shiftVector.z * 0.2;
 
 		result += PerlinNoise3D(x - shiftVector.x, y - shiftVector.y, z - shiftVector.z, p) * amp;
-		x *= 2.0f;
-		y *= 2.0f;
-		z *= 2.0f;
-		amp /= 2.0f;
+		x *= 2.0;
+		y *= 2.0;
+		z *= 2.0;
+		amp /= 2.0;
 	}
 
 	return result; // unnormalized
@@ -164,8 +164,8 @@ float AccumulatedOctavePerlinNoise3D(
 //	Normalized octave noise [-1, 1]
 //
 
-float NormalizedOctavePerlinNoise3D(
-	float x, float y, float z, float3 shift, int octaves, __global uchar *p)
+REAL NormalizedOctavePerlinNoise3D(
+	REAL x, REAL y, REAL z, REAL3 shift, int octaves, __global uchar *p)
 {
 	return AccumulatedOctavePerlinNoise3D(x, y, z, shift, octaves, p) / PerlinWeight(octaves);
 }
@@ -175,10 +175,10 @@ float NormalizedOctavePerlinNoise3D(
 //	Normalized octave noise [0, 1]
 //
 
-float NormalizedOctavePerlinNoise3D_0_1(
-	float x, float y, float z, float3 shift, int octaves, __global uchar *p)
+REAL NormalizedOctavePerlinNoise3D_0_1(
+	REAL x, REAL y, REAL z, REAL3 shift, int octaves, __global uchar *p)
 {
-	return NormalizedOctavePerlinNoise3D(x, y, z, shift, octaves, p) * 0.5f + 0.5f;
+	return NormalizedOctavePerlinNoise3D(x, y, z, shift, octaves, p) * 0.5 + 0.5;
 }
 
 #endif // CLOUDS

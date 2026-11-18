@@ -25,23 +25,23 @@ REAL4 MandelbulbVaryPowerV1Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 		int iterationRange =
 			fractal->transformCommon.stopIterations - fractal->transformCommon.startIterations250;
 		int currentIteration = (aux->i - fractal->transformCommon.startIterations250);
-		tempVC += fractal->transformCommon.offset0 * (1.0f * currentIteration) / iterationRange;
+		tempVC += fractal->transformCommon.offset0 * (1.0 * currentIteration) / iterationRange;
 	}
 	if (aux->i >= fractal->transformCommon.stopIterations)
 	{
 		tempVC = (tempVC + fractal->transformCommon.offset0);
 	}
 
-	// if (aux->r < 1e-21f)
-	//	aux->r = 1e-21f;
+	// if (aux->r < 1e-21)
+	//	aux->r = 1e-21;
 	REAL th0 = asin(z.z / aux->r) + fractal->bulb.betaAngleOffset;
 	REAL ph0 = atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset;
-	REAL rp = pow(aux->r, tempVC - 1.0f);
+	REAL rp = pow(aux->r, tempVC - 1.0);
 	REAL th = th0 * tempVC;
 	REAL ph = ph0 * tempVC;
 	REAL cth = native_cos(th);
-	aux->DE = rp * aux->DE * tempVC + 1.0f;
+	aux->DE = rp * aux->DE * tempVC + 1.0;
 	rp *= aux->r;
-	z = (REAL4){cth * native_cos(ph), cth * native_sin(ph), native_sin(th), 0.0f} * rp;
+	z = (REAL4){cth * native_cos(ph), cth * native_sin(ph), native_sin(th), 0.0} * rp;
 	return z;
 }

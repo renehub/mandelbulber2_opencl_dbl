@@ -30,38 +30,38 @@ REAL4 MengerSmoothChebyshevIteration(REAL4 z, __global sFractalCl *fractal, sExt
 			z.y = temp;
 		}
 		REAL F = z.x / z.y;
-		if (z.y == 0.0f)
-			t = (z.x > 0.0f ? 0.0 : 4.0f);
-		else if (fabs(F) < 1.0f)
+		if (z.y == 0.0)
+			t = (z.x > 0.0 ? 0.0 : 4.0);
+		else if (fabs(F) < 1.0)
 		{
-			if (z.y > 0.0f)
-				t = 2.0f - F;
+			if (z.y > 0.0)
+				t = 2.0 - F;
 			else
-				t = 6.0f - F;
+				t = 6.0 - F;
 		}
 		else
 		{
 			F = z.y / z.x;
-			if (z.x > 0.0f)
-				t = fmod(F, 8.0f);
+			if (z.x > 0.0)
+				t = fmod(F, 8.0);
 			else
-				t = 4.0f + F;
+				t = 4.0 + F;
 		}
 
 		t += fractal->transformCommon.offset1;
 
 		REAL Length2 = max(fabs(z.x), fabs(z.y));
 
-		REAL C = t - 8.0f * floor(t / 8.0f);
+		REAL C = t - 8.0 * floor(t / 8.0);
 
-		C = fabs(C - 4.0f) - 2.0f;
-		z.x = clamp(C, -1.0f, 1.0f) * Length2;
+		C = fabs(C - 4.0) - 2.0;
+		z.x = clamp(C, -1.0, 1.0) * Length2;
 
-		REAL S = t - 2.0f;
-		S = S - 8.0f * floor(S / 8.0f);
-		S = fabs(S - 4.0f) - 2.0f;
-		z.y = clamp(S, -1.0f, 1.0f) * Length2;
-		aux->DE *= SQRT_1_2_F * 2.0f;
+		REAL S = t - 2.0;
+		S = S - 8.0 * floor(S / 8.0);
+		S = fabs(S - 4.0) - 2.0;
+		z.y = clamp(S, -1.0, 1.0) * Length2;
+		aux->DE *= SQRT_1_2_F * 2.0;
 	}
 
 	if (fractal->transformCommon.functionEnabled)
@@ -74,7 +74,7 @@ REAL4 MengerSmoothChebyshevIteration(REAL4 z, __global sFractalCl *fractal, sExt
 	{
 		z = fabs(z);
 		t = fractal->transformCommon.offset;
-		z += (REAL4){t, t, t, 0.0f};
+		z += (REAL4){t, t, t, 0.0};
 	}
 
 	if (aux->i >= fractal->transformCommon.startIterationsE
@@ -83,14 +83,14 @@ REAL4 MengerSmoothChebyshevIteration(REAL4 z, __global sFractalCl *fractal, sExt
 		z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);
 	}
 
-	REAL OffsetS = 0.0f;
+	REAL OffsetS = 0.0;
 	if (aux->i >= fractal->transformCommon.startIterationsD
 			&& aux->i < fractal->transformCommon.stopIterationsD)
 	{
 		OffsetS = fractal->transformCommon.offset0005;
 	}
 
-	REAL col = 0.0f;
+	REAL col = 0.0;
 	if (z.x < z.y) col += fractal->foldColor.difs0000.x;
 	t = z.x - z.y;
 	t = fractal->transformCommon.scale05

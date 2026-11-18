@@ -34,10 +34,10 @@ REAL4 MandelcupIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	}
 
 	REAL r = aux->r;
-	aux->DE = r * 2.0f * aux->DE + 1.0f;
+	aux->DE = r * 2.0 * aux->DE + 1.0;
 	REAL Scale = fractal->transformCommon.scale1;
 	REAL Shape = fractal->transformCommon.offset0;
-	REAL temp = 1.0f;
+	REAL temp = 1.0;
 
 	// stereographic projection, modified a bit
 	if (fractal->transformCommon.functionEnabledx)
@@ -59,7 +59,7 @@ REAL4 MandelcupIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	}
 	if (fractal->transformCommon.functionEnabledDFalse)
 	{
-		temp = 1.0f / (z.z * z.z * 1.0f);
+		temp = 1.0 / (z.z * z.z * 1.0);
 		z.x *= temp;
 		z.y *= temp;
 	}
@@ -71,18 +71,18 @@ REAL4 MandelcupIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 
 	// complex multiplication
 	temp = z.x * z.x - z.y * z.y;
-	z.y = 2.0f * z.x * z.y;
+	z.y = 2.0 * z.x * z.y;
 	z.x = temp;
-	temp = Scale * (1.0f + (Shape * Shape));
+	temp = Scale * (1.0 + (Shape * Shape));
 
 	z.x *= temp;
 	z.y *= temp;
 
 	// inverse stereographic
-	REAL mag1 = z.x * z.x + z.y * z.y - 1.0f;
-	REAL mag2 = 1.0f / (mag1 + 2.0f);
-	z.x = z.x * 2.0f * mag2;
-	z.y = z.y * 2.0f * mag2;
+	REAL mag1 = z.x * z.x + z.y * z.y - 1.0;
+	REAL mag2 = 1.0 / (mag1 + 2.0);
+	z.x = z.x * 2.0 * mag2;
+	z.y = z.y * 2.0 * mag2;
 	z.z = mag1 * mag2;
 
 	z *= r * r;

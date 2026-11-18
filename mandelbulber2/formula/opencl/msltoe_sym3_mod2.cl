@@ -19,29 +19,29 @@ REAL4 MsltoeSym3Mod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 {
 	REAL4 c = aux->const_c;
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	REAL theta;
 	REAL phi;
 	REAL4 z2 = z * z;
 	REAL r = z2.x + z2.y + z2.z;
-	// if (r < 1e-21f)
-	//	r = 1e-21f;
+	// if (r < 1e-21)
+	//	r = 1e-21;
 	REAL r1 = native_sqrt(r + fractal->transformCommon.scale0 * z2.y * z2.z);
-	// if (r1 < 1e-21f)
-	//	r1 = 1e-21f;
+	// if (r1 < 1e-21)
+	//	r1 = 1e-21;
 	if (z2.z < z2.y)
 	{
-		theta = 2.0f * atan2(z.y, z.x);
-		phi = 2.0f * asin(z.z / r1);
+		theta = 2.0 * atan2(z.y, z.x);
+		phi = 2.0 * asin(z.z / r1);
 		z.x = r * native_cos(theta) * native_cos(phi);
 		z.y = r * native_sin(theta) * native_cos(phi);
 		z.z = -r * native_sin(phi);
 	}
 	else
 	{
-		theta = 2.0f * atan2(z.z, z.x);
-		phi = 2.0f * asin(z.y / r1);
+		theta = 2.0 * atan2(z.z, z.x);
+		phi = 2.0 * asin(z.y / r1);
 		z.x = r * native_cos(theta) * native_cos(phi);
 		z.y = -r * native_sin(phi);
 		z.z = r * native_sin(theta) * native_cos(phi);
@@ -61,9 +61,9 @@ REAL4 MsltoeSym3Mod2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		z.z += sign(z.z) * tempFAB.z;
 	}
 	REAL lengthTempZ = -length(z);
-	// if (lengthTempZ > -1e-21f)
-	//	lengthTempZ = -1e-21f;   //  z is neg.)
-	z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+	// if (lengthTempZ > -1e-21)
+	//	lengthTempZ = -1e-21;   //  z is neg.)
+	z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 	z *= fractal->transformCommon.scale1;
 	aux->DE *= fabs(fractal->transformCommon.scale1);
 	return z;

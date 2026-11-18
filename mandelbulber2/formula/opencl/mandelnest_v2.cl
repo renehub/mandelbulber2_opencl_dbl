@@ -66,7 +66,7 @@ REAL4 MandelnestV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 
 	if (!fractal->transformCommon.functionEnabledAFalse)
 	{
-		rN = 1.0f / length(z);
+		rN = 1.0 / length(z);
 		z *= rN;
 		aux->DE *= rN;
 	}
@@ -79,7 +79,7 @@ REAL4 MandelnestV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 
 	r = length(z);
 
-	aux->DE = aux->DE * Power * r + 1.0f;
+	aux->DE = aux->DE * Power * r + 1.0;
 	if (fractal->analyticDE.enabledFalse)
 	{
 		aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset0;
@@ -87,7 +87,7 @@ REAL4 MandelnestV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		// aux->dist
 		if (fractal->transformCommon.functionEnabledDFalse)
 		{
-			aux->DE0 = 0.5f * log(r) * r / aux->DE;
+			aux->DE0 = 0.5 * log(r) * r / aux->DE;
 
 			if (aux->i <= fractal->transformCommon.startIterationsE)
 				aux->dist = min(aux->DE0, fractal->analyticDE.offset1);

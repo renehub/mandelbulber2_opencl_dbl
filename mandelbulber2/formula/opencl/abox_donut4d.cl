@@ -17,10 +17,10 @@
 
 REAL4 AboxDonut4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	// initial conditions 4D
-	REAL4 ct = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 ct = (REAL4){0.0, 0.0, 0.0, 0.0};
 	if (aux->i == 0)
 	{
 		REAL angle = atan2(z.x, z.y) * fractal->transformCommon.scaleA2;
@@ -38,7 +38,7 @@ REAL4 AboxDonut4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	}
 
 	// abox
-	REAL rrCol = 0.0f;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 
@@ -64,7 +64,7 @@ REAL4 AboxDonut4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 
 	// scale
 	z *= fractal->transformCommon.scale2;
-	aux->DE = aux->DE * fabs(fractal->transformCommon.scale2) + 1.0f;
+	aux->DE = aux->DE * fabs(fractal->transformCommon.scale2) + 1.0;
 
 	z += fractal->transformCommon.additionConstant0000;
 

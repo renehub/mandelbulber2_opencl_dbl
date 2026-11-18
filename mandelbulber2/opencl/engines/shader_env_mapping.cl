@@ -33,44 +33,45 @@
  */
 
 #ifdef USE_ENV_MAPPING
-float3 EnvMappingShader(
+REAL3 EnvMappingShader(
 	__constant sClInConstants *consts, sRenderData *renderData, sShaderInputDataCl *input)
 {
-	float3 envReflect;
+	REAL3 envReflect;
 
-	float dotp = -dot(input->viewVector, input->normal);
-	float3 reflect = input->normal * 2.0f * dotp + input->viewVector;
+	REAL dotp = -dot(input->viewVector, input->normal);
+	REAL3 reflect = input->normal * 2.0 * dotp + input->viewVector;
 
-	float alphaTexture = -GetAlpha(reflect) + M_PI_F;
-	float betaTexture = -GetBeta(reflect);
+	REAL alphaTexture = -GetAlpha(reflect) + M_PI_F;
+	REAL betaTexture = -GetBeta(reflect);
 	int texWidth = renderData->textureSizes[0].x;
 	int texHeight = renderData->textureSizes[0].y;
 
-	if (betaTexture > 0.5f * M_PI_F) betaTexture = 0.5f * M_PI_F - betaTexture;
+	if (betaTexture > 0.5 * M_PI_F) betaTexture = 0.5 * M_PI_F - betaTexture;
 
-	if (betaTexture < -0.5f * M_PI_F) betaTexture = -0.5f * M_PI_F + betaTexture;
+	if (betaTexture < -0.5 * M_PI_F) betaTexture = -0.5 * M_PI_F + betaTexture;
 
-	float dtx = alphaTexture / (2.0f * M_PI_F) * texWidth + texWidth * 8.25f;
-	float dty = (betaTexture / M_PI_F + 0.5f) * texHeight + texHeight * 8.0f;
+	REAL dtx = alphaTexture / (2.0 * M_PI_F) * texWidth + texWidth * 8.25;
+	REAL dty = (betaTexture / M_PI_F + 0.5) * texHeight + texHeight * 8.0;
 	dtx = fmod(dtx, texWidth);
 	dty = fmod(dty, texHeight);
-	if (dtx < 0.0f) dtx = 0.0f;
-	if (dty < 0.0f) dty = 0.0f;
+	if (dtx < 0.0) dtx = 0.0;
+	if (dty < 0.0) dty = 0.0;
 
-	float reflectance = 1.0f;
+	REAL reflectance = 1.0;
 	if (input->material->fresnelReflectance)
 	{
-		float n1 = 1.0f;
-		float n2 = input->material->transparencyIndexOfRefraction;
+		REAL n1 = 1.0;
+		REAL n2 = input->material->transparencyIndexOfRefraction;
 		reflectance = Reflectance(input->normal, input->viewVector, n1, n2);
-		if (reflectance < 0.0f) reflectance = 0.0f;
-		if (reflectance > 1.0f) reflectance = 1.0f;
+		if (reflectance < 0.0) reflectance = 0.0;
+		if (reflectance > 1.0) reflectance = 1.0;
 	}
 
 	__global uchar4 *texture = renderData->textures[0];
 
-	envReflect = BicubicInterpolation(dtx / texWidth, dty / texHeight, texture, texWidth, texHeight)
-							 * reflectance;
+	envReflect =
+		TO_REAL3(BicubicInterpolation(dtx / texWidth, dty / texHeight, texture, texWidth, texHeight))
+		* reflectance;
 
 	return envReflect;
 }

@@ -22,25 +22,25 @@ REAL4 TransfBenesiCubeSphereIteration(REAL4 z, __global sFractalCl *fractal, sEx
 	REAL4 oldZ = z;
 	z *= z; // so all now positive
 
-	// if (z.x == 0.0f)
-	//	z.x = 1e-21f;
-	// if (z.z == 0.0f)
-	//	z.z = 1e-21f;
+	// if (z.x == 0.0)
+	//	z.x = 1e-21;
+	// if (z.z == 0.0)
+	//	z.z = 1e-21;
 
 	REAL rCyz = z.y / z.z;
 
 	REAL rCxyz = (z.y + z.z) / z.x;
 
-	if (rCxyz == -1.0f) z.z = 1.0f; //+ 1e-21f
-	if (rCyz < 1.0f)
-		rCyz = native_sqrt(rCyz + 1.0f);
+	if (rCxyz == -1.0) z.z = 1.0; //+ 1e-21
+	if (rCyz < 1.0)
+		rCyz = native_sqrt(rCyz + 1.0);
 	else
-		rCyz = native_sqrt(1.0f / rCyz + 1.0f);
+		rCyz = native_sqrt(1.0 / rCyz + 1.0);
 
-	if (rCxyz < 1.0f)
-		rCxyz = native_sqrt(rCxyz + 1.0f);
+	if (rCxyz < 1.0)
+		rCxyz = native_sqrt(rCxyz + 1.0);
 	else
-		rCxyz = native_sqrt(1.0f / rCxyz + 1.0f);
+		rCxyz = native_sqrt(1.0 / rCxyz + 1.0);
 
 	z.y *= rCyz;
 	z.z *= rCyz;

@@ -16,17 +16,17 @@
 
 REAL4 TransfHybridColorIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL linearOffset = 0.0f;
-	REAL boxTrap = 0.0f;
-	REAL sphereTrap = 0.0f;
-	REAL planeBias = 0.0f;
-	REAL twoPoints = 0.0f;
-	REAL componentMaster = 0.0f;
+	REAL linearOffset = 0.0;
+	REAL boxTrap = 0.0;
+	REAL sphereTrap = 0.0;
+	REAL planeBias = 0.0;
+	REAL twoPoints = 0.0;
+	REAL componentMaster = 0.0;
 
 	// max linear offset
 	if (fractal->transformCommon.functionEnabledMFalse)
 	{
-		REAL temp30 = 0.0f;
+		REAL temp30 = 0.0;
 		REAL4 temp31 = z;
 		if (fractal->transformCommon.functionEnabledM) temp31 = fabs(temp31);
 
@@ -40,7 +40,7 @@ REAL4 TransfHybridColorIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	{
 		REAL4 box = fractal->transformCommon.scale3D444;
 		REAL4 temp35 = z;
-		REAL temp39 = 0.0f;
+		REAL temp39 = 0.0;
 		if (fractal->transformCommon.functionEnabledCx) temp35 = fabs(temp35);
 
 		temp35 = box - temp35;

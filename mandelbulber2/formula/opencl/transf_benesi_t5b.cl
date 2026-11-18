@@ -24,12 +24,12 @@ REAL4 TransfBenesiT5bIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	z = (REAL4){(tempXZ - z.y) * SQRT_1_2_F, (tempXZ + z.y) * SQRT_1_2_F,
 		z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, z.w};
 
-	// if (z.x > -1e-21f && z.x < 1e-21f)
-	// z.x = (z.x > 0) ? 1e-21f : -1e-21f;
-	// if (z.y > -1e-21f && z.y < 1e-21f)
-	// z.y = (z.y > 0) ? 1e-21f : -1e-21f;
-	// if (z.z > -1e-21f && z.z < 1e-21f)
-	// z.z = (z.z > 0) ? 1e-21f : -1e-21f;
+	// if (z.x > -1e-21 && z.x < 1e-21)
+	// z.x = (z.x > 0) ? 1e-21 : -1e-21;
+	// if (z.y > -1e-21 && z.y < 1e-21)
+	// z.y = (z.y > 0) ? 1e-21 : -1e-21;
+	// if (z.z > -1e-21 && z.z < 1e-21)
+	// z.z = (z.z > 0) ? 1e-21 : -1e-21;
 	REAL4 tempV2 = z;
 	tempV2.x =
 		fabs(pow(pow(z.y, fractal->transformCommon.int8X) + pow(z.z, fractal->transformCommon.int8X),

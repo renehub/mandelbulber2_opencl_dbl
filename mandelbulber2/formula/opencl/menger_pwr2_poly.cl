@@ -56,10 +56,10 @@ REAL4 MengerPwr2PolyIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		partB *= fractal->transformCommon.scale4;
 		REAL4 constantMult = (REAL4){fractal->transformCommon.constantMultiplierB111.x,
 			fractal->transformCommon.constantMultiplierB111.y,
-			fractal->transformCommon.constantMultiplierB111.z, 0.0f};
+			fractal->transformCommon.constantMultiplierB111.z, 0.0};
 		z = constantMult + partB - partA * fnZ1;
 		z *= fractal->transformCommon.scale025;
-		aux->DE = aux->DE * 4.0f * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
+		aux->DE = aux->DE * 4.0 * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 	}
 	if (fractal->transformCommon.addCpixelEnabledFalse)
 	{
@@ -119,9 +119,9 @@ REAL4 MengerPwr2PolyIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			z.y = temp;
 		}
 		z *= fractal->transformCommon.scale3;
-		z.x -= 2.0f * fractal->transformCommon.constantMultiplierA111.x;
-		z.y -= 2.0f * fractal->transformCommon.constantMultiplierA111.y;
-		if (z.z > 1.0f) z.z -= 2.0f * fractal->transformCommon.constantMultiplierA111.z;
+		z.x -= 2.0 * fractal->transformCommon.constantMultiplierA111.x;
+		z.y -= 2.0 * fractal->transformCommon.constantMultiplierA111.y;
+		if (z.z > 1.0) z.z -= 2.0 * fractal->transformCommon.constantMultiplierA111.z;
 
 		aux->DE *= fractal->transformCommon.scale3;
 

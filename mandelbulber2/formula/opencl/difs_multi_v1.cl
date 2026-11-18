@@ -16,7 +16,7 @@
 
 REAL4 DIFSMultiV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	REAL4 boxFold = fractal->transformCommon.additionConstantA111;
 
@@ -58,7 +58,7 @@ REAL4 DIFSMultiV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -113,13 +113,13 @@ REAL4 DIFSMultiV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		z.y -= fractal->transformCommon.offsetF2;
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 		// else
 
 		if (fractal->transformCommon.functionEnabledKFalse
@@ -166,14 +166,14 @@ REAL4 DIFSMultiV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	{
 		REAL4 boxSize = fractal->transformCommon.additionConstant111;
 		REAL4 bxV = zc;
-		REAL bxD = 0.0f;
+		REAL bxD = 0.0;
 		bxV = fabs(bxV) - boxSize;
 		bxD = max(bxV.x, max(bxV.y, bxV.z)); // infnorm
-		if (bxD > 0.0f)
+		if (bxD > 0.0)
 		{
-			bxV.x = max(bxV.x, 0.0f);
-			bxV.y = max(bxV.y, 0.0f);
-			bxV.z = max(bxV.z, 0.0f);
+			bxV.x = max(bxV.x, 0.0);
+			bxV.y = max(bxV.y, 0.0);
+			bxV.z = max(bxV.z, 0.0);
 			aux->DE0 = length(bxV);
 		}
 		aux->dist = min(aux->dist, aux->DE0 / aux->DE);
@@ -191,7 +191,7 @@ REAL4 DIFSMultiV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 			&& aux->i >= fractal->transformCommon.startIterationsO
 			&& aux->i < fractal->transformCommon.stopIterationsO)
 	{
-		REAL cylD = 0.0f;
+		REAL cylD = 0.0;
 		//- fractal->transformCommon.scale0 * aux->i;
 
 		if (fractal->transformCommon.functionEnabledSwFalse)
@@ -209,14 +209,14 @@ REAL4 DIFSMultiV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		if (!fractal->transformCommon.functionEnabledXFalse)
 		{
 			if (!fractal->transformCommon.functionEnabledzFalse) cylR = cylRm;
-			cylR = max(cylR, 0.0f);
-			REAL cylHm = max(cylH, 0.0f);
+			cylR = max(cylR, 0.0);
+			REAL cylHm = max(cylH, 0.0);
 			cylD = native_sqrt(cylR * cylR + cylHm * cylHm);
 		}
 		else
 			cylD = native_sqrt(cylRm * cylRm + cylH * cylH);
 
-		aux->DE0 = min(max(cylRm, cylH) - fractal->transformCommon.offsetR0, 0.0f) + cylD;
+		aux->DE0 = min(max(cylRm, cylH) - fractal->transformCommon.offsetR0, 0.0) + cylD;
 		aux->dist = min(aux->dist, aux->DE0 / aux->DE);
 	}
 
@@ -252,7 +252,7 @@ REAL4 DIFSMultiV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 		}
 
 		aux->DE0 = max(fabs(zc.x) - fractal->transformCommon.offset2,
-			max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5f, -zc.z) - fractal->transformCommon.offsetA05);
+			max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5, -zc.z) - fractal->transformCommon.offsetA05);
 
 		aux->dist = min(aux->dist, aux->DE0 / aux->DE);
 	}

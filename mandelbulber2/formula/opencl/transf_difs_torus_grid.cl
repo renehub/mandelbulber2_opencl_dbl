@@ -29,8 +29,8 @@ REAL4 TransfDIFSTorusGridIteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 	if (!fractal->transformCommon.functionEnabledGFalse)
 	{
-		zc.x = fabs(zc.x - size * floor(zc.x / size + 0.5f));
-		zc.y = fabs(zc.y - size * floor(zc.y / size + 0.5f));
+		zc.x = fabs(zc.x - size * floor(zc.x / size + 0.5));
+		zc.y = fabs(zc.y - size * floor(zc.y / size + 0.5));
 	}
 	else
 	{
@@ -48,7 +48,7 @@ REAL4 TransfDIFSTorusGridIteration(REAL4 z, __global sFractalCl *fractal, sExten
 		torD = max(fabs(torD), fabs(zc.z));
 
 	REAL colDist = aux->dist;
-	aux->dist = min(aux->dist, torD - fractal->transformCommon.offset0005 / (aux->DE + 1.0f));
+	aux->dist = min(aux->dist, torD - fractal->transformCommon.offset0005 / (aux->DE + 1.0));
 
 	if (fractal->foldColor.auxColorEnabledFalse && colDist != aux->dist
 			&& aux->i >= fractal->foldColor.startIterationsA

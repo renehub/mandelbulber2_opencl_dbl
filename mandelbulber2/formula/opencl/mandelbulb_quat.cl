@@ -58,18 +58,18 @@ REAL4 MandelbulbQuatIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
 		aux->r = length(z);
-		z = (REAL4){z.x * z.x - z.y * z.y - z.z * z.z, z.x * z.y, z.x * z.z, 0.0f};
-		aux->DE = aux->DE * 2.0f * aux->r;
+		z = (REAL4){z.x * z.x - z.y * z.y - z.z * z.z, z.x * z.y, z.x * z.z, 0.0};
+		aux->DE = aux->DE * 2.0 * aux->r;
 		REAL tempL = length(z);
 		z *= fractal->transformCommon.constantMultiplier122;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
-		REAL3 tempAvgScale = (REAL3){z.x, z.y / 2.0f, z.z / 2.0f};
+		// if (tempL < 1e-21) tempL = 1e-21;
+		REAL3 tempAvgScale = (REAL3){z.x, z.y / 2.0, z.z / 2.0};
 		REAL avgScale = length(tempAvgScale) / tempL;
 		REAL tempAux = aux->DE * avgScale;
 		aux->DE = aux->DE + (tempAux - aux->DE) * fractal->analyticDE.scale1;
 		z += fractal->transformCommon.offset000;
 		// if (!fractal->analyticDE.enabledFalse)
-		//	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0f;
+		//	aux->DE = aux->DE * fabs(aux->actualScale) + 1.0;
 		// else
 		//	aux->DE =
 		//		aux->DE * fabs(aux->actualScale) * fractal->analyticDE.scale1 +
@@ -81,11 +81,11 @@ REAL4 MandelbulbQuatIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			&& aux->i < fractal->transformCommon.stopIterationsB)
 	{
 		aux->r = length(z);
-		aux->DE = aux->DE * 2.0f * aux->r;
+		aux->DE = aux->DE * 2.0 * aux->r;
 		REAL4 temp = z;
 		REAL tempL = length(temp);
-		// if (tempL < 1e-21f)
-		//	tempL = 1e-21f;
+		// if (tempL < 1e-21)
+		//	tempL = 1e-21;
 		z *= fractal->transformCommon.scale3D111;
 
 		aux->DE *= length(z) / tempL;
@@ -109,19 +109,19 @@ REAL4 MandelbulbQuatIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			z.z = temp;
 		}
 
-		if (z.x * z.z < 0.0f) z.z = -z.z;
-		if (z.x * z.y < 0.0f) z.y = -z.y;
+		if (z.x * z.z < 0.0) z.z = -z.z;
+		if (z.x * z.y < 0.0) z.y = -z.y;
 
 		temp.x = z.x * z.x - z.y * z.y - z.z * z.z;
-		temp.y = 2.0f * z.x * z.y;
-		temp.z = 2.0f * z.x * z.z;
+		temp.y = 2.0 * z.x * z.y;
+		temp.z = 2.0 * z.x * z.z;
 
 		z = temp + fractal->transformCommon.offsetF000;
 		// radial offset
 		REAL lengthTempZ = -length(z);
-		// if (lengthTempZ > -1e-21f)
-		//	lengthTempZ = -1e-21f;   //  z is neg.)
-		z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+		// if (lengthTempZ > -1e-21)
+		//	lengthTempZ = -1e-21;   //  z is neg.)
+		z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 
 		// scale
 		z *= fractal->transformCommon.scale1;
@@ -169,10 +169,10 @@ REAL4 MandelbulbQuatIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			case multi_OrderOfZYXCl_xzy: v = (REAL3){z.x, z.z, z.y}; break;
 			case multi_OrderOfZYXCl_xyz: v = (REAL3){z.x, z.y, z.z}; break;
 		}
-		if (v.x * v.x + v.y * v.y == 0.0f)
+		if (v.x * v.x + v.y * v.y == 0.0)
 		{
 			v.y = v.z * v.z;
-			v.z = 0.0f;
+			v.z = 0.0;
 		}
 		if (fractal->sinTan2Trig.asinOrAcos == multi_asinOrAcosCl_asin)
 			th0 += asin(v.x / aux->r);
@@ -184,11 +184,11 @@ REAL4 MandelbulbQuatIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		else
 			ph0 += atan(v.y / v.z);
 
-		REAL rp = pow(aux->r, fractal->bulb.power - 1.0f);
+		REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
 		REAL th = th0 * fractal->bulb.power * fractal->transformCommon.scaleA1;
 		REAL ph = ph0 * fractal->bulb.power * fractal->transformCommon.scaleB1;
 
-		aux->DE = rp * aux->DE * fractal->bulb.power + 1.0f;
+		aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 		rp *= aux->r;
 
 		if (fractal->transformCommon.functionEnabledxFalse)
@@ -196,14 +196,14 @@ REAL4 MandelbulbQuatIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 			REAL sinth = th;
 			if (fractal->transformCommon.functionEnabledyFalse) sinth = th0;
 			sinth = native_sin(sinth);
-			z = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0f};
+			z = rp * (REAL4){sinth * native_sin(ph), native_cos(ph) * sinth, native_cos(th), 0.0};
 		}
 		else
 		{ // sine mode
 			REAL costh = th;
 			if (fractal->transformCommon.functionEnabledzFalse) costh = th0;
 			costh = native_cos(costh);
-			z = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0f};
+			z = rp * (REAL4){costh * native_cos(ph), native_sin(ph) * costh, native_sin(th), 0.0};
 		}
 
 		if (fractal->transformCommon.functionEnabledKFalse)

@@ -33,7 +33,7 @@ REAL4 DIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	{
 		z.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int6;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -54,13 +54,13 @@ REAL4 DIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	REAL RR = fractal->transformCommon.minR2p25;
 	if (rr < RR)
 	{
-		RR = 1.0f / RR;
+		RR = 1.0 / RR;
 		z *= RR;
 		aux->DE *= RR;
 	}
-	else if (rr < 1.0f)
+	else if (rr < 1.0)
 	{
-		RR = 1.0f / rr;
+		RR = 1.0 / rr;
 		z *= RR;
 		aux->DE *= RR;
 	}
@@ -89,7 +89,7 @@ REAL4 DIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	// aux->color
 	if (fractal->foldColor.auxColorEnabled)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		if (fractal->foldColor.auxColorEnabledA)
 			if (colorDist != aux->dist) colorAdd += fractal->foldColor.difs1;
 
@@ -106,7 +106,7 @@ REAL4 DIFSAmazingIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 										* (fabs(zCol.z) - fractal->transformCommon.additionConstant111.z);
 			if (rrCol > fractal->transformCommon.minR2p25)
 				colorAdd +=
-					fractal->foldColor.difs0000.w * (rrCol - fractal->transformCommon.minR2p25) / 100.0f;
+					fractal->foldColor.difs0000.w * (rrCol - fractal->transformCommon.minR2p25) / 100.0;
 		}
 		aux->color += colorAdd;
 	}

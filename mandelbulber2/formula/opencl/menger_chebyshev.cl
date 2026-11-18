@@ -27,40 +27,40 @@ REAL4 MengerChebyshevIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			z.x = z.y;
 			z.y = temp;
 		}
-		REAL tmp = 0.0f;
+		REAL tmp = 0.0;
 		REAL F = z.x / z.y;
-		if (z.y == 0.0f)
-			tmp = (z.x > 0.0f ? 0.0 : 4.0f);
-		else if (fabs(F) < 1.0f)
+		if (z.y == 0.0)
+			tmp = (z.x > 0.0 ? 0.0 : 4.0);
+		else if (fabs(F) < 1.0)
 		{
-			if (z.y > 0.0f)
-				tmp = 2.0f - F;
+			if (z.y > 0.0)
+				tmp = 2.0 - F;
 			else
-				tmp = 6.0f - F;
+				tmp = 6.0 - F;
 		}
 		else
 		{
 			F = z.y / z.x;
-			if (z.x > 0.0f)
-				tmp = fmod(F, 8.0f);
+			if (z.x > 0.0)
+				tmp = fmod(F, 8.0);
 			else
-				tmp = 4.0f + F;
+				tmp = 4.0 + F;
 		}
 
 		tmp = tmp + fractal->transformCommon.offset1;
 
 		REAL Length2 = max(fabs(z.x), fabs(z.y));
 
-		REAL C = tmp - 8.0f * floor(tmp / 8.0f);
+		REAL C = tmp - 8.0 * floor(tmp / 8.0);
 
-		C = fabs(C - 4.0f) - 2.0f;
-		z.x = clamp(C, -1.0f, 1.0f) * Length2;
+		C = fabs(C - 4.0) - 2.0;
+		z.x = clamp(C, -1.0, 1.0) * Length2;
 
-		REAL S = tmp - 2.0f;
-		S = S - 8.0f * floor(S / 8.0f);
-		S = fabs(S - 4.0f) - 2.0f;
-		z.y = clamp(S, -1.0f, 1.0f) * Length2;
-		aux->DE *= SQRT_1_2_F * 2.0f;
+		REAL S = tmp - 2.0;
+		S = S - 8.0 * floor(S / 8.0);
+		S = fabs(S - 4.0) - 2.0;
+		z.y = clamp(S, -1.0, 1.0) * Length2;
+		aux->DE *= SQRT_1_2_F * 2.0;
 	}
 
 	z = fabs(z);
@@ -73,7 +73,7 @@ REAL4 MengerChebyshevIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	}
 
 	REAL temp;
-	REAL col = 0.0f;
+	REAL col = 0.0;
 	if (z.x < z.y)
 	{
 		temp = z.y;
@@ -105,7 +105,7 @@ REAL4 MengerChebyshevIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 
 	z = z * fractal->transformCommon.scale3 - fractal->transformCommon.offset222;
 	aux->DE = aux->DE * fractal->transformCommon.scale3 + fractal->analyticDE.offset0;
-	if (z.z < -1.0f) z.z += 2.0f;
+	if (z.z < -1.0) z.z += 2.0;
 
 	// boxoffset
 	if (fractal->transformCommon.functionEnabledxFalse
@@ -120,9 +120,9 @@ REAL4 MengerChebyshevIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		if (fractal->transformCommon.functionEnabledFalse)
 		{
 			REAL tempL = length(zCopy);
-			// if (tempL < 1e-21f) tempL = 1e-21f;
+			// if (tempL < 1e-21) tempL = 1e-21;
 			REAL avgScale = length(z) / tempL;
-			aux->DE = aux->DE * avgScale + 1.0f;
+			aux->DE = aux->DE * avgScale + 1.0;
 		}
 	}
 

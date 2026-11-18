@@ -95,8 +95,8 @@ REAL4 TransfDIFSHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	{
 		temp = cylRm;
 	}
-	temp = max(temp, 0.0f);
-	REAL cylHm = max(cylH, 0.0f);
+	temp = max(temp, 0.0);
+	REAL cylHm = max(cylH, 0.0);
 	REAL cylD = native_sqrt(temp * temp + cylHm * cylHm);
 
 	// rings
@@ -106,12 +106,12 @@ REAL4 TransfDIFSHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	{
 		cylD = native_sqrt(cylRm * cylRm + cylH * cylH);
 	}
-	cylD = min(max(cylRm, cylH) - fractal->transformCommon.offsetR0, 0.0f) + cylD;
+	cylD = min(max(cylRm, cylH) - fractal->transformCommon.offsetR0, 0.0) + cylD;
 	if (fractal->analyticDE.enabledFalse)
 	{
 		aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset0;
 	}
-	cylD /= (aux->DE + 1.0f);
+	cylD /= (aux->DE + 1.0);
 	REAL colDist = aux->dist;
 	aux->dist = min(aux->dist, cylD);
 
@@ -130,8 +130,8 @@ REAL4 TransfDIFSHelixIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		if (!fractal->transformCommon.functionEnabledGFalse)
 		{
 			REAL ang =
-				(M_PI_F - 2.0f * fabs(atan(fractal->foldColor.difs1 * zc.y / zc.z))) * 4.0f * M_PI_2x_INV_F;
-			if (fmod(ang, 2.0f) < 1.0f)
+				(M_PI_F - 2.0 * fabs(atan(fractal->foldColor.difs1 * zc.y / zc.z))) * 4.0 * M_PI_2x_INV_F;
+			if (fmod(ang, 2.0) < 1.0)
 				colAdd += fractal->foldColor.difs0000.z;
 			else
 				colAdd += fractal->foldColor.difs0000.y;

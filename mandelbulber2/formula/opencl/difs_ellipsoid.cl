@@ -16,7 +16,7 @@
 
 REAL4 DIFSEllipsoidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	REAL4 boxFold = fractal->transformCommon.additionConstantA111;
 
@@ -56,7 +56,7 @@ REAL4 DIFSEllipsoidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -108,13 +108,13 @@ REAL4 DIFSEllipsoidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		z.y -= fractal->transformCommon.offsetF2;
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 		// scale vary
 		if (fractal->transformCommon.functionEnabledKFalse
 				&& aux->i >= fractal->transformCommon.startIterationsK
@@ -193,7 +193,7 @@ REAL4 DIFSEllipsoidIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 
 		REAL rd = length(rV);
 		REAL rrd = length(rrV);
-		REAL ellD = rd * (rd - 1.0f) / rrd;
+		REAL ellD = rd * (rd - 1.0) / rrd;
 		aux->dist = min(aux->dist, ellD / aux->DE);
 	}
 	// sphere

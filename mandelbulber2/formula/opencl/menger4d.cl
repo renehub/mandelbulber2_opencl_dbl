@@ -23,41 +23,41 @@ REAL4 Menger4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 		z += fractal->transformCommon.additionConstant0000; // offset
 	}
 
-	REAL temp = 0.0f;
-	REAL col = 0.0f;
+	REAL temp = 0.0;
+	REAL col = 0.0;
 	z = fabs(z);
-	if (z.x - z.y < 0.0f)
+	if (z.x - z.y < 0.0)
 	{
 		temp = z.y;
 		z.y = z.x;
 		z.x = temp;
 	}
-	if (z.x - z.z < 0.0f)
+	if (z.x - z.z < 0.0)
 	{
 		temp = z.z;
 		z.z = z.x;
 		z.x = temp;
 	}
-	if (z.y - z.z < 0.0f)
+	if (z.y - z.z < 0.0)
 	{
 		temp = z.z;
 		z.z = z.y;
 		z.y = temp;
 	}
-	if (z.x - z.w < 0.0f)
+	if (z.x - z.w < 0.0)
 	{
 		temp = z.w;
 		z.w = z.x;
 		z.x = temp;
 		col += fractal->foldColor.difs0000.x;
 	}
-	if (z.y - z.w < 0.0f)
+	if (z.y - z.w < 0.0)
 	{
 		temp = z.w;
 		z.w = z.y;
 		z.y = temp;
 	}
-	if (z.z - z.w < 0.0f)
+	if (z.z - z.w < 0.0)
 	{
 		temp = z.w;
 		z.w = z.z;
@@ -120,9 +120,9 @@ REAL4 Menger4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 	z.x = scaleM * z.x - offsetM.x;
 	z.y = scaleM * z.y - offsetM.y;
 	z.w = scaleM * z.w - offsetM.w;
-	z.z -= 0.5f * offsetM.z / scaleM;
+	z.z -= 0.5 * offsetM.z / scaleM;
 	z.z = -fabs(-z.z);
-	z.z += 0.5f * offsetM.z / scaleM;
+	z.z += 0.5 * offsetM.z / scaleM;
 	z.z *= scaleM;
 	aux->DE *= scaleM;
 
@@ -131,7 +131,7 @@ REAL4 Menger4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		REAL r2 = dot(z, z);
-		// if (r2 < 1e-21f && r2 > -1e-21f) r2 = (r2 > 0) ? 1e-21f : -1e-21f;
+		// if (r2 < 1e-21 && r2 > -1e-21) r2 = (r2 > 0) ? 1e-21 : -1e-21;
 
 		if (r2 < fractal->transformCommon.minR2p25)
 		{

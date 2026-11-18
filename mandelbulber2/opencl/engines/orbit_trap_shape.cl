@@ -34,11 +34,11 @@
 
 #ifdef FAKE_LIGHTS
 
-float OrbitTrapShapeDistance(float4 z4, __constant sClInConstants *consts)
+REAL OrbitTrapShapeDistance(REAL4 z4, __constant sClInConstants *consts)
 {
-	float dist = 0.0f;
-	float3 z = z4.xyz;
-	float3 delta = z - consts->params.common.fakeLightsOrbitTrap;
+	REAL dist = 0.0;
+	REAL3 z = z4.xyz;
+	REAL3 delta = z - consts->params.common.fakeLightsOrbitTrap;
 
 #ifdef FAKE_LIGHTS_POINT
 	dist = length(delta);
@@ -51,44 +51,44 @@ float OrbitTrapShapeDistance(float4 z4, __constant sClInConstants *consts)
 
 #ifdef FAKE_LIGHTS_CIRCLE
 	delta = Matrix33MulFloat3(consts->params.common.mRotFakeLightsRotation, delta);
-	float lengthYZ = length(delta.yz) - consts->params.common.fakeLightsOrbitTrapSize;
-	dist = length((float2){lengthYZ, delta.x});
+	REAL lengthYZ = length(delta.yz) - consts->params.common.fakeLightsOrbitTrapSize;
+	dist = length((REAL2){lengthYZ, delta.x});
 #endif
 
 #ifdef FAKE_LIGHTS_SQUARE
 	delta = Matrix33MulFloat3(consts->params.common.mRotFakeLightsRotation, delta);
-	float size = consts->params.common.fakeLightsOrbitTrapSize;
+	REAL size = consts->params.common.fakeLightsOrbitTrapSize;
 
-	float dy = max(fabs(fabs(delta.y) - size), fabs(delta.z) - size);
-	float dz = max(fabs(fabs(delta.z) - size), fabs(delta.y) - size);
-	float deltaRect = min(dy, dz);
-	dist = length((float2){deltaRect, delta.x});
+	REAL dy = max(fabs(fabs(delta.y) - size), fabs(delta.z) - size);
+	REAL dz = max(fabs(fabs(delta.z) - size), fabs(delta.y) - size);
+	REAL deltaRect = min(dy, dz);
+	dist = length((REAL2){deltaRect, delta.x});
 #endif
 
 #ifdef FAKE_LIGHTS_SPHERE
 	delta = Matrix33MulFloat3(consts->params.common.mRotFakeLightsRotation, delta);
-	float lengthYZ = length(delta.yz) - consts->params.common.fakeLightsOrbitTrapSize;
-	float distYZ = length((float2){lengthYZ, delta.x});
+	REAL lengthYZ = length(delta.yz) - consts->params.common.fakeLightsOrbitTrapSize;
+	REAL distYZ = length((REAL2){lengthYZ, delta.x});
 
-	float lengthXZ = length(delta.xz) - consts->params.common.fakeLightsOrbitTrapSize;
-	float distXZ = length((float2){lengthXZ, delta.y});
+	REAL lengthXZ = length(delta.xz) - consts->params.common.fakeLightsOrbitTrapSize;
+	REAL distXZ = length((REAL2){lengthXZ, delta.y});
 
-	float lengthXY = length(delta.xy) - consts->params.common.fakeLightsOrbitTrapSize;
-	float distXY = length((float2){lengthXY, delta.z});
+	REAL lengthXY = length(delta.xy) - consts->params.common.fakeLightsOrbitTrapSize;
+	REAL distXY = length((REAL2){lengthXY, delta.z});
 
 	dist = min(min(distYZ, distXZ), distXY);
 #endif
 
 #ifdef FAKE_LIGHTS_CUBE
 	delta = Matrix33MulFloat3(consts->params.common.mRotFakeLightsRotation, delta);
-	float size = consts->params.common.fakeLightsOrbitTrapSize;
+	REAL size = consts->params.common.fakeLightsOrbitTrapSize;
 
-	float dy_x = max(fabs(fabs(delta.y) - size), fabs(delta.z) - size);
-	float dz_x = max(fabs(fabs(delta.z) - size), fabs(delta.y) - size);
-	float dx_z = max(fabs(fabs(delta.y) - size), fabs(delta.x) - size);
-	float deltaRectYZ = min(dy_x, dz_x);
-	float distYZ = length((float2){deltaRectYZ, fabs(fabs(delta.x) - size)});
-	float distXZ = length((float2){dx_z, fabs(fabs(z.z) - size)});
+	REAL dy_x = max(fabs(fabs(delta.y) - size), fabs(delta.z) - size);
+	REAL dz_x = max(fabs(fabs(delta.z) - size), fabs(delta.y) - size);
+	REAL dx_z = max(fabs(fabs(delta.y) - size), fabs(delta.x) - size);
+	REAL deltaRectYZ = min(dy_x, dz_x);
+	REAL distYZ = length((REAL2){deltaRectYZ, fabs(fabs(delta.x) - size)});
+	REAL distXZ = length((REAL2){dx_z, fabs(fabs(z.z) - size)});
 
 	dist = min(distYZ, distXZ);
 #endif

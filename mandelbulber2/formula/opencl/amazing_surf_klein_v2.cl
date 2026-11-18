@@ -26,7 +26,7 @@ REAL4 AmazingSurfKleinV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		z.x = fabs(z.x);
 		if (fractal->transformCommon.functionEnabledCy) z.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int8Y;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -89,10 +89,10 @@ REAL4 AmazingSurfKleinV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 		REAL rr = dot(z, z);
 		REAL MinRR = fractal->transformCommon.minR0;
-		REAL dividend = rr < MinRR ? MinRR : min(rr, 1.0f);
+		REAL dividend = rr < MinRR ? MinRR : min(rr, 1.0);
 
 		// scale
-		REAL useScale = 1.0f;
+		REAL useScale = 1.0;
 		useScale = (aux->actualScaleA + fractal->transformCommon.scale1) / dividend;
 		z *= useScale;
 		aux->DE = aux->DE * fabs(useScale) + fractal->analyticDE.offset1;
@@ -116,7 +116,7 @@ REAL4 AmazingSurfKleinV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 		if (fractal->foldColor.auxColorEnabledFalse)
 		{
-			REAL colorAdd = 0.0f;
+			REAL colorAdd = 0.0;
 			if (zCol.x != oldZ.x)
 				colorAdd += fractal->foldColor.difs0000.x
 										* (fabs(zCol.x) - fractal->transformCommon.additionConstant111.x);

@@ -17,8 +17,8 @@
 
 REAL4 RiemannSphereMsltoeV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL theta = 0.0f;
-	REAL phi = 0.0f;
+	REAL theta = 0.0;
+	REAL phi = 0.0;
 	REAL rx;
 	REAL rz;
 	REAL r = aux->r;
@@ -29,24 +29,24 @@ REAL4 RiemannSphereMsltoeV2Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	// invert and scale
 	z *= fractal->transformCommon.scale08 / r;
 
-	// if (fabs(z.x) < 1e-21f) z.x = 1e-21f;
-	// if (fabs(z.z) < 1e-21f) z.z = 1e-21f;
+	// if (fabs(z.x) < 1e-21) z.x = 1e-21;
+	// if (fabs(z.z) < 1e-21) z.z = 1e-21;
 
-	rx = z.x / (z.y - 1.0f);
-	theta = 8.0f * atan2(2.0f * rx, rx * rx - 1.0f);
-	rz = z.z / (z.y - 1.0f);
-	phi = 8.0f * atan2(2.0f * rz, rz * rz - 1.0f);
+	rx = z.x / (z.y - 1.0);
+	theta = 8.0 * atan2(2.0 * rx, rx * rx - 1.0);
+	rz = z.z / (z.y - 1.0);
+	phi = 8.0 * atan2(2.0 * rz, rz * rz - 1.0);
 
 	theta *= fractal->transformCommon.scaleA1;
 	phi *= fractal->transformCommon.scaleB1;
 
-	rx = native_sin(theta) / (1.0f + native_cos(theta));
-	rz = native_sin(phi) / (1.0f + native_cos(phi));
+	rx = native_sin(theta) / (1.0 + native_cos(theta));
+	rz = native_sin(phi) / (1.0 + native_cos(phi));
 	REAL rXZ = rx * rx + rz * rz;
-	REAL d = 2.0f / (rXZ + 1.0f);
+	REAL d = 2.0 / (rXZ + 1.0);
 
 	REAL a1 = rx * d;
-	REAL b1 = (rXZ - 1.0f) * 0.5f * d;
+	REAL b1 = (rXZ - 1.0) * 0.5 * d;
 	REAL c1 = rz * d;
 
 	REAL rrrr = r * r * r * r;
@@ -59,7 +59,7 @@ REAL4 RiemannSphereMsltoeV2Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 
 	if (fractal->analyticDE.enabled)
 	{
-		aux->DE *= 8.0f * fractal->transformCommon.scale08 * length(z) / r;
+		aux->DE *= 8.0 * fractal->transformCommon.scale08 * length(z) / r;
 		aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 	}
 	return z;

@@ -27,7 +27,7 @@ REAL4 MandeltorusV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	REAL power1 = fractal->bulb.power;						// Longitude power, symmetry
 	REAL power2 = fractal->transformCommon.pwr8a; // Latitude power
 
-	REAL off1p5 = 1.0f;
+	REAL off1p5 = 1.0;
 
 	if (aux->i >= fractal->transformCommon.startIterationsE
 			&& aux->i < fractal->transformCommon.stopIterationsE)
@@ -59,7 +59,7 @@ REAL4 MandeltorusV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	else // mode 2
 	{
 		REAL tangle = atan2(native_sqrt(px * px + py * py), z.z) * power2;
-		REAL sintheta = (1.5f + native_cos(tangle)) * rh2;
+		REAL sintheta = (1.5 + native_cos(tangle)) * rh2;
 		z.x = sintheta * native_cos(phipow);
 		z.y = sintheta * native_sin(phipow);
 		z.z = native_sin(tangle) * rh1; // mode 2
@@ -72,7 +72,7 @@ REAL4 MandeltorusV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 
 	if (!fractal->analyticDE.enabledFalse)
 	{
-		aux->DE = temp * aux->DE + 1.0f;
+		aux->DE = temp * aux->DE + 1.0;
 	}
 	else
 	{

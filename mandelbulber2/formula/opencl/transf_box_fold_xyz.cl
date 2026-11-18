@@ -19,7 +19,7 @@ REAL4 TransfBoxFoldXYZIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	REAL4 oldZ = z;
 	REAL4 Value4 = fractal->transformCommon.additionConstant222;
 	if (fractal->transformCommon.functionEnabledFalse)
-		Value4 = 2.0f * fractal->transformCommon.additionConstant111;
+		Value4 = 2.0 * fractal->transformCommon.additionConstant111;
 
 	if (z.x > fractal->transformCommon.additionConstant111.x)
 	{

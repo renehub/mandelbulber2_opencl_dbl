@@ -30,14 +30,14 @@ REAL4 TransfAddCpixelSphereFoldIteration(REAL4 z, __global sFractalCl *fractal, 
 	}
 	// modes
 	if (fractal->transformCommon.functionEnabledBFalse && rr >= fractal->transformCommon.maxR2d1)
-		cv = cv * (1.0f - (fractal->transformCommon.maxR2d1 - rr) / rr);
+		cv = cv * (1.0 - (fractal->transformCommon.maxR2d1 - rr) / rr);
 
 	if (fractal->transformCommon.functionEnabledDFalse && rr >= fractal->transformCommon.maxR2d1)
 		cv = cv * fractal->transformCommon.maxR2d1;
 
 	if (fractal->transformCommon.functionEnabledCFalse && rr >= fractal->transformCommon.maxR2d1)
 	{
-		cv = cv * (1.0f - (rr - fractal->transformCommon.maxR2d1) / fractal->transformCommon.scale1);
+		cv = cv * (1.0 - (rr - fractal->transformCommon.maxR2d1) / fractal->transformCommon.scale1);
 	}
 
 	if (fractal->transformCommon.functionEnabledAFalse)

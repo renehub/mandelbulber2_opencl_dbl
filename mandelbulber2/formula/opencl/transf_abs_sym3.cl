@@ -97,7 +97,7 @@ REAL4 TransfAbsSym3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		// last two z lengths
 		if (fractal->foldColor.auxColorEnabledAFalse)
 		{
-			REAL lastVec = 0.0f;
+			REAL lastVec = 0.0;
 			REAL4 oldPt = aux->old_z;
 			REAL lastZ = length(oldPt); // aux->old_r;
 			REAL newZ = length(z);

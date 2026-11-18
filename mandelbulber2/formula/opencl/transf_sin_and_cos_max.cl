@@ -30,7 +30,7 @@ REAL4 TransfSinAndCosMaxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		sinCosZ.x = sinZ.x * cosZ.x * fractal->transformCommon.scaleC1;
 		maxZ.x = max(max(sinZ.x, cosZ.x), sinCosZ.x);
 
-		if (fractal->transformCommon.functionEnabledFalse) maxZ.x /= (fabs(oldZ.x) + 1.0f);
+		if (fractal->transformCommon.functionEnabledFalse) maxZ.x /= (fabs(oldZ.x) + 1.0);
 	}
 
 	if (fractal->transformCommon.functionEnabledAyFalse)
@@ -42,7 +42,7 @@ REAL4 TransfSinAndCosMaxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		sinCosZ.y = sinZ.y * cosZ.y * fractal->transformCommon.scaleC1;
 		maxZ.y = max(max(sinZ.y, cosZ.y), sinCosZ.y);
 
-		if (fractal->transformCommon.functionEnabledFalse) maxZ.y /= (fabs(oldZ.y) + 1.0f);
+		if (fractal->transformCommon.functionEnabledFalse) maxZ.y /= (fabs(oldZ.y) + 1.0);
 	}
 
 	if (fractal->transformCommon.functionEnabledAzFalse)
@@ -54,7 +54,7 @@ REAL4 TransfSinAndCosMaxIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		sinCosZ.z = sinZ.z * cosZ.z * fractal->transformCommon.scaleC1;
 		maxZ.z = max(max(sinZ.z, cosZ.z), sinCosZ.z);
 
-		if (fractal->transformCommon.functionEnabledFalse) maxZ.z /= (fabs(oldZ.z) + 1.0f);
+		if (fractal->transformCommon.functionEnabledFalse) maxZ.z /= (fabs(oldZ.z) + 1.0);
 	}
 
 	// post scale

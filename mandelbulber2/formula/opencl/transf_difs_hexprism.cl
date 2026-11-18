@@ -42,9 +42,9 @@ REAL4 TransfDIFSHexprismIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		zc = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, zc);
 	}
 
-	REAL4 k = (REAL4){-SQRT_3_4_F, 0.5f, SQRT_1_3_F, 0.0f};
+	REAL4 k = (REAL4){-SQRT_3_4_F, 0.5, SQRT_1_3_F, 0.0};
 
-	REAL tp = 2.0f * min(k.x * zc.x + k.y * zc.y, 0.0f);
+	REAL tp = 2.0 * min(k.x * zc.x + k.y * zc.y, 0.0);
 	zc.x -= tp * k.x;
 	zc.y -= tp * k.y;
 
@@ -55,7 +55,7 @@ REAL4 TransfDIFSHexprismIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	dx = tp * sign(zc.y - lenX) + fractal->transformCommon.offsetB0;
 	dy = zc.z - lenY + fractal->transformCommon.offsetB0;
 	tp = dx;
-	REAL colIn = 0.0f;
+	REAL colIn = 0.0;
 	if (fractal->transformCommon.functionEnabledDFalse)
 	{
 		colIn = dx + fractal->transformCommon.offset0;
@@ -64,11 +64,11 @@ REAL4 TransfDIFSHexprismIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		if (fractal->transformCommon.functionEnabledBFalse) dx = max(dx, tp);
 	}
 
-	REAL maxdx = max(dx, 0.0f);
-	REAL maxdy = max(dy, 0.0f);
+	REAL maxdx = max(dx, 0.0);
+	REAL maxdy = max(dy, 0.0);
 
 	tp = native_sqrt(maxdx * maxdx + maxdy * maxdy);
-	aux->DE0 = min(max(dx, dy), 0.0f) + tp;
+	aux->DE0 = min(max(dx, dy), 0.0) + tp;
 
 	REAL colDist = aux->dist;
 	aux->dist = min(aux->dist,

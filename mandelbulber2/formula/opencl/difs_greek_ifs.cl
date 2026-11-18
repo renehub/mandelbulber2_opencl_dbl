@@ -52,7 +52,7 @@ REAL4 DIFSGreekIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 
 	REAL4 zc = z;
 
-	if (zc.x > 0.0f) zc.y += fractal->transformCommon.offsetA0;
+	if (zc.x > 0.0) zc.y += fractal->transformCommon.offsetA0;
 
 	if (!fractal->transformCommon.functionEnabledMFalse
 			&& aux->i >= fractal->transformCommon.startIterationsM
@@ -89,7 +89,7 @@ REAL4 DIFSGreekIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	if (fractal->transformCommon.functionEnabledCx) t = max(t, fabs(zc.z));
 	if (fractal->transformCommon.functionEnabledDFalse) t = native_sqrt(t * t + zc.z * zc.z);
 	if (fractal->transformCommon.functionEnabledEFalse)
-		t = max(fabs(t) * SQRT_3_4_F + zc.z * 0.5f, -zc.z);
+		t = max(fabs(t) * SQRT_3_4_F + zc.z * 0.5, -zc.z);
 	if (fractal->transformCommon.functionEnabledFFalse)
 	{
 		REAL zA = zc.z;
@@ -106,7 +106,7 @@ REAL4 DIFSGreekIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 		if (fractal->transformCommon.functionEnabledCzFalse)
 			zB = -zB + fractal->transformCommon.offsetC0;
 
-		t = max(fabs(t) * SQRT_3_4_F + zA * 0.5f, zB);
+		t = max(fabs(t) * SQRT_3_4_F + zA * 0.5, zB);
 	}
 
 	t -= fractal->transformCommon.offset02;
@@ -119,13 +119,13 @@ REAL4 DIFSGreekIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	}
 
 	// plane
-	REAL g = 0.0f;
+	REAL g = 0.0;
 	if (fractal->transformCommon.functionEnabledRFalse)
 	{
 		g =
 			fabs(aux->const_c.z - fractal->transformCommon.offsetR0) - fractal->transformCommon.offsetE0;
 		t = min(g, t);
-		if (t == g) g = 1.0f;
+		if (t == g) g = 1.0;
 	}
 
 	if (fractal->transformCommon.functionEnabledSFalse) // clip
@@ -141,7 +141,7 @@ REAL4 DIFSGreekIfsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		if (colDist != aux->dist) colorAdd += fractal->foldColor.difs0000.x;
 
 		if (fractal->foldColor.auxColorEnabledAFalse)

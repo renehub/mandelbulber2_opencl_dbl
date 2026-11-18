@@ -17,7 +17,7 @@
 
 REAL4 TransfBlockifyV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL master = fractal->transformCommon.scale / 100.0f;
+	REAL master = fractal->transformCommon.scale / 100.0;
 	REAL4 bSize = fractal->transformCommon.constantMultiplier111 * master;
 	if (!fractal->transformCommon.functionEnabledFalse)
 	{
@@ -26,23 +26,23 @@ REAL4 TransfBlockifyV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			if (fractal->transformCommon.functionEnabledCx)
 			{
 				if (!fractal->transformCommon.functionEnabledAxFalse)
-					z.x = (floor(z.x / bSize.x) + 0.5f) * bSize.x;
+					z.x = (floor(z.x / bSize.x) + 0.5) * bSize.x;
 				else
-					z.x = floor(z.x / bSize.x + 0.5f) * bSize.x;
+					z.x = floor(z.x / bSize.x + 0.5) * bSize.x;
 			}
 			if (fractal->transformCommon.functionEnabledCy)
 			{
 				if (!fractal->transformCommon.functionEnabledAyFalse)
-					z.y = (floor(z.y / bSize.y) + 0.5f) * bSize.y;
+					z.y = (floor(z.y / bSize.y) + 0.5) * bSize.y;
 				else
-					z.y = floor(z.y / bSize.y + 0.5f) * bSize.y;
+					z.y = floor(z.y / bSize.y + 0.5) * bSize.y;
 			}
 			if (fractal->transformCommon.functionEnabledCz)
 			{
 				if (!fractal->transformCommon.functionEnabledAzFalse)
-					z.z = (floor(z.z / bSize.z) + 0.5f) * bSize.z;
+					z.z = (floor(z.z / bSize.z) + 0.5) * bSize.z;
 				else
-					z.z = floor(z.z / bSize.z + 0.5f) * bSize.z;
+					z.z = floor(z.z / bSize.z + 0.5) * bSize.z;
 			}
 		}
 		else // normalize
@@ -52,23 +52,23 @@ REAL4 TransfBlockifyV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			if (fractal->transformCommon.functionEnabledCx)
 			{
 				if (!fractal->transformCommon.functionEnabledAxFalse)
-					z.x = (floor(z.x / bSize.x) + 0.5f) * bSize.x;
+					z.x = (floor(z.x / bSize.x) + 0.5) * bSize.x;
 				else
-					z.x = floor(z.x / bSize.x + 0.5f) * bSize.x;
+					z.x = floor(z.x / bSize.x + 0.5) * bSize.x;
 			}
 			if (fractal->transformCommon.functionEnabledCy)
 			{
 				if (!fractal->transformCommon.functionEnabledAyFalse)
-					z.y = (floor(z.y / bSize.y) + 0.5f) * bSize.y;
+					z.y = (floor(z.y / bSize.y) + 0.5) * bSize.y;
 				else
-					z.y = floor(z.y / bSize.y + 0.5f) * bSize.y;
+					z.y = floor(z.y / bSize.y + 0.5) * bSize.y;
 			}
 			if (fractal->transformCommon.functionEnabledCz)
 			{
 				if (!fractal->transformCommon.functionEnabledAzFalse)
-					z.z = (floor(z.z / bSize.z) + 0.5f) * bSize.z;
+					z.z = (floor(z.z / bSize.z) + 0.5) * bSize.z;
 				else
-					z.z = floor(z.z / bSize.z + 0.5f) * bSize.z;
+					z.z = floor(z.z / bSize.z + 0.5) * bSize.z;
 			}
 			z *= rNorm;
 		}
@@ -99,7 +99,7 @@ REAL4 TransfBlockifyV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	z *= fractal->transformCommon.scale1;
 	aux->DE = aux->DE * fractal->transformCommon.scale1 * fractal->analyticDE.scale1
 						+ fractal->analyticDE.offset0;
-	// aux->DE = aux->DE - 0.001f;
+	// aux->DE = aux->DE - 0.001;
 	// aux->DE *= length(z) / length(oldZ);
 	return z;
 }

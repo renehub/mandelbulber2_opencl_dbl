@@ -30,11 +30,11 @@ REAL4 TransfDELinearCubeIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	}
 	else // mix
 	{
-		R = max(max(fabs(z.x), fabs(z.y)), fabs(z.z)) * (1.0f - fractal->transformCommon.scaleA0)
+		R = max(max(fabs(z.x), fabs(z.y)), fabs(z.z)) * (1.0 - fractal->transformCommon.scaleA0)
 				+ length(z) * fractal->transformCommon.scaleA0;
 	}
 	aux->dist =
-		(fractal->transformCommon.scale1 * R / aux->DE) - fractal->transformCommon.offset0 / 100.0f;
+		(fractal->transformCommon.scale1 * R / aux->DE) - fractal->transformCommon.offset0 / 100.0;
 
 	// aux->color
 	if (fractal->foldColor.auxColorEnabledFalse)

@@ -21,7 +21,7 @@
 REAL4 AboxMod15Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
@@ -86,8 +86,8 @@ REAL4 AboxMod15Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		z += fractal->transformCommon.offsetA000;
 
 	// spherical fold
-	REAL rrCol = 0.0f;
-	REAL m = 1.0f;
+	REAL rrCol = 0.0;
+	REAL m = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
@@ -105,7 +105,7 @@ REAL4 AboxMod15Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	if (aux->i >= fractal->transformCommon.startIterationsE
 			&& aux->i < fractal->transformCommon.stopIterationsE)
 	{
-		REAL useScale = 1.0f;
+		REAL useScale = 1.0;
 
 		useScale = (aux->actualScaleA + fractal->transformCommon.scale2);
 		z *= useScale;
@@ -172,8 +172,8 @@ REAL4 AboxMod15Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 		t = z.x;
 		z.x = z.x + z.y;
 		z.y = t - z.y;
-		z.x *= 0.5f;
-		z.y *= 0.5f;
+		z.x *= 0.5;
+		z.y *= 0.5;
 		if (fractal->transformCommon.functionEnabledAx
 				&& aux->i >= fractal->transformCommon.startIterationsD
 				&& aux->i < fractal->transformCommon.stopIterationsD)
@@ -190,14 +190,14 @@ REAL4 AboxMod15Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 				&& aux->i < fractal->foldColor.stopIterationsA)
 		{
 			zCol = fabs(zCol - oldZ);
-			if (zCol.x > 0.0f) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
-			if (zCol.y > 0.0f) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
-			if (zCol.z > 0.0f) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
+			if (zCol.x > 0.0) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
+			if (zCol.y > 0.0) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
+			if (zCol.z > 0.0) colorAdd += fractal->foldColor.difs0000.z * zCol.z;
 		}
 
 		if (rrCol > fractal->transformCommon.maxR2d1)
 			colorAdd +=
-				fractal->foldColor.difs0000.w * (rrCol - fractal->transformCommon.maxR2d1) / 100.0f;
+				fractal->foldColor.difs0000.w * (rrCol - fractal->transformCommon.maxR2d1) / 100.0;
 
 		colorAdd += fractal->mandelbox.color.factorSp1 * m;
 

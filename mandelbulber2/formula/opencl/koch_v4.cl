@@ -46,7 +46,7 @@ REAL4 KochV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		{
 			zc.x = fabs(zc.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(zc.y, zc.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(zc.y, zc.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(zc.x * zc.x + zc.y * zc.y);
 			zc.x = native_cos(psi) * len;
 			zc.y = native_sin(psi) * len;
@@ -86,7 +86,7 @@ REAL4 KochV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	zc.x += FRAC_1_3_F;
 
 	REAL4 Offset = fractal->transformCommon.offset100;
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	useScale = (aux->actualScaleA + fractal->transformCommon.scale3);
 	if (fractal->transformCommon.functionEnabledKFalse)
 	{
@@ -114,7 +114,7 @@ REAL4 KochV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	REAL a = fractal->transformCommon.offsetA0;
 	if (!fractal->transformCommon.functionEnabledFFalse)
 	{
-		REAL4 b = fabs(zc) - (REAL4){a, a, a, 0.0f};
+		REAL4 b = fabs(zc) - (REAL4){a, a, a, 0.0};
 		d = max(b.x, max(b.y, b.z));
 	}
 	else
@@ -133,7 +133,7 @@ REAL4 KochV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	REAL e = fractal->transformCommon.offset2;
 	if (!fractal->transformCommon.functionEnabledEFalse)
 	{
-		REAL4 f = fabs(c) - (REAL4){e, e, e, 0.0f};
+		REAL4 f = fabs(c) - (REAL4){e, e, e, 0.0};
 		if (!fractal->transformCommon.functionEnabledIFalse)
 			e = max(f.x, f.y); // sq
 		else
@@ -142,9 +142,9 @@ REAL4 KochV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	else
 	{
 		if (!fractal->transformCommon.functionEnabledIFalse)
-			e = clamp(native_sqrt(c.x * c.x + c.y * c.y) - e, 0.0f, 100.0f); // circle
+			e = clamp(native_sqrt(c.x * c.x + c.y * c.y) - e, 0.0, 100.0); // circle
 		else
-			e = clamp(length(c) - e, 0.0f, 100.0f); // sphere
+			e = clamp(length(c) - e, 0.0, 100.0); // sphere
 	}
 
 	d = max(g, e) / aux->DE;
@@ -156,7 +156,7 @@ REAL4 KochV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL addColor = 0.0f;
+		REAL addColor = 0.0;
 		if (aux->dist == d)
 			aux->color = fractal->foldColor.difs0000.x;
 

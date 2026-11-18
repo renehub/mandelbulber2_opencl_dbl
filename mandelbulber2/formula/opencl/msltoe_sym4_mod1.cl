@@ -52,7 +52,7 @@ REAL4 MsltoeSym4Mod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	}
 
 	REAL4 c = aux->const_c;
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	REAL psi = fractal->transformCommon.int8Y;
 	if (fractal->transformCommon.functionEnabledBFalse
@@ -62,18 +62,18 @@ REAL4 MsltoeSym4Mod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		psi += fractal->transformCommon.int1;
 	}
 	psi = M_PI_F / psi;
-	psi = fabs(fmod(atan2(z.z, z.y) + M_PI_F + psi, 2.0f * psi) - psi);
+	psi = fabs(fmod(atan2(z.z, z.y) + M_PI_F + psi, 2.0 * psi) - psi);
 	REAL len = native_sqrt(z.y * z.y + z.z * z.z);
 	z.y = native_cos(psi) * len;
 	z.z = native_sin(psi) * len;
 
 	REAL4 z2 = z * z;
 	REAL rr = z2.x + z2.y + z2.z;
-	REAL m = 1.0f - z2.z / rr;
+	REAL m = 1.0 - z2.z / rr;
 	REAL4 temp;
 	temp.x = (z2.x - z2.y) * m * fractal->transformCommon.scaleB1;
-	temp.y = 2.0f * z.x * z.y * m * fractal->transformCommon.scale; // scaling y;
-	temp.z = 2.0f * z.z * native_sqrt(z2.x + z2.y);
+	temp.y = 2.0 * z.x * z.y * m * fractal->transformCommon.scale; // scaling y;
+	temp.z = 2.0 * z.z * native_sqrt(z2.x + z2.y);
 	temp.w = z.w;
 	z = temp + fractal->transformCommon.additionConstantNeg100;
 
@@ -92,7 +92,7 @@ REAL4 MsltoeSym4Mod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		z.z += sign(z.z) * tempFAB.z;
 	}
 	REAL lengthTempZ = -length(z);
-	z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+	z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 	z *= fractal->transformCommon.scale1;
 	aux->DE *= fabs(fractal->transformCommon.scale1);
 
@@ -102,10 +102,10 @@ REAL4 MsltoeSym4Mod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	if (fractal->transformCommon.functionEnabledOFalse)
 	{
 		aux->DE0 = length(z);
-		if (aux->DE0 > 1.0f)
-			aux->DE0 = 0.5f * log(aux->DE0) * aux->DE0 / aux->DE;
+		if (aux->DE0 > 1.0)
+			aux->DE0 = 0.5 * log(aux->DE0) * aux->DE0 / aux->DE;
 		else
-			aux->DE0 = 0.0f;
+			aux->DE0 = 0.0;
 		if (!fractal->transformCommon.functionEnabledYFalse)
 			aux->dist = aux->DE0;
 		else

@@ -27,22 +27,22 @@ REAL4 MandelbulbQuadratIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 	if (fractal->transformCommon.functionEnabled)
 	{
-		aux->DE = aux->DE * 2.0f * length(z) + 1.0f;
-		REAL temp = 0.0f;
+		aux->DE = aux->DE * 2.0 * length(z) + 1.0;
+		REAL temp = 0.0;
 		if (fractal->transformCommon.functionEnabledDFalse
 				&& aux->i >= fractal->transformCommon.startIterationsD
 				&& aux->i < fractal->transformCommon.stopIterationsD1)
 			temp = fractal->transformCommon.offset0;
 
 		temp = z.x * z.x + z.y * z.y + temp;
-		if (temp == 0.0f)
+		if (temp == 0.0)
 			z = aux->const_c;
-		else if (temp < 0.0f)
-			z = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		else if (temp < 0.0)
+			z = (REAL4){0.0, 0.0, 0.0, 0.0};
 		else
 		{
 			REAL4 Mul = fractal->transformCommon.constantMultiplier122;
-			Mul.w = 0.0f;
+			Mul.w = 0.0;
 			REAL ZR = fractal->transformCommon.offset1;
 			Mul.z = -Mul.z * z.z * native_sqrt(temp);
 			temp = ZR - z.z * z.z / temp;
@@ -57,23 +57,23 @@ REAL4 MandelbulbQuadratIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 	if (fractal->transformCommon.functionEnabledFalse)
 	{
-		aux->DE = aux->DE * 2.0f * length(z) + 1.0f;
+		aux->DE = aux->DE * 2.0 * length(z) + 1.0;
 
-		REAL temp = 0.0f;
+		REAL temp = 0.0;
 		if (fractal->transformCommon.functionEnabledTFalse
 				&& aux->i >= fractal->transformCommon.startIterationsT
 				&& aux->i < fractal->transformCommon.stopIterationsT1)
 			temp = fractal->transformCommon.offsetA0;
 
 		temp = z.z * z.z + z.y * z.y + temp;
-		if (temp == 0.0f)
+		if (temp == 0.0)
 			z = aux->const_c;
-		else if (temp < 0.0f)
-			z = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		else if (temp < 0.0)
+			z = (REAL4){0.0, 0.0, 0.0, 0.0};
 		else
 		{
 			REAL4 Mul = fractal->transformCommon.constantMultiplier221;
-			Mul.w = 0.0f;
+			Mul.w = 0.0;
 			REAL ZR = fractal->transformCommon.offsetA1;
 			Mul.x = -Mul.x * z.x * native_sqrt(temp);
 			temp = ZR - z.x * z.x / temp;

@@ -22,7 +22,7 @@
 REAL4 AboxMod12Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	// tglad fold
 	REAL4 oldZ = z;
 	if (aux->i >= fractal->transformCommon.startIterationsA
@@ -49,9 +49,9 @@ REAL4 AboxMod12Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
 		REAL4 limit = fractal->transformCommon.additionConstant111;
-		REAL4 length = 2.0f * limit;
-		REAL4 tgladS = 1.0f / length;
-		REAL4 Add = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 length = 2.0 * limit;
+		REAL4 tgladS = 1.0 / length;
+		REAL4 Add = (REAL4){0.0, 0.0, 0.0, 0.0};
 		if (fabs(z.x) < limit.x) Add.x = z.x * z.x * tgladS.x;
 		if (fabs(z.y) < limit.y) Add.y = z.y * z.y * tgladS.y;
 		if (fabs(z.z) < limit.z) Add.z = z.z * z.z * tgladS.z;
@@ -76,8 +76,8 @@ REAL4 AboxMod12Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		REAL minR2 = fractal->transformCommon.minR2p25;
-		REAL addR = 0.0f;
-		REAL m = 1.0f;
+		REAL addR = 0.0;
+		REAL m = 1.0;
 		oldZ = z;
 
 		// spherical fold with xyz bias option
@@ -200,7 +200,7 @@ REAL4 AboxMod12Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	{
 		useScale += aux->actualScaleA;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 
 		// update actualScale for next iteration
 		REAL vary = fractal->transformCommon.scaleVary0
@@ -213,7 +213,7 @@ REAL4 AboxMod12Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	else
 	{
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 	}
 
 	// offset

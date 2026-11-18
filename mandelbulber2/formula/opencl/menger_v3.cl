@@ -30,7 +30,7 @@ REAL4 MengerV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			t = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * t;
 			z.y = native_sin(psi) * t;
@@ -59,15 +59,15 @@ REAL4 MengerV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 			&& aux->i < fractal->transformCommon.stopIterations1)
 	{
 		int k = 0;
-		REAL e = 0.0f;
-		REAL rr = 0.0f;
-		REAL4 one = (REAL4){1.0f, 1.0f, 1.0f, 0.0f};
+		REAL e = 0.0;
+		REAL rr = 0.0;
+		REAL4 one = (REAL4){1.0, 1.0, 1.0, 0.0};
 
 		zc += one;
 		REAL modOff = fractal->transformCommon.offset3;
 		aux->DE += fractal->analyticDE.offset0;
 		int count = fractal->transformCommon.int8X;
-		for (k = 0; k < count && rr < 10.0f; k++)
+		for (k = 0; k < count && rr < 10.0; k++)
 		{
 			zc += fractal->transformCommon.offset000;
 			if (fractal->transformCommon.functionEnabledRFalse
@@ -78,7 +78,7 @@ REAL4 MengerV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 				zc += fractal->transformCommon.offsetA000;
 			}
 
-			t = 0.5f * modOff;
+			t = 0.5 * modOff;
 			REAL4 pp = z;
 			pp.x = fmod(zc.x * aux->DE, modOff) - t;
 			pp.y = fmod(zc.y * aux->DE, modOff) - t;
@@ -97,7 +97,7 @@ REAL4 MengerV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 				e = length(z);
 			else
 				e = length(zc);
-			e = clamp(e - fractal->transformCommon.offset2, 0.0f, 100.0f);
+			e = clamp(e - fractal->transformCommon.offset2, 0.0, 100.0);
 			t = max(aux->DE0, e);
 		}
 		else
@@ -113,7 +113,7 @@ REAL4 MengerV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 
 		if (fractal->foldColor.auxColorEnabledFalse)
 		{
-			REAL colorAdd = 0.0f;
+			REAL colorAdd = 0.0;
 			if (colDist != aux->dist) colorAdd = fractal->foldColor.difs0000.x;
 			if (t <= e) colorAdd = fractal->foldColor.difs0000.y;
 

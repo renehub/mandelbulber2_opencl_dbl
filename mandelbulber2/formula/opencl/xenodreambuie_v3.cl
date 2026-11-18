@@ -53,14 +53,14 @@ REAL4 XenodreambuieV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			&& aux->i >= fractal->transformCommon.startIterationsX
 			&& aux->i < fractal->transformCommon.stopIterationsX)
 	{
-		if (native_cos(th) < 0.0f) ph = ph + M_PI_F;
+		if (native_cos(th) < 0.0) ph = ph + M_PI_F;
 	}
 
 	if (fractal->transformCommon.functionEnabledYFalse
 			&& aux->i >= fractal->transformCommon.startIterationsY
 			&& aux->i < fractal->transformCommon.stopIterationsY)
 	{
-		if (fabs(t) > 0.5f * M_PI_F) t = sign(t) * M_PI_F - t;
+		if (fabs(t) > 0.5 * M_PI_F) t = sign(t) * M_PI_F - t;
 		th = t * fractal->bulb.power * fractal->transformCommon.scaleA1;
 	}
 
@@ -118,13 +118,13 @@ REAL4 XenodreambuieV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	{
 		aux->DE0 = length(z);
 
-		if (aux->DE0 > 1.0f)
+		if (aux->DE0 > 1.0)
 		{
-			aux->DE0 = 0.5f * log(aux->DE0) * aux->DE0 / (aux->DE);
+			aux->DE0 = 0.5 * log(aux->DE0) * aux->DE0 / (aux->DE);
 		}
 		else
 		{
-			aux->DE0 = 0.0f; // 0.01f artifacts in openCL
+			aux->DE0 = 0.0; // 0.01 artifacts in openCL
 		}
 		aux->dist = aux->DE0;
 	}

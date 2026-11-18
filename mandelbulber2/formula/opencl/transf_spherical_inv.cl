@@ -19,10 +19,10 @@
 REAL4 TransfSphericalInvIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 oldZ = z;
-	REAL rr = 1.0f;
+	REAL rr = 1.0;
 	z += fractal->mandelbox.offset;
 	z *= fractal->transformCommon.scale;
-	aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0f;
+	aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0;
 
 	if (!fractal->transformCommon.functionEnabledyFalse)
 		rr = dot(z, z);
@@ -32,7 +32,7 @@ REAL4 TransfSphericalInvIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 
 	if (!fractal->transformCommon.functionEnabledzFalse)
 	{
-		mde = 1.0f / mde;
+		mde = 1.0 / mde;
 		z *= mde;
 		aux->DE *= mde;
 	}
@@ -49,9 +49,9 @@ REAL4 TransfSphericalInvIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			}
 			if (fractal->transformCommon.functionEnabledxFalse) // Mode 2
 			{
-				if (rr < fractal->transformCommon.minR0) mode = 2.0f * fractal->transformCommon.minR0 - rr;
+				if (rr < fractal->transformCommon.minR0) mode = 2.0 * fractal->transformCommon.minR0 - rr;
 			}
-			mode = 1.0f / mode;
+			mode = 1.0 / mode;
 			z *= mode;
 			aux->DE *= fabs(mode);
 		}
@@ -69,7 +69,7 @@ REAL4 TransfSphericalInvIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL addCol = 0.0f;
+		REAL addCol = 0.0;
 		addCol += fractal->foldColor.difs0000.x * mde;
 		if (rr > fractal->mandelbox.foldingSphericalFixed) addCol += fractal->foldColor.difs0000.y;
 		if (rr < fractal->transformCommon.minR0) addCol += fractal->foldColor.difs0000.z;

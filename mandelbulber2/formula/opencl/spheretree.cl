@@ -18,55 +18,55 @@ REAL4 SpheretreeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 {
 	REAL Dd;
 	if (!fractal->transformCommon.functionEnabledByFalse)
-		Dd = 1.0f;
+		Dd = 1.0;
 	else
 		Dd = aux->DE;
-	REAL4 ColV = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 ColV = (REAL4){0.0, 0.0, 0.0, 0.0};
 	REAL4 oldZ = z;
 	REAL t = fractal->transformCommon.minR06;
-	REAL4 t1 = (REAL4){SQRT_3_4_F, -0.5f, 0.0f, 0.0f};
-	REAL4 t2 = (REAL4){-SQRT_3_4_F, -0.5f, 0.0f, 0.0f};
-	REAL4 n1 = (REAL4){-0.5f, -SQRT_3_4_F, 0.0f, 0.0f};
-	REAL4 n2 = (REAL4){-0.5f, SQRT_3_4_F, 0.0f, 0.0f};
-	REAL innerScale = SQRT_3_F / (1.0f + SQRT_3_F);
-	REAL innerScaleB = innerScale * innerScale * 0.25f;
+	REAL4 t1 = (REAL4){SQRT_3_4_F, -0.5, 0.0, 0.0};
+	REAL4 t2 = (REAL4){-SQRT_3_4_F, -0.5, 0.0, 0.0};
+	REAL4 n1 = (REAL4){-0.5, -SQRT_3_4_F, 0.0, 0.0};
+	REAL4 n2 = (REAL4){-0.5, SQRT_3_4_F, 0.0, 0.0};
+	REAL innerScale = SQRT_3_F / (1.0 + SQRT_3_F);
+	REAL innerScaleB = innerScale * innerScale * 0.25;
 
-	// for (int i = 0; i < fractal->transformCommon.int8X && dot(z, z) < 0.5f; i++)
+	// for (int i = 0; i < fractal->transformCommon.int8X && dot(z, z) < 0.5; i++)
 	for (int n = 0; n < fractal->transformCommon.int8X; n++)
 	{
 		if (!fractal->transformCommon.functionEnabledBxFalse)
 		{
-			REAL4 zB = z - (REAL4){0.0f, 0.0f, innerScale * 0.5f, 0.0f};
+			REAL4 zB = z - (REAL4){0.0, 0.0, innerScale * 0.5, 0.0};
 			if (dot(zB, zB) < innerScaleB) break; // definitely inside
 		}
 
-		REAL maxH = 0.4f * fractal->transformCommon.scaleG1;
-		if (n == 0) maxH = -100.0f;
+		REAL maxH = 0.4 * fractal->transformCommon.scaleG1;
+		if (n == 0) maxH = -100.0;
 
-		REAL4 zC = z - (REAL4){0.0f, 0.0f, t, 0.0f};
+		REAL4 zC = z - (REAL4){0.0, 0.0, t, 0.0};
 		if (z.z > maxH && dot(zC, zC) > t * t) break; // definitely outside
 
-		REAL4 zD = z - (REAL4){0.0f, 0.0f, 0.5f, 0.0f};
+		REAL4 zD = z - (REAL4){0.0, 0.0, 0.5, 0.0};
 		REAL invSC = fractal->transformCommon.scaleF1 / dot(z, z);
 
-		if (z.z < maxH && dot(zD, zD) > 0.25f)
+		if (z.z < maxH && dot(zD, zD) > 0.25)
 		{
 			// needs a sphere inverse
 			Dd *= invSC;
 			z *= invSC;
-			ColV.x += 1.0f;
+			ColV.x += 1.0;
 		}
 		else
 		{
 			// stretch onto a plane at zero
-			ColV.y += 1.0f;
+			ColV.y += 1.0;
 			Dd *= invSC;
 			z *= invSC;
-			z.z -= 1.0f;
-			z.z *= -1.0f;
+			z.z -= 1.0;
+			z.z *= -1.0;
 			z *= SQRT_3_F;
 			Dd *= SQRT_3_F;
-			z.z += 1.0f;
+			z.z += 1.0;
 
 			// and rotate it a twelfth of a revolution pi/6
 			REAL a = M_PI_F / fractal->transformCommon.scale6;
@@ -78,18 +78,18 @@ REAL4 SpheretreeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 			z.y = yy;
 		}
 
-		// now modolu the space so we move to being in just the central hexagon, inner radius 0.5f
+		// now modolu the space so we move to being in just the central hexagon, inner radius 0.5
 		REAL h = z.z * fractal->transformCommon.scaleE1;
-		REAL x = dot(z, -1.0f * n2) * fractal->transformCommon.scaleA2 / SQRT_3_F;
-		REAL y = dot(z, -1.0f * n1) * fractal->transformCommon.scaleA2 / SQRT_3_F;
+		REAL x = dot(z, -1.0 * n2) * fractal->transformCommon.scaleA2 / SQRT_3_F;
+		REAL y = dot(z, -1.0 * n1) * fractal->transformCommon.scaleA2 / SQRT_3_F;
 		x = x - floor(x);
 		y = y - floor(y);
 
-		if (x + y > 1.0f)
+		if (x + y > 1.0)
 		{
-			x = 1.0f - x;
-			y = 1.0f - y;
-			ColV.z += 1.0f;
+			x = 1.0 - x;
+			y = 1.0 - y;
+			ColV.z += 1.0;
 		}
 
 		z = x * t1 - y * t2;
@@ -102,11 +102,11 @@ REAL4 SpheretreeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 
 		if (l1 < l0 && l1 < l2)
 		{
-			z -= t1 * (2.0f * dot(z, t1) - 1.0f);
+			z -= t1 * (2.0 * dot(z, t1) - 1.0);
 		}
 		else if (l2 < l0 && l2 < l1)
 		{
-			z -= t2 * (2.0f * dot(z, t2) + 1.0f);
+			z -= t2 * (2.0 * dot(z, t2) + 1.0);
 		}
 		z.z = h;
 		z *= fractal->transformCommon.scaleD1;
@@ -115,11 +115,11 @@ REAL4 SpheretreeIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	}
 	// aux->DE
 	aux->DE = Dd;
-	REAL4 len = z - (REAL4){0.0f, 0.0f, 0.5f, 0.0f};
-	REAL d = (length(len) - 0.5f);
-	// d = (native_sqrt(d + 1.0f) - 1.0f) * 2.0f;
+	REAL4 len = z - (REAL4){0.0, 0.0, 0.5, 0.0};
+	REAL d = (length(len) - 0.5);
+	// d = (native_sqrt(d + 1.0) - 1.0) * 2.0;
 	ColV.w = d;
-	d /= fractal->analyticDE.scale1 * 2.22f * aux->DE;
+	d /= fractal->analyticDE.scale1 * 2.22 * aux->DE;
 
 	if (!fractal->transformCommon.functionEnabledXFalse)
 		aux->dist = min(aux->dist, d);

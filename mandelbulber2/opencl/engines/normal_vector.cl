@@ -32,80 +32,80 @@
  * Normal vector calculation for opencl
  */
 
-float3 NormalVector(__constant sClInConstants *consts, sRenderData *renderData, float3 point,
-	float mainDistance, float distThresh, float invertMode, sClCalcParams *calcParam)
+REAL3 NormalVector(__constant sClInConstants *consts, sRenderData *renderData, REAL3 point,
+	REAL mainDistance, REAL distThresh, REAL invertMode, sClCalcParams *calcParam)
 {
 #ifndef SLOW_SHADING
-	float delta = distThresh * consts->params.smoothness;
+	REAL delta = distThresh * consts->params.smoothness;
 #ifdef INTERIOR_MODE
-	delta = calcParam->distThresh * 0.2f * consts->params.smoothness;
+	delta = calcParam->distThresh * 0.2 * consts->params.smoothness;
 #endif
 
 	calcParam->distThresh = distThresh;
 	calcParam->detailSize = distThresh;
 	calcParam->normalCalculationMode = true;
 
-	float3 deltas[6];
-	deltas[0] = (float3){delta, 0.0f, 0.0f};
-	deltas[1] = (float3){-delta, 0.0f, 0.0f};
-	deltas[2] = (float3){0.0f, delta, 0.0f};
-	deltas[3] = (float3){0.0f, -delta, 0.0f};
-	deltas[4] = (float3){0.0f, 0.0f, delta};
-	deltas[5] = (float3){0.0f, 0.0f, -delta};
+	REAL3 deltas[6];
+	deltas[0] = (REAL3){delta, 0.0, 0.0};
+	deltas[1] = (REAL3){-delta, 0.0, 0.0};
+	deltas[2] = (REAL3){0.0, delta, 0.0};
+	deltas[3] = (REAL3){0.0, -delta, 0.0};
+	deltas[4] = (REAL3){0.0, 0.0, delta};
+	deltas[5] = (REAL3){0.0, 0.0, -delta};
 
-	float s[6];
+	REAL s[6];
 	for (int i = 0; i < 6; i++)
 	{
 		s[i] = CalculateDistance(consts, point + deltas[i], calcParam, renderData).distance;
 	}
 
-	float3 normal = (float3){s[0] - s[1], s[2] - s[3], s[4] - s[5]};
+	REAL3 normal = (REAL3){s[0] - s[1], s[2] - s[3], s[4] - s[5]};
 	normal = normalize(normal);
 	calcParam->normalCalculationMode = false;
 
-	if (invertMode) normal *= -1.0f;
+	if (invertMode) normal *= -1.0;
 
 	return normal;
 #else
 
 	// calculating normal vector based on average value of binary central difference
 
-	float3 point2;
-	float3 point3;
+	REAL3 point2;
+	REAL3 point3;
 
-	float delta = calcParam->detailSize * consts->params.smoothness;
+	REAL delta = calcParam->detailSize * consts->params.smoothness;
 #ifdef INTERIOR_MODE
-	delta = calcParam->distThresh * 0.2f * consts->params.smoothness;
+	delta = calcParam->distThresh * 0.2 * consts->params.smoothness;
 #endif
 
 	formulaOut out;
-	out.z = (float4)(0.0f, 0.0f, 0.0f, 0.0f);
+	out.z = (REAL4)(0.0, 0.0, 0.0, 0.0);
 	out.iters = 0;
-	out.distance = 0.0f;
-	out.colorIndex = 0.0f;
-	out.orbitTrapR = 0.0f;
+	out.distance = 0.0;
+	out.colorIndex = 0.0;
+	out.orbitTrapR = 0.0;
 	out.maxiter = false;
 	out.objectId = 0;
 
-	float3 normal = 0.0f;
-	for (point2.x = -1.0f; point2.x <= 1.0f; point2.x += 0.2f) //+0.2
+	REAL3 normal = 0.0;
+	for (point2.x = -1.0; point2.x <= 1.0; point2.x += 0.2) //+0.2
 	{
-		for (point2.y = -1.0f; point2.y <= 1.0f; point2.y += 0.2f)
+		for (point2.y = -1.0; point2.y <= 1.0; point2.y += 0.2)
 		{
-			for (point2.z = -1.0f; point2.z <= 1.0f; point2.z += 0.2f)
+			for (point2.z = -1.0; point2.z <= 1.0; point2.z += 0.2)
 			{
 				point3 = point + point2 * delta;
 
 				out = Fractal(
 					consts, point3, calcParam, calcModeNormal, NULL, -1, renderData, 0, point3, false);
-				float pseudoDistance = 1.0f + consts->params.N - out.iters;
+				REAL pseudoDistance = 1.0 + consts->params.N - out.iters;
 				normal += point2 * pseudoDistance;
 			}
 		}
 	}
 	normal = normalize(normal);
 
-	if (invertMode) normal *= -1.0f;
+	if (invertMode) normal *= -1.0;
 
 	return normal;
 #endif

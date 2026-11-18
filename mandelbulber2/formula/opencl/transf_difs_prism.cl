@@ -17,7 +17,7 @@
 REAL4 TransfDIFSPrismIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 zc = z;
-	REAL t, tp = 0.0f;
+	REAL t, tp = 0.0;
 
 	// swap axis
 	if (fractal->transformCommon.functionEnabledSwFalse)
@@ -27,7 +27,7 @@ REAL4 TransfDIFSPrismIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		zc.z = temp;
 	}
 
-	REAL priX = max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5f, -zc.z) - fractal->transformCommon.offset05;
+	REAL priX = max(fabs(zc.y) * SQRT_3_4_F + zc.z * 0.5, -zc.z) - fractal->transformCommon.offset05;
 	tp = fabs(priX);
 	if (fractal->transformCommon.functionEnabledFalse)
 	{

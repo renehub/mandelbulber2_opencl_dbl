@@ -17,7 +17,7 @@
 REAL4 TransfSphericalFoldVaryVCLIteration(
 	REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL para = 0.0f;
+	REAL para = 0.0;
 	if (fractal->Cpara.enabledLinear)
 	{
 		para = fractal->Cpara.para00; // parameter value at iter 0
@@ -48,13 +48,13 @@ REAL4 TransfSphericalFoldVaryVCLIteration(
 		// Curvi part on "true"
 		if (fractal->Cpara.enabledCurves)
 		{
-			REAL paraAdd = 0.0f;
+			REAL paraAdd = 0.0;
 			REAL paraIt;
-			if (lengthAB > 2.0f * fractal->Cpara.iterA) // stop  error, todo fix.
+			if (lengthAB > 2.0 * fractal->Cpara.iterA) // stop  error, todo fix.
 			{
-				REAL curve1 = (grade2 - grade1) / (4.0f * fractal->Cpara.iterA);
+				REAL curve1 = (grade2 - grade1) / (4.0 * fractal->Cpara.iterA);
 				REAL tempL = lengthAB - fractal->Cpara.iterA;
-				REAL curve2 = (grade3 - grade2) / (4.0f * tempL);
+				REAL curve2 = (grade3 - grade2) / (4.0 * tempL);
 				if (aux->i < 2 * fractal->Cpara.iterA)
 				{
 					paraIt = tempA - fabs(tempA - aux->i);
@@ -69,11 +69,11 @@ REAL4 TransfSphericalFoldVaryVCLIteration(
 			}
 		}
 	}
-	REAL paraAddP0 = 0.0f;
+	REAL paraAddP0 = 0.0;
 	if (fractal->Cpara.enabledParabFalse)
 	{ // parabolic = paraOffset + iter *slope + (iter *iter *scale)
 		paraAddP0 = fractal->Cpara.parabOffset0 + (aux->i * fractal->Cpara.parabSlope)
-								+ (aux->i * aux->i * 0.001f * fractal->Cpara.parabScale);
+								+ (aux->i * aux->i * 0.001 * fractal->Cpara.parabScale);
 	}
 	para += paraAddP0 + fractal->transformCommon.minR2p25;
 
@@ -82,7 +82,7 @@ REAL4 TransfSphericalFoldVaryVCLIteration(
 
 	z += fractal->mandelbox.offset;
 
-	// if (r2 < 1e-21f) r2 = 1e-21f;
+	// if (r2 < 1e-21) r2 = 1e-21;
 	if (r2 < para)
 	{
 		z *= fractal->transformCommon.maxR2d1 / para;

@@ -28,10 +28,10 @@ REAL4 TransfDIFSEllipsoidIteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 	REAL rd = length(rV);
 	REAL rrd = length(rrV);
-	REAL ellD = rd * (rd - 1.0f) / rrd;
+	REAL ellD = rd * (rd - 1.0) / rrd;
 
 	REAL colDist = aux->dist;
-	aux->dist = min(aux->dist, ellD / (aux->DE + 1.0f));
+	aux->dist = min(aux->dist, ellD / (aux->DE + 1.0));
 
 	if (fractal->foldColor.auxColorEnabledFalse && colDist != aux->dist
 			&& aux->i >= fractal->foldColor.startIterationsA

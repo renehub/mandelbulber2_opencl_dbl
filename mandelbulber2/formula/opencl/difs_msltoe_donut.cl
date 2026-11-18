@@ -27,7 +27,7 @@ REAL4 DIFSMsltoeDonutIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	REAL t = R2 + z.z * z.z - radius2 * radius2;
 	REAL theta2 = nSect * round(atan2(z.y, z.x) / nSect);
 
-	if (t > 0.03f)
+	if (t > 0.03)
 	{
 		REAL c1 = native_cos(theta2);
 		REAL s1 = native_sin(theta2);
@@ -44,7 +44,7 @@ REAL4 DIFSMsltoeDonutIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	}
 
 	t = native_sqrt(R2 + zt.z * zt.z) - radius2;
-	aux->dist = min(aux->dist, t / (aux->DE + 1.0f));
+	aux->dist = min(aux->dist, t / (aux->DE + 1.0));
 
 	// aux->color
 	if (fractal->foldColor.auxColorEnabled) aux->color += fractal->foldColor.difs1;

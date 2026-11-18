@@ -15,7 +15,7 @@
 
 REAL4 DIFSMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	REAL4 boxFold = fractal->transformCommon.additionConstantA111;
 
@@ -55,7 +55,7 @@ REAL4 DIFSMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -107,13 +107,13 @@ REAL4 DIFSMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		z.y -= fractal->transformCommon.offsetF2;
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 		// scale vary
 		if (fractal->transformCommon.functionEnabledKFalse
 				&& aux->i >= fractal->transformCommon.startIterationsK
@@ -149,21 +149,21 @@ REAL4 DIFSMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	// DE
 	REAL colorDist = aux->dist;
 	REAL4 zc = oldZ;
-	REAL mengD = 0.0f;
+	REAL mengD = 0.0;
 
 	// menger sponge
 	if (aux->i >= fractal->transformCommon.startIterations
 			&& aux->i < fractal->transformCommon.stopIterations)
 	{
-		REAL4 ones = (REAL4){1.0f, 1.0f, 1.0f, 0.0f};
-		REAL rr = 0.0f;
+		REAL4 ones = (REAL4){1.0, 1.0, 1.0, 0.0};
+		REAL rr = 0.0;
 		REAL sz = fractal->transformCommon.scale05;
-		REAL4 szVect = (REAL4){sz, sz, sz, 1.0f};
+		REAL4 szVect = (REAL4){sz, sz, sz, 1.0};
 		int count = fractal->transformCommon.int8X; // Menger Sponge
-		zc *= (1.0f / szVect);
-		aux->pseudoKleinianDE = 1.0f;
+		zc *= (1.0 / szVect);
+		aux->pseudoKleinianDE = 1.0;
 
-		for (int k = 0; k < count && rr < 10.0f; k++)
+		for (int k = 0; k < count && rr < 10.0; k++)
 		{
 			zc = fabs(zc + fractal->transformCommon.offsetA000);
 
@@ -179,7 +179,7 @@ REAL4 DIFSMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 				zc.y = zc.z;
 				zc.z = temp;
 			}
-			REAL factor = 1.0f / fractal->transformCommon.offset3;
+			REAL factor = 1.0 / fractal->transformCommon.offset3;
 			if (!fractal->transformCommon.functionEnabledJFalse)
 			{
 				if (zc.y < factor) zc.y = fabs(zc.y - factor) + factor;
@@ -202,11 +202,11 @@ REAL4 DIFSMengerIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		REAL4 bxV = zc;
 
 		mengD = max(bxV.x, max(bxV.y, bxV.z));
-		if (mengD > 0.0f)
+		if (mengD > 0.0)
 		{
-			bxV.x = max(bxV.x, 0.0f);
-			bxV.y = max(bxV.y, 0.0f);
-			bxV.z = max(bxV.z, 0.0f);
+			bxV.x = max(bxV.x, 0.0);
+			bxV.y = max(bxV.y, 0.0);
+			bxV.z = max(bxV.z, 0.0);
 			mengD = length(bxV);
 		}
 		mengD = mengD * sz;

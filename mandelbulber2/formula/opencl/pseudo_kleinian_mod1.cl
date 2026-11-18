@@ -25,8 +25,8 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		z.y = fabs(z.y);
 		z.z = fabs(z.z);
-		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-		REAL t = max(0.0f, dot1);
+		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+		REAL t = max(0.0, dot1);
 		z.x -= t * -SQRT_3_F;
 		z.y = fabs(z.y - t);
 
@@ -36,7 +36,7 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			z.y = z.z;
 			z.z = t;
 		}
-		z -= fractal->transformCommon.constantMultiplier000 * (REAL4){SQRT_3_4_F, 1.5f, 1.5f, 0.0f};
+		z -= fractal->transformCommon.constantMultiplier000 * (REAL4){SQRT_3_4_F, 1.5, 1.5, 0.0};
 		// z was pos, now some points neg (ie neg shift)
 		if (z.z > z.x)
 		{
@@ -44,10 +44,10 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			z.z = z.x;
 			z.x = t;
 		}
-		if (z.x > 0.0f)
+		if (z.x > 0.0)
 		{
-			z.y = max(0.0f, z.y);
-			z.z = max(0.0f, z.z);
+			z.y = max(0.0, z.y);
+			z.z = max(0.0, z.z);
 		}
 	}
 
@@ -67,9 +67,9 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		REAL4 tempZ = z;
 		REAL tempL = length(tempZ);
 		z = fabs(z) * fractal->transformCommon.scale3D222;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
-		aux->DE = aux->DE * avgScale + 1.0f;
+		aux->DE = aux->DE * avgScale + 1.0;
 
 		tempXZ = (z.y + z.x) * SQRT_1_2_F;
 
@@ -89,9 +89,9 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		REAL4 temp = z;
 		REAL tempL = length(temp);
 		z = fabs(z) * fractal->transformCommon.scale3D333;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
-		aux->DE = aux->DE * avgScale + 1.0f;
+		aux->DE = aux->DE * avgScale + 1.0;
 
 		z = (fabs(z + fractal->transformCommon.additionConstant111)
 				 - fabs(z - fractal->transformCommon.additionConstant111) - z);
@@ -106,8 +106,8 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			&& aux->i >= fractal->transformCommon.startIterationsF
 			&& aux->i < fractal->transformCommon.stopIterationsF)
 	{
-		REAL4 tempA = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
-		REAL4 tempB = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 tempA = (REAL4){0.0, 0.0, 0.0, 0.0};
+		REAL4 tempB = (REAL4){0.0, 0.0, 0.0, 0.0};
 
 		if (fractal->transformCommon.functionEnabledAx)
 			tempA.x = fabs(z.x + fractal->transformCommon.offsetF000.x);
@@ -137,13 +137,13 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	}
 
 	// Pseudo kleinian
-	REAL k = 1.0f;
+	REAL k = 1.0;
 	REAL4 cSize = fractal->transformCommon.additionConstant0777;
 	if (fractal->transformCommon.functionEnabledAw
 			&& aux->i >= fractal->transformCommon.startIterationsC
 			&& aux->i < fractal->transformCommon.stopIterationsC)
 	{
-		REAL4 tempZ = z; //  correct c++ version. non conditional mult 2.0f
+		REAL4 tempZ = z; //  correct c++ version. non conditional mult 2.0
 		if (z.x > cSize.x) tempZ.x = cSize.x;
 		if (z.x < -cSize.x) tempZ.x = -cSize.x;
 		if (z.y > cSize.y) tempZ.y = cSize.y;
@@ -154,8 +154,8 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		z *= fractal->transformCommon.scaleB1;
 		aux->DE *= fabs(fractal->transformCommon.scaleB1);
 
-		z = tempZ * 2.0f - z;
-		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0f);
+		z = tempZ * 2.0 - z;
+		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0);
 		z *= k;
 		if (fractal->transformCommon.functionEnabledNFalse) z.z = -z.z;
 
@@ -167,15 +167,15 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 			&& aux->i >= fractal->transformCommon.startIterationsB
 			&& aux->i < fractal->transformCommon.stopIterationsB)
 	{
-		//  variation from openCL conditional mult 2.0f
-		if (z.x > cSize.x) z.x = cSize.x * 2.0f - z.x;
-		if (z.x < -cSize.x) z.x = -cSize.x * 2.0f - z.x;
-		if (z.y > cSize.y) z.y = cSize.y * 2.0f - z.y;
-		if (z.y < -cSize.y) z.y = -cSize.y * 2.0f - z.y;
-		if (z.z > cSize.z) z.z = cSize.z * 2.0f - z.z;
-		if (z.z < -cSize.z) z.z = -cSize.z * 2.0f - z.z;
+		//  variation from openCL conditional mult 2.0
+		if (z.x > cSize.x) z.x = cSize.x * 2.0 - z.x;
+		if (z.x < -cSize.x) z.x = -cSize.x * 2.0 - z.x;
+		if (z.y > cSize.y) z.y = cSize.y * 2.0 - z.y;
+		if (z.y < -cSize.y) z.y = -cSize.y * 2.0 - z.y;
+		if (z.z > cSize.z) z.z = cSize.z * 2.0 - z.z;
+		if (z.z < -cSize.z) z.z = -cSize.z * 2.0 - z.z;
 
-		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0f);
+		k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0);
 		z *= k;
 		if (fractal->transformCommon.functionEnabledKFalse) z.x = -z.x;
 		aux->DE *= k + fractal->analyticDE.tweak005;
@@ -191,28 +191,28 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		z = fabs(z);
 		REAL temp;
 		z = fabs(z);
-		if (z.x - z.y < 0.0f)
+		if (z.x - z.y < 0.0)
 		{
 			temp = z.y;
 			z.y = z.x;
 			z.x = temp;
 		}
-		if (z.x - z.z < 0.0f)
+		if (z.x - z.z < 0.0)
 		{
 			temp = z.z;
 			z.z = z.x;
 			z.x = temp;
 		}
-		if (z.y - z.z < 0.0f)
+		if (z.y - z.z < 0.0)
 		{
 			temp = z.z;
 			z.z = z.y;
 			z.y = temp;
 		}
 		z *= fractal->transformCommon.scale3;
-		z.x -= 2.0f * fractal->transformCommon.constantMultiplierA111.x;
-		z.y -= 2.0f * fractal->transformCommon.constantMultiplierA111.y;
-		if (z.z > 1.0f) z.z -= 2.0f * fractal->transformCommon.constantMultiplierA111.z;
+		z.x -= 2.0 * fractal->transformCommon.constantMultiplierA111.x;
+		z.y -= 2.0 * fractal->transformCommon.constantMultiplierA111.y;
+		if (z.z > 1.0) z.z -= 2.0 * fractal->transformCommon.constantMultiplierA111.z;
 		aux->DE *= fractal->transformCommon.scale3 * fractal->transformCommon.scaleA1;
 
 		z += fractal->transformCommon.additionConstantA000;
@@ -221,7 +221,7 @@ REAL4 PseudoKleinianMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		colorAdd += fractal->foldColor.difs0000.x * k;
 		colorAdd += fractal->foldColor.difs0000.y * fabs(z.z);
 		colorAdd += fractal->foldColor.difs0000.z * fabs(z.z - oldZz);

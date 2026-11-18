@@ -22,7 +22,7 @@ REAL4 TransfAddCpixel4dIteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 		if (fractal->transformCommon.functionEnabledAFalse)
 		{ // c.w = rad
-			t = (REAL4){t.x, t.y, t.z, 0.0f};
+			t = (REAL4){t.x, t.y, t.z, 0.0};
 			t = (REAL4){t.x, t.y, t.z, length(t)};
 		}
 

@@ -17,8 +17,8 @@
 
 REAL4 KochIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL col = 0.0f;
-	REAL temp = 0.0f;
+	REAL col = 0.0;
+	REAL temp = 0.0;
 	z.x = fabs(z.x);
 	z.y = fabs(z.y);
 	if (z.y > z.x)

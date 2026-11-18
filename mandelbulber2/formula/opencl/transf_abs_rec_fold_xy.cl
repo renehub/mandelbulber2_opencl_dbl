@@ -36,8 +36,8 @@ REAL4 TransfAbsRecFoldXYIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	t = z.x;
 	z.x = z.x + z.y;
 	z.y = t - z.y;
-	z.x *= 0.5f;
-	z.y *= 0.5f;
+	z.x *= 0.5;
+	z.y *= 0.5;
 	if (fractal->transformCommon.functionEnabledAx) z.x = foldX - fabs(z.x + foldX);
 	if (fractal->transformCommon.functionEnabledAxFalse) z.y = foldY - fabs(z.y + foldY);
 

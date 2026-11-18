@@ -20,17 +20,17 @@ REAL4 TransfBoxTilingV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 	if (!fractal->transformCommon.functionEnabledFalse)
 	{
-		if (fractal->transformCommon.functionEnabledx && size.x != 0.0f)
+		if (fractal->transformCommon.functionEnabledx && size.x != 0.0)
 		{
 			z.x -= round(z.x / size.x) * size.x;
 			z.x = clamp(fabs(z.x), -t.x, t.x);
 		}
-		if (fractal->transformCommon.functionEnabledyFalse && size.y != 0.0f)
+		if (fractal->transformCommon.functionEnabledyFalse && size.y != 0.0)
 		{
 			z.y -= round(z.y / size.y) * size.y;
 			z.y = clamp(fabs(z.y), -t.y, t.y);
 		}
-		if (fractal->transformCommon.functionEnabledzFalse && size.z != 0.0f)
+		if (fractal->transformCommon.functionEnabledzFalse && size.z != 0.0)
 		{
 			z.z -= round(z.z / size.z) * size.z;
 			z.z = clamp(fabs(z.z), -t.z, t.z);
@@ -41,20 +41,20 @@ REAL4 TransfBoxTilingV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		REAL4 repeatPos = fractal->transformCommon.offsetA111;
 		REAL4 repeatNeg = fractal->transformCommon.offsetB111;
 
-		if (fractal->transformCommon.functionEnabledx && z.x < (repeatPos.x + 0.5f) * size.x
-				&& z.x > (repeatNeg.x + 0.5f) * -size.x && size.x != 0.0f)
+		if (fractal->transformCommon.functionEnabledx && z.x < (repeatPos.x + 0.5) * size.x
+				&& z.x > (repeatNeg.x + 0.5) * -size.x && size.x != 0.0)
 		{
 			z.x -= round(z.x / size.x) * size.x;
 			z.x = clamp(fabs(z.x), -t.x, t.x);
 		}
-		if (fractal->transformCommon.functionEnabledyFalse && z.y < (repeatPos.y + 0.5f) * size.y
-				&& z.y > (repeatNeg.y + 0.5f) * -size.y && size.y != 0.0f)
+		if (fractal->transformCommon.functionEnabledyFalse && z.y < (repeatPos.y + 0.5) * size.y
+				&& z.y > (repeatNeg.y + 0.5) * -size.y && size.y != 0.0)
 		{
 			z.y -= round(z.y / size.y) * size.y;
 			z.y = clamp(fabs(z.y), -t.y, t.y);
 		}
-		if (fractal->transformCommon.functionEnabledzFalse && z.z < (repeatPos.z + 0.5f) * size.z
-				&& z.z > (repeatNeg.z + 0.5f) * -size.z && size.z != 0.0f)
+		if (fractal->transformCommon.functionEnabledzFalse && z.z < (repeatPos.z + 0.5) * size.z
+				&& z.z > (repeatNeg.z + 0.5) * -size.z && size.z != 0.0)
 		{
 			z.z -= round(z.z / size.z) * size.z;
 			z.z = clamp(fabs(z.z), -t.z, t.z);

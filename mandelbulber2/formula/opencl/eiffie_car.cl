@@ -25,49 +25,49 @@ REAL4 EiffieCarIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	REAL r = native_sqrt(p.z * p.z + p.x * p.x);
 
 	REAL4 tp = p0;
-	tp.y = max(fabs(p.y) - fractal->transformCommon.scale05, 0.0f);
-	tp.z = max(r - fractal->transformCommon.offset2, 0.0f);
-	tp.x = max(-p.z + fractal->transformCommon.offset105, 0.0f);
+	tp.y = max(fabs(p.y) - fractal->transformCommon.scale05, 0.0);
+	tp.z = max(r - fractal->transformCommon.offset2, 0.0);
+	tp.x = max(-p.z + fractal->transformCommon.offset105, 0.0);
 	REAL d = length(tp) - fractal->transformCommon.offset01; // round
 	d = max(d, p.x - fractal->transformCommon.scale1p1);		 // boot
-	if (fractal->transformCommon.functionEnabledDFalse) d = 100.0f;
+	if (fractal->transformCommon.functionEnabledDFalse) d = 100.0;
 
 	p.z = p0.z - fractal->transformCommon.offsetD0;					 // locate z
 	p.x = p0.x + fractal->transformCommon.minR2p25;					 // wheels and guards locate x
 	p.y = fabs(fabs(p.y) - fractal->transformCommon.minR06); // locate y
 	p.x = fabs(p.x) - fractal->transformCommon.offsetR1;		 // wheels and guards dist apart
 	r = native_sqrt(p.z * p.z + p.x * p.x);
-	tp.x = max(r - fractal->transformCommon.scale025, 0.0f); // guard rad
-	tp.y = max(p.y - fractal->transformCommon.offsetBp01 - 0.05f, 0.0f);
-	tp.z = max(-p.z - 0.08f, 0.0f); // mmmmmmmmmmmmmmmmmmmmm
+	tp.x = max(r - fractal->transformCommon.scale025, 0.0); // guard rad
+	tp.y = max(p.y - fractal->transformCommon.offsetBp01 - 0.05, 0.0);
+	tp.z = max(-p.z - 0.08, 0.0); // mmmmmmmmmmmmmmmmmmmmm
 
 	// IQ's smooth minium function.
 	if (!fractal->transformCommon.functionEnabledEFalse)
 	{
 		d = -log(exp(-fractal->transformCommon.scale8 * d)
-						 + exp(-fractal->transformCommon.scale8 * (length(tp) - 0.04f)))
+						 + exp(-fractal->transformCommon.scale8 * (length(tp) - 0.04)))
 				/ fractal->transformCommon.scale8;
 	}
 	else
 	{
 
-		//	REAL b = length(tp) - 0.04f;
-		//	REAL h = clamp( 0.5f + 0.5f * (b - d) / 0.2f, 0.f , 1.0f);
-		//	d = mix(b, d, h) - h * (1.0f - h) * 0.2f;
+		//	REAL b = length(tp) - 0.04;
+		//	REAL h = clamp( 0.5 + 0.5 * (b - d) / 0.2, 0. , 1.0);
+		//	d = mix(b, d, h) - h * (1.0 - h) * 0.2;
 	}
 
-	d = max(d, -max(p.y - 0.165f, r - 0.24f)); // guard and car
-	REAL zcd = 0.0f;
+	d = max(d, -max(p.y - 0.165, r - 0.24)); // guard and car
+	REAL zcd = 0.0;
 	if (!fractal->transformCommon.functionEnabledFFalse)
 	{
 		REAL4 q = fabs(p0) - fractal->transformCommon.offset100;
 		REAL4 zc = q;
 
-		zc.x = max(zc.x, 0.0f);
+		zc.x = max(zc.x, 0.0);
 
-		zc.y -= fractal->transformCommon.minR06 + 2.0f * (fractal->transformCommon.offsetBp01 - 0.05f);
-		zc.y = max(zc.y, 0.0f);
-		zc.z = max(zc.z, 0.0f);
+		zc.y -= fractal->transformCommon.minR06 + 2.0 * (fractal->transformCommon.offsetBp01 - 0.05);
+		zc.y = max(zc.y, 0.0);
+		zc.z = max(zc.z, 0.0);
 		zcd = length(zc);
 
 		zcd -= fractal->transformCommon.offsetB0;
@@ -81,14 +81,14 @@ REAL4 EiffieCarIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	cylR = max(fabs(cylR) - fractal->transformCommon.offsetp05, cylR); // tyre
 	REAL cylH = fabs(zc.y) - fractal->transformCommon.offsetp1;				 // tyre width
 
-	cylR = max(cylR, 0.0f);
-	cylH = max(cylH, 0.0f);
+	cylR = max(cylR, 0.0);
+	cylH = max(cylH, 0.0);
 	REAL cylD = native_sqrt(cylR * cylR + cylH * cylH);
-	cylD = min(max(cylR, cylH), 0.0f) + cylD;
+	cylD = min(max(cylR, cylH), 0.0) + cylD;
 
-	REAL d2 = cylD - 0.02f; // round tyre
-	if (fractal->transformCommon.functionEnabledCFalse) d2 = 100.f;
-	//	REAL d2 = native_sqrt(tp.y * tp.y + tp.z * tp.z) - .02f;
+	REAL d2 = cylD - 0.02; // round tyre
+	if (fractal->transformCommon.functionEnabledCFalse) d2 = 100.;
+	//	REAL d2 = native_sqrt(tp.y * tp.y + tp.z * tp.z) - .02;
 
 	d = min(d, d2);
 	aux->dist = d;
@@ -97,11 +97,11 @@ REAL4 EiffieCarIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *
 	if (fractal->foldColor.auxColorEnabledFalse)
 	{
 		if (aux->dist == d2)
-			aux->color = 3.0f + fractal->foldColor.difs0000.y;
+			aux->color = 3.0 + fractal->foldColor.difs0000.y;
 		else
-			aux->color = 5.0f + fractal->foldColor.difs0000.x;
+			aux->color = 5.0 + fractal->foldColor.difs0000.x;
 
-		if (aux->dist == zcd) aux->color = 4.0f + fractal->foldColor.difs0000.z;
+		if (aux->dist == zcd) aux->color = 4.0 + fractal->foldColor.difs0000.z;
 	}
 	return z;
 }

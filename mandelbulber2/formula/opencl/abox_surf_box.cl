@@ -20,8 +20,8 @@
 
 REAL4 AboxSurfBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 
@@ -83,7 +83,7 @@ REAL4 AboxSurfBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 
 		z += fractal->mandelbox.offset;
 
-		// if (r2 < 1e-21f) r2 = 1e-21f;
+		// if (r2 < 1e-21) r2 = 1e-21;
 		if (rr < fractal->transformCommon.minR2p25)
 		{
 			REAL tglad_factor1 = fractal->transformCommon.maxR2d1 / fractal->transformCommon.minR2p25;
@@ -106,7 +106,7 @@ REAL4 AboxSurfBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	{
 		useScale += aux->actualScaleA;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 
 		// update actualScale for next iteration
 		REAL vary = fractal->transformCommon.scaleVary0
@@ -119,7 +119,7 @@ REAL4 AboxSurfBoxIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	else
 	{
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 	}
 
 	// offset

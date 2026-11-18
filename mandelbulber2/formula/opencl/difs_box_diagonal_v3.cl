@@ -16,7 +16,7 @@
 
 REAL4 DIFSBoxDiagonalV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	if (fractal->transformCommon.functionEnabledAFalse
 			&& aux->i >= fractal->transformCommon.startIterationsA
@@ -46,7 +46,7 @@ REAL4 DIFSBoxDiagonalV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	{
 		z.x = fabs(z.x);
 		REAL psi = M_PI_F / fractal->transformCommon.int6;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -113,13 +113,13 @@ REAL4 DIFSBoxDiagonalV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		}
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsS
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 		// scale vary
 		if (fractal->transformCommon.functionEnabledKFalse
 				&& aux->i >= fractal->transformCommon.startIterationsK
@@ -179,18 +179,18 @@ REAL4 DIFSBoxDiagonalV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			boxSize.y -= fractal->transformCommon.scaleA0 * zc.z;
 		}
 		REAL4 bxV = zc;
-		REAL bxD = 0.0f;
+		REAL bxD = 0.0;
 		bxV = fabs(bxV) - boxSize;
 
-		if (fractal->transformCommon.functionEnabledJFalse && bxD < 0.0f)
+		if (fractal->transformCommon.functionEnabledJFalse && bxD < 0.0)
 		{
 			bxD = max(bxV.x, max(bxV.y, bxV.z));
 		}
 		else
 		{
-			bxV.x = max(bxV.x, 0.0f);
-			bxV.y = max(bxV.y, 0.0f);
-			bxV.z = max(bxV.z, 0.0f);
+			bxV.x = max(bxV.x, 0.0);
+			bxV.y = max(bxV.y, 0.0);
+			bxV.z = max(bxV.z, 0.0);
 			bxD = length(bxV);
 		}
 		aux->dist = min(aux->dist, bxD / aux->DE);

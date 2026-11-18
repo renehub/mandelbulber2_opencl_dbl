@@ -18,7 +18,7 @@ REAL4 TransfDIFSHybridColorIteration(REAL4 z, __global sFractalCl *fractal, sExt
 	if (aux->i >= fractal->transformCommon.startIterations
 			&& aux->i < fractal->transformCommon.stopIterations)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		if (fractal->foldColor.auxColorEnabledFalse)
 		{
 			colorAdd += fractal->foldColor.difs0000.x * fabs(z.x * z.y);
@@ -44,7 +44,7 @@ REAL4 TransfDIFSHybridColorIteration(REAL4 z, __global sFractalCl *fractal, sExt
 		aux->colorHybrid = aux->dist;
 	}
 	// else
-	// aux->color = 0.0f;
+	// aux->color = 0.0;
 
 	// NOT RELATED TO COLOR  an aux->dist tweak test
 	if (aux->i >= fractal->transformCommon.startIterationsA

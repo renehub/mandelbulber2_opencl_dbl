@@ -22,10 +22,10 @@ REAL4 AboxModKaliV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		z = fractal->transformCommon.offset111 - fabs(z);
 		REAL rr = dot(z, z);
 		REAL MinR = fractal->transformCommon.minR0;
-		REAL dividend = rr < MinR ? MinR : min(rr, 1.0f);
+		REAL dividend = rr < MinR ? MinR : min(rr, 1.0);
 		REAL m = -fractal->transformCommon.scale015 / dividend;
 		z = z * m;
-		aux->DE = aux->DE * fabs(m) + 1.0f;
+		aux->DE = aux->DE * fabs(m) + 1.0;
 	}
 
 	if (aux->i >= fractal->transformCommon.startIterationsB

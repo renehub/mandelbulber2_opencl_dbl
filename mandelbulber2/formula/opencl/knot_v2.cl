@@ -37,10 +37,10 @@ REAL4 KnotV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	REAL ang = atan2(tempA, zc.x);
 	REAL t = tempB;
 
-	REAL colorDist = 0.0f;
+	REAL colorDist = 0.0;
 	for (int n = 0; n < fractal->transformCommon.int3; n++)
 	{
-		zc = (REAL4){rxz, t, ang + M_PI_2x_F * n, 0.0f};
+		zc = (REAL4){rxz, t, ang + M_PI_2x_F * n, 0.0};
 
 		zc.x -= fractal->transformCommon.offsetA2;
 
@@ -70,9 +70,9 @@ REAL4 KnotV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	// aux->color
 	if (fractal->foldColor.auxColorEnabled)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 
-		if (fmod(ang, 2.0f) < 1.0f) colorAdd += fractal->foldColor.difs0000.x;
+		if (fmod(ang, 2.0) < 1.0) colorAdd += fractal->foldColor.difs0000.x;
 		colorAdd += fractal->foldColor.difs0000.y * (zc.x);
 		colorAdd += fractal->foldColor.difs0000.z * (zc.y);
 		colorAdd += fractal->foldColor.difs0000.w * (zc.z);

@@ -18,7 +18,7 @@
 
 REAL4 MengerCrossKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 Col = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 Col = (REAL4){0.0, 0.0, 0.0, 0.0};
 	REAL4 gap = fractal->transformCommon.constantMultiplier000;
 	REAL t;
 	REAL dot1;
@@ -30,9 +30,9 @@ REAL4 MengerCrossKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		z.z = fabs(z.z);
 		if (fractal->transformCommon.functionEnabledFFalse) z.x = fabs(z.x);
 
-		dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-		t = max(0.0f, dot1);
-		z.x -= (t * -SQRT_3_F) - 0.5f;
+		dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+		t = max(0.0, dot1);
+		z.x -= (t * -SQRT_3_F) - 0.5;
 		z.y = fabs(z.y - t);
 
 		if (z.y > z.z)
@@ -41,23 +41,23 @@ REAL4 MengerCrossKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 			z.y = z.z;
 			z.z = t;
 		}
-		z.y -= 0.75f;
-		z -= gap * (REAL4){SQRT_3_4_F, 1.5f, 1.5f, 0.0f};
+		z.y -= 0.75;
+		z -= gap * (REAL4){SQRT_3_4_F, 1.5, 1.5, 0.0};
 
 		if (z.z > z.x)
 		{
 			t = z.z;
 			z.z = z.x;
 			z.x = t;
-			Col.x = 1.0f;
+			Col.x = 1.0;
 		}
 
 		z *= fractal->transformCommon.constantMultiplier111; // post scale
 
 		if (fractal->transformCommon.functionEnabledyFalse)
 		{
-			z.y = max(0.0f, z.y) * fractal->transformCommon.scaleA1;
-			z.z = max(0.0f, z.z) * fractal->transformCommon.scaleB1;
+			z.y = max(0.0, z.y) * fractal->transformCommon.scaleA1;
+			z.z = max(0.0, z.z) * fractal->transformCommon.scaleB1;
 		}
 
 		z += fractal->transformCommon.additionConstant000; // post offset
@@ -76,31 +76,31 @@ REAL4 MengerCrossKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		z.z = fabs(z.z);
 		if (fractal->transformCommon.functionEnabledzFalse) z.x = fabs(z.x);
 
-		lengthL = z.x * SQRT_3_4_F - z.y * 0.5f;
-		if (lengthL < 0.0f)
+		lengthL = z.x * SQRT_3_4_F - z.y * 0.5;
+		if (lengthL < 0.0)
 		{
-			z.x -= SQRT_3_4_F * (2.0f * lengthL);
+			z.x -= SQRT_3_4_F * (2.0 * lengthL);
 			z.y -= -lengthL;
-			Col.y = 1.0f;
+			Col.y = 1.0;
 		}
 		lengthL = z.y;
-		if (lengthL < 0.0f)
+		if (lengthL < 0.0)
 		{
-			z.y -= 2.0f * lengthL;
-			//		Col.y = 1.0f;
+			z.y -= 2.0 * lengthL;
+			//		Col.y = 1.0;
 		}
 		lengthL = (-z.y + z.z) * SQRT_1_2_F;
-		if (lengthL < 0.0f)
+		if (lengthL < 0.0)
 		{
-			z.y -= -SQRT_1_2_F * (2.0f * lengthL);
-			z.z -= SQRT_1_2_F * (2.0f * lengthL);
-			Col.z = 1.0f;
+			z.y -= -SQRT_1_2_F * (2.0 * lengthL);
+			z.z -= SQRT_1_2_F * (2.0 * lengthL);
+			Col.z = 1.0;
 		}
 		lengthL = z.y;
-		if (lengthL < 0.5f)
+		if (lengthL < 0.5)
 		{
-			z.y -= 2.0f * (lengthL - 0.5f);
-			Col.w = 1.0f;
+			z.y -= 2.0 * (lengthL - 0.5);
+			Col.w = 1.0;
 		}
 		REAL4 edge = fractal->transformCommon.offset222;
 		if (fractal->transformCommon.functionEnabledxFalse)
@@ -111,7 +111,7 @@ REAL4 MengerCrossKIFSIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 		}
 
 		z *= fractal->transformCommon.scale3;
-		z -= (REAL4){SQRT_3_4_F, 1.5f, 1.5f, 0.0f} * (fractal->transformCommon.scale3 - 1.0f);
+		z -= (REAL4){SQRT_3_4_F, 1.5, 1.5, 0.0} * (fractal->transformCommon.scale3 - 1.0);
 		aux->DE *= fractal->transformCommon.scale3;
 
 		z += fractal->transformCommon.offset000; // post offset

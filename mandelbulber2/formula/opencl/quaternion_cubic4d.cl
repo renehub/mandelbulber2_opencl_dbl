@@ -17,7 +17,7 @@
 
 REAL4 QuaternionCubic4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE *= 2.0f * aux->r;
+	aux->DE *= 2.0 * aux->r;
 	if (fractal->transformCommon.functionEnabledxFalse) z.x = fabs(z.x);
 	if (fractal->transformCommon.functionEnabledyFalse) z.y = fabs(z.y);
 	if (fractal->transformCommon.functionEnabledzFalse) z.z = fabs(z.z);

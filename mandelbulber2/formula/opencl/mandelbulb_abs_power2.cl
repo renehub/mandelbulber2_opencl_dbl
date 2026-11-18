@@ -33,25 +33,25 @@ REAL4 MandelbulbAbsPower2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 		z += fractal->transformCommon.offsetA000;
 	}
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 
 	// pre abs. abs(z.x) and abs(z.y) effect newy. abs(z.z) effects newz
 	if (fractal->buffalo.preabsx) z.x = fabs(z.x);
 	if (fractal->buffalo.preabsy) z.y = fabs(z.y);
 	if (fractal->buffalo.preabsz) z.z = fabs(z.z);
 
-	if (z.x * z.x + z.y * z.y == 0.0f)
+	if (z.x * z.x + z.y * z.y == 0.0)
 	{
 		z.y = z.z * z.z;
-		z.z = 0.0f;
+		z.z = 0.0;
 	}
 
 	REAL4 zz = z * z;
 	REAL4 newZ = z;
-	REAL temp = 1.0f - zz.z / (zz.x + zz.y);
+	REAL temp = 1.0 - zz.z / (zz.x + zz.y);
 	newZ.x = (zz.x - zz.y) * temp;
-	newZ.y = 2.0f * z.x * z.y * temp;
-	newZ.z = (fractal->buffalo.posz ? 2.0f : -2.0f) * z.z * native_sqrt(zz.x + zz.y);
+	newZ.y = 2.0 * z.x * z.y * temp;
+	newZ.z = (fractal->buffalo.posz ? 2.0 : -2.0) * z.z * native_sqrt(zz.x + zz.y);
 	z = newZ;
 
 	z.x = fractal->buffalo.absx ? fabs(z.x) : z.x;

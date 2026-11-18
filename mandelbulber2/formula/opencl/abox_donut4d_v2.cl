@@ -17,11 +17,11 @@
 
 REAL4 AboxDonut4dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL t;
 
 	// initial conditions 4D
-	REAL4 ct = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 ct = (REAL4){0.0, 0.0, 0.0, 0.0};
 	//
 	if (aux->i == 0)
 	{
@@ -79,7 +79,7 @@ REAL4 AboxDonut4dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	}
 
 	// abox
-	REAL rrCol = 0.0f;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 
@@ -115,10 +115,10 @@ REAL4 AboxDonut4dV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	z -= fractal->transformCommon.offset0000;
 
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	useScale = aux->actualScaleA + fractal->transformCommon.scale2;
 	z *= useScale;
-	aux->DE = aux->DE * fabs(useScale) + 1.0f;
+	aux->DE = aux->DE * fabs(useScale) + 1.0;
 	// scale vary
 	if (fractal->transformCommon.functionEnabledKFalse
 			&& aux->i >= fractal->transformCommon.startIterationsK

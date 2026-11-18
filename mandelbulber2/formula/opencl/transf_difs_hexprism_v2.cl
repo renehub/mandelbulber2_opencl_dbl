@@ -30,7 +30,7 @@ REAL4 TransfDIFSHexprismV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	{
 		z.y = fabs(z.y);
 		REAL psi = M_PI_F / fractal->transformCommon.int6;
-		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+		psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 		REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 		z.x = native_cos(psi) * len;
 		z.y = native_sin(psi) * len;
@@ -45,8 +45,8 @@ REAL4 TransfDIFSHexprismV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	}
 
 	REAL4 zc = fabs(z);
-	REAL4 k = (REAL4){-SQRT_3_4_F, 0.5f, SQRT_1_3_F, 0.0f};
-	REAL tp = 2.0f * min(k.x * zc.x + k.y * zc.y, 0.0f);
+	REAL4 k = (REAL4){-SQRT_3_4_F, 0.5, SQRT_1_3_F, 0.0};
+	REAL tp = 2.0 * min(k.x * zc.x + k.y * zc.y, 0.0);
 	zc.x -= tp * k.x;
 	zc.y -= tp * k.y;
 
@@ -58,8 +58,8 @@ REAL4 TransfDIFSHexprismV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 
 	dy = zc.z - fractal->transformCommon.offsetA1 + fractal->transformCommon.offsetB0;
 
-	k.x = 0.0f;
-	k.y = 0.0f;
+	k.x = 0.0;
+	k.y = 0.0;
 	if (fractal->transformCommon.functionEnabledCFalse)
 	{
 		if (fractal->transformCommon.functionEnabledMFalse
@@ -86,7 +86,7 @@ REAL4 TransfDIFSHexprismV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 			k.y = fractal->transformCommon.offsetF0;
 	}
 	tp = dx;
-	REAL colIn = 0.0f;
+	REAL colIn = 0.0;
 	if (fractal->transformCommon.functionEnabledDFalse)
 	{
 		colIn = dx + fractal->transformCommon.offset0;
@@ -99,7 +99,7 @@ REAL4 TransfDIFSHexprismV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	REAL maxdy = max(dy, k.y);
 
 	tp = native_sqrt(maxdx * maxdx + maxdy * maxdy);
-	aux->DE0 = min(max(dx, dy), 0.0f) + tp;
+	aux->DE0 = min(max(dx, dy), 0.0) + tp;
 	REAL colDist = aux->dist;
 	aux->dist = min(aux->dist,
 		aux->DE0 / (aux->DE + fractal->analyticDE.offset0) - fractal->transformCommon.offsetB0);

@@ -22,12 +22,12 @@ REAL4 TransfReciprocal4dIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->transformCommon.functionEnabledx)
 	{
 		if (fractal->transformCommon.functionEnabledAx)
-			tempZ.x = (1.0f / fractal->transformCommon.offset1111.x)
-								- 1.0f / (fabs(z.x) + fractal->transformCommon.offset1111.x);
+			tempZ.x = (1.0 / fractal->transformCommon.offset1111.x)
+								- 1.0 / (fabs(z.x) + fractal->transformCommon.offset1111.x);
 
 		if (fractal->transformCommon.functionEnabledAxFalse)
 			tempZ.x = (fractal->transformCommon.offsetA1111.x)
-								- 1.0f / (fabs(z.x) + fractal->transformCommon.offset1111.x);
+								- 1.0 / (fabs(z.x) + fractal->transformCommon.offset1111.x);
 
 		tempZ.x += fabs(z.x) * fractal->transformCommon.additionConstant0000.x; // function slope
 		z.x = sign(z.x) * tempZ.x;
@@ -36,12 +36,12 @@ REAL4 TransfReciprocal4dIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->transformCommon.functionEnabledy)
 	{
 		if (fractal->transformCommon.functionEnabledAx)
-			tempZ.y = (1.0f / fractal->transformCommon.offset1111.y)
-								- 1.0f / (fabs(z.y) + fractal->transformCommon.offset1111.y);
+			tempZ.y = (1.0 / fractal->transformCommon.offset1111.y)
+								- 1.0 / (fabs(z.y) + fractal->transformCommon.offset1111.y);
 
 		if (fractal->transformCommon.functionEnabledAxFalse)
 			tempZ.y = (fractal->transformCommon.offsetA1111.y)
-								- 1.0f / (fabs(z.y) + fractal->transformCommon.offset1111.y);
+								- 1.0 / (fabs(z.y) + fractal->transformCommon.offset1111.y);
 
 		tempZ.y += fabs(z.y) * fractal->transformCommon.additionConstant0000.y;
 		z.y = sign(z.y) * tempZ.y;
@@ -50,12 +50,12 @@ REAL4 TransfReciprocal4dIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->transformCommon.functionEnabledz)
 	{
 		if (fractal->transformCommon.functionEnabledAx)
-			tempZ.z = (1.0f / fractal->transformCommon.offset1111.z)
-								- 1.0f / (fabs(z.z) + fractal->transformCommon.offset1111.z);
+			tempZ.z = (1.0 / fractal->transformCommon.offset1111.z)
+								- 1.0 / (fabs(z.z) + fractal->transformCommon.offset1111.z);
 
 		if (fractal->transformCommon.functionEnabledAxFalse)
 			tempZ.z = (fractal->transformCommon.offsetA1111.z)
-								- 1.0f / (fabs(z.z) + fractal->transformCommon.offset1111.z);
+								- 1.0 / (fabs(z.z) + fractal->transformCommon.offset1111.z);
 
 		tempZ.z += fabs(z.z) * fractal->transformCommon.additionConstant0000.z;
 		z.z = sign(z.z) * tempZ.z;
@@ -64,12 +64,12 @@ REAL4 TransfReciprocal4dIteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	if (fractal->transformCommon.functionEnabledw)
 	{
 		if (fractal->transformCommon.functionEnabledAw)
-			tempZ.w = (1.0f / fractal->transformCommon.offset1111.w)
-								- 1.0f / (fabs(z.w) + fractal->transformCommon.offset1111.w);
+			tempZ.w = (1.0 / fractal->transformCommon.offset1111.w)
+								- 1.0 / (fabs(z.w) + fractal->transformCommon.offset1111.w);
 
 		if (fractal->transformCommon.functionEnabledAwFalse)
 			tempZ.w = (fractal->transformCommon.offsetA1111.w)
-								- 1.0f / (fabs(z.w) + fractal->transformCommon.offset1111.w);
+								- 1.0 / (fabs(z.w) + fractal->transformCommon.offset1111.w);
 
 		tempZ.z += fabs(z.w) * fractal->transformCommon.additionConstant0000.w;
 		z.z = sign(z.w) * tempZ.w;

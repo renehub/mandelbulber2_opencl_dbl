@@ -35,27 +35,27 @@
 
 typedef struct
 {
-	float3 start;
-	float3 direction;
-	float minScan;
-	float maxScan;
+	REAL3 start;
+	REAL3 direction;
+	REAL minScan;
+	REAL maxScan;
 	bool binaryEnable;
 	bool invertMode;
 } sRayMarchingIn;
 
 typedef struct
 {
-	float3 point;
-	float lastDist;
-	float depth;
-	float distThresh;
+	REAL3 point;
+	REAL lastDist;
+	REAL depth;
+	REAL distThresh;
 	int objectId;
 	int sequenceIndex;
 	bool found;
 	int count;
-	float3 transformedPoint;
+	REAL3 transformedPoint;
 	bool hasTransformedPoint;
-	float detailLevelMultiplier;
+	REAL detailLevelMultiplier;
 } sRayMarchingOut;
 
 typedef enum
@@ -68,8 +68,8 @@ typedef enum
 typedef struct
 {
 	sRayMarchingIn rayMarchingIn;
-	float4 resultShader;
-	float3 objectColour;
+	REAL4 resultShader;
+	REAL3 objectColour;
 	enumRayBranch rayBranch;
 	bool calcInside;
 } sRayRecursionIn;
@@ -77,14 +77,14 @@ typedef struct
 typedef struct
 {
 	sRayMarchingOut rayMarchingOut;
-	float3 point;
-	float4 resultShader;
-	float3 objectColour;
-	float3 normal;
-	float3 specular;
-	float3 outShadow;
-	float3 outGlobalIllumination;
-	float fogOpacity;
+	REAL3 point;
+	REAL4 resultShader;
+	REAL3 objectColour;
+	REAL3 normal;
+	REAL3 specular;
+	REAL3 outShadow;
+	REAL3 outGlobalIllumination;
+	REAL fogOpacity;
 	bool found;
 } sRayRecursionOut;
 
@@ -93,19 +93,19 @@ typedef struct
 	sRayRecursionIn in;
 	sRayRecursionOut out;
 #ifdef USE_REFLECTANCE
-	float4 reflectShader;
+	REAL4 reflectShader;
 #endif
 #ifdef USE_REFRACTION
-	float4 transparentShader;
+	REAL4 transparentShader;
 #endif
 	enumRayBranch rayBranch;
 	bool goDeeper;
 } sRayStack;
 
 #if defined(USE_REFRACTION) || defined(USE_REFLECTANCE)
-float3 ReflectionVector(const float3 normal, const float3 incident)
+REAL3 ReflectionVector(const REAL3 normal, const REAL3 incident)
 {
-	return incident - normal * dot(incident, normal) * 2.0f;
+	return incident - normal * dot(incident, normal) * 2.0;
 }
 #endif
 
@@ -144,8 +144,8 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 	int count;
 	int bsIterations = 0; // binary search iterations (counted into step stats)
 
-	float3 point;
-	float scan, distance;
+	REAL3 point;
+	REAL scan, distance;
 
 	scan = in.minScan;
 
@@ -153,13 +153,13 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 	calcParam.N = consts->params.N;
 	calcParam.normalCalculationMode = false;
 	calcParam.iterThreshMode = consts->params.iterThreshMode;
-	float distThresh = 1e-6f;
+	REAL distThresh = 1e-6;
 
 	formulaOut outF;
-	float step = 0.0f;
+	REAL step = 0.0;
 
-	float searchAccuracy = 0.001f * consts->params.detailLevel;
-	float searchLimit = 1.0f - searchAccuracy;
+	REAL searchAccuracy = 0.001 * consts->params.detailLevel;
+	REAL searchLimit = 1.0 - searchAccuracy;
 
 	// ray-marching
 	for (count = 0; count < MAX_RAYMARCHING && scan < in.maxScan; count++)
@@ -179,14 +179,14 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 		out->sequenceIndex = outF.sequenceIndex;
 		out->transformedPoint = outF.transformedPoint;
 		out->hasTransformedPoint = outF.hasTransformedPoint;
-		out->detailLevelMultiplier = 1.0f;
+		out->detailLevelMultiplier = 1.0;
 		if (outF.objectId >= 0 && outF.objectId < renderData->numberOfObjects)
 		{
 			out->detailLevelMultiplier = renderData->objectsData[outF.objectId].detailLevelMultiplier;
 		}
 
 		// Apply per-object detailLevelMultiplier to distThresh dynamically
-		if (out->detailLevelMultiplier > 0.0f)
+		if (out->detailLevelMultiplier > 0.0)
 		{
 			distThresh *= out->detailLevelMultiplier;
 		}
@@ -194,8 +194,8 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 #ifdef USE_REFRACTION
 		if (in.invertMode)
 		{
-			distance = distThresh * 1.99f - distance;
-			if (distance < 0.0f) distance = 0.0f;
+			distance = distThresh * 1.99 - distance;
+			if (distance < 0.0) distance = 0.0;
 		}
 #endif
 
@@ -205,21 +205,21 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 			// a hit far below the threshold means a bad distance estimation
 			rmStats->hit = true;
 			rmStats->hitIters = (uint)outF.iters;
-			if (distance < 0.1f * distThresh) rmStats->missedDE = true;
+			if (distance < 0.1 * distThresh) rmStats->missedDE = true;
 			found = true;
 			break;
 		}
 
 #ifdef INTERIOR_MODE
-		step = (distance - 0.8f * distThresh) * consts->params.DEFactor;
+		step = (distance - 0.8 * distThresh) * consts->params.DEFactor;
 #else
-		step = (distance - 0.5f * distThresh) * consts->params.DEFactor;
+		step = (distance - 0.5 * distThresh) * consts->params.DEFactor;
 #endif
 
 #ifdef MONTE_CARLO
-		step *= (1.0f - Random(1000, randomSeed) / 5000.0f);
+		step *= (1.0 - Random(1000, randomSeed) / 5000.0);
 #else
-		step *= (1.0f - Random(1000, randomSeed) / 10000.0f);
+		step *= (1.0 - Random(1000, randomSeed) / 10000.0);
 #endif
 
 #ifdef ADVANCED_QUALITY
@@ -238,7 +238,7 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 	// final binary searching
 	if (found)
 	{
-		step *= 0.5f;
+		step *= 0.5;
 		for (int i = 0; i < 30; i++)
 		{
 			bsIterations++;
@@ -274,12 +274,12 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 			// #ifdef USE_REFRACTION
 			if (in.invertMode)
 			{
-				distance = distThresh * 1.99f - distance;
-				if (distance < 0.0f) distance = 0.0f;
+				distance = distThresh * 1.99 - distance;
+				if (distance < 0.0) distance = 0.0;
 			}
 			// #endif
 
-			step *= 0.5f;
+			step *= 0.5;
 		}
 	}
 
@@ -309,13 +309,13 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 		rayStack[i].rayBranch = rayBranchReflection;
 
 #ifdef USE_REFLECTANCE
-		rayStack[i].reflectShader = 0.0f;
+		rayStack[i].reflectShader = 0.0;
 #endif
 #ifdef USE_REFRACTION
-		rayStack[i].transparentShader = 0.0f;
+		rayStack[i].transparentShader = 0.0;
 #endif
-		rayStack[i].in.objectColour = 0.0f;
-		rayStack[i].in.resultShader = 0.0f;
+		rayStack[i].in.objectColour = 0.0;
+		rayStack[i].in.resultShader = 0.0;
 	}
 
 	do
@@ -353,12 +353,12 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 				}
 			}
 
-			float3 point = rayMarchingOut.point;
+			REAL3 point = rayMarchingOut.point;
 
 			bool found = rayMarchingOut.found;
-			float depth = rayMarchingOut.depth;
+			REAL depth = rayMarchingOut.depth;
 
-			float distThresh = CalcDistThresh(point, consts);
+			REAL distThresh = CalcDistThresh(point, consts);
 
 			sClCalcParams calcParam;
 			calcParam.N = consts->params.N;
@@ -430,8 +430,8 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			shaderInputData.stepCount = rayMarchingOut.count;
 			shaderInputData.randomSeed = *randomSeed;
 
-			float reflect = shaderInputData.material->reflectance;
-			float transparent = shaderInputData.material->transparencyOfSurface;
+			REAL reflect = shaderInputData.material->reflectance;
+			REAL transparent = shaderInputData.material->transparencyOfSurface;
 
 			rayStack[rayIndex].out.rayMarchingOut = rayMarchingOut;
 
@@ -445,13 +445,13 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 				calcParam.distThresh = shaderInputData.distThresh;
 				calcParam.detailSize = shaderInputData.delta;
 
-				float3 normal =
+				REAL3 normal =
 					NormalVector(consts, renderData, shaderInputData.point, shaderInputData.lastDist,
 						shaderInputData.distThresh, shaderInputData.invertMode, &calcParam);
 				shaderInputData.normal = normal;
 
 #ifdef USE_ROUGH_SURFACE
-				float roughnessGradient = 1.0f;
+				REAL roughnessGradient = 1.0;
 
 #ifdef USE_ROUGHNESS_GRADIENT
 				if (shaderInputData.material->useColorsFromPalette
@@ -463,7 +463,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 				}
 #endif // USE_ROUGHNESS_GRADIENT
 
-				float roughnesTexture = 1.0f;
+				REAL roughnesTexture = 1.0;
 #ifdef USE_TEXTURES
 #ifdef USE_ROUGHNESS_TEXTURE
 				roughnesTexture = RoughnessTexture(&shaderInputData, renderData, objectData,
@@ -473,16 +473,16 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 				if (shaderInputData.material->roughSurface)
 				{
-					float roughness = shaderInputData.material->surfaceRoughness;
+					REAL roughness = shaderInputData.material->surfaceRoughness;
 					// every axis is calculated twice because of simple Random() function (increase
 					// randomness)
-					float totalRoughness = roughnesTexture * roughnessGradient * roughness;
-					normal.x += totalRoughness * (Random(20000, randomSeed) / 10000.0f - 1.0f);
-					normal.x += totalRoughness * (Random(20000, randomSeed) / 10000.0f - 1.0f);
-					normal.y += totalRoughness * (Random(20000, randomSeed) / 10000.0f - 1.0f);
-					normal.y += totalRoughness * (Random(20000, randomSeed) / 10000.0f - 1.0f);
-					normal.z += totalRoughness * (Random(20000, randomSeed) / 10000.0f - 1.0f);
-					normal.z += totalRoughness * (Random(20000, randomSeed) / 10000.0f - 1.0f);
+					REAL totalRoughness = roughnesTexture * roughnessGradient * roughness;
+					normal.x += totalRoughness * (Random(20000, randomSeed) / 10000.0 - 1.0);
+					normal.x += totalRoughness * (Random(20000, randomSeed) / 10000.0 - 1.0);
+					normal.y += totalRoughness * (Random(20000, randomSeed) / 10000.0 - 1.0);
+					normal.y += totalRoughness * (Random(20000, randomSeed) / 10000.0 - 1.0);
+					normal.z += totalRoughness * (Random(20000, randomSeed) / 10000.0 - 1.0);
+					normal.z += totalRoughness * (Random(20000, randomSeed) / 10000.0 - 1.0);
 					shaderInputData.normal = normal = normalize(normal);
 				}
 #endif // USE_ROUGH_SURFACE
@@ -490,10 +490,10 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 #ifdef USE_TEXTURES
 #ifdef USE_NORMAL_MAP_TEXTURE
 				{
-					float3 normalMapResult = NormalMapShader(&shaderInputData, renderData, objectData,
+					REAL3 normalMapResult = NormalMapShader(&shaderInputData, renderData, objectData,
 						shaderInputData.material->normalMapTextureIndex);
-					float normalMapLength = length(normalMapResult);
-					bool valid = normalMapLength > 1e-5f && normalMapLength < 1e5;
+					REAL normalMapLength = length(normalMapResult);
+					bool valid = normalMapLength > 1e-5 && normalMapLength < 1e5;
 
 					if (valid)
 					{
@@ -508,24 +508,24 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 #if defined(USE_REFRACTION) || defined(USE_REFLECTANCE)
 				// prepare refraction values
-				float n1, n2;
+				REAL n1, n2;
 
 #ifdef CHROMATIC_ABERRATION
-				float aberrationStrength = consts->params.DOFMonteCarloCADispersionGain * 0.01f;
-				float hueEffect = 1.0f - aberrationStrength + aberrationStrength * renderData->hue / 180.0f;
+				REAL aberrationStrength = consts->params.DOFMonteCarloCADispersionGain * 0.01;
+				REAL hueEffect = 1.0 - aberrationStrength + aberrationStrength * renderData->hue / 180.0;
 #else
-				float hueEffect = 1.0f;
+				REAL hueEffect = 1.0;
 #endif
 
 				if (rayStack[rayIndex].in.calcInside) // if trace is inside the object
 				{
 					n1 = shaderInputData.material->transparencyIndexOfRefraction
 							 / hueEffect; // reverse refractive indices
-					n2 = 1.0f;
+					n2 = 1.0;
 				}
 				else
 				{
-					n1 = 1.0f;
+					n1 = 1.0;
 					n2 = shaderInputData.material->transparencyIndexOfRefraction / hueEffect;
 				}
 
@@ -540,7 +540,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 #ifdef USE_REFLECTANCE
 						// calculate reflection
-						if (reflect > 0.0f)
+						if (reflect > 0.0)
 						{
 							rayIndex++; // increase recursion level
 
@@ -548,15 +548,15 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 							sRayMarchingIn rayMarchingIn;
 
 							// calculate new direction of reflection
-							float3 newDirection =
+							REAL3 newDirection =
 								ReflectionVector(normal, rayStack[rayIndex - 1].in.rayMarchingIn.direction);
-							float3 newPoint = point + newDirection * shaderInputData.distThresh;
+							REAL3 newPoint = point + newDirection * shaderInputData.distThresh;
 
 							// prepare for new recursion
 							rayMarchingIn.binaryEnable = true;
 							rayMarchingIn.direction = newDirection;
 							rayMarchingIn.maxScan = consts->params.viewDistanceMax;
-							rayMarchingIn.minScan = 0.0f;
+							rayMarchingIn.minScan = 0.0;
 							rayMarchingIn.start = newPoint;
 							rayMarchingIn.invertMode = false;
 							recursionIn.rayMarchingIn = rayMarchingIn;
@@ -581,7 +581,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 #ifdef USE_REFRACTION
 						// calculate refraction (transparency)
-						if (transparent > 0.0f)
+						if (transparent > 0.0)
 						{
 							rayIndex++; // increase recursion level
 
@@ -589,23 +589,23 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 							sRayMarchingIn rayMarchingIn;
 
 							// calculate direction of refracted light
-							float3 newDirection =
+							REAL3 newDirection =
 								RefractVector(normal, rayStack[rayIndex - 1].in.rayMarchingIn.direction, n1, n2);
 
 							// move starting point a little
-							float3 newPoint = point
+							REAL3 newPoint = point
 																+ rayStack[rayIndex - 1].in.rayMarchingIn.direction
-																		* shaderInputData.distThresh * 1.0f;
+																		* shaderInputData.distThresh * 1.0;
 
 							// if is total internal reflection the use reflection instead of refraction
 							bool internalReflection = false;
-							if (length(newDirection) == 0.0f)
+							if (length(newDirection) == 0.0)
 							{
 								newDirection =
 									ReflectionVector(normal, rayStack[rayIndex - 1].in.rayMarchingIn.direction);
 								newPoint = point
 													 + rayStack[rayIndex - 1].in.rayMarchingIn.direction
-															 * shaderInputData.distThresh * 1.0f;
+															 * shaderInputData.distThresh * 1.0;
 								internalReflection = true;
 							}
 
@@ -613,7 +613,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 							rayMarchingIn.binaryEnable = true;
 							rayMarchingIn.direction = newDirection;
 							rayMarchingIn.maxScan = consts->params.viewDistanceMax;
-							rayMarchingIn.minScan = 0.0f;
+							rayMarchingIn.minScan = 0.0;
 							rayMarchingIn.start = newPoint;
 							rayMarchingIn.invertMode =
 								!rayStack[rayIndex - 1].in.calcInside || internalReflection;
@@ -658,21 +658,21 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			sRayRecursionOut recursionOut;
 
 			recursionOut = rayStack[rayIndex].out;
-			recursionOut.specular = 0.0f;
-			recursionOut.outShadow = 0.0f;
+			recursionOut.specular = 0.0;
+			recursionOut.outShadow = 0.0;
 
 			sRayMarchingOut rayMarchingOut = recursionOut.rayMarchingOut;
 
-			float3 point = rayMarchingOut.point;
+			REAL3 point = rayMarchingOut.point;
 
 #ifdef USE_REFLECTANCE
-			float4 reflectShader = rayStack[rayIndex].reflectShader;
+			REAL4 reflectShader = rayStack[rayIndex].reflectShader;
 #endif
 #ifdef USE_REFRACTION
-			float4 transparentShader = rayStack[rayIndex].transparentShader;
+			REAL4 transparentShader = rayStack[rayIndex].transparentShader;
 #endif
 
-			float distThresh = CalcDistThresh(point, consts);
+			REAL distThresh = CalcDistThresh(point, consts);
 
 			sShaderInputDataCl shaderInputData;
 			shaderInputData.distThresh = distThresh;
@@ -746,27 +746,27 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			calcParam.randomSeed = *randomSeed;
 
 #ifdef USE_REFLECTANCE
-			float reflect = shaderInputData.material->reflectance;
+			REAL reflect = shaderInputData.material->reflectance;
 #endif
 #ifdef USE_REFRACTION
-			float transparent = shaderInputData.material->transparencyOfSurface;
+			REAL transparent = shaderInputData.material->transparencyOfSurface;
 #endif
 
-			float4 resultShader = rayStack[rayIndex].in.resultShader;
-			float3 objectColour = rayStack[rayIndex].in.objectColour;
+			REAL4 resultShader = rayStack[rayIndex].in.resultShader;
+			REAL3 objectColour = rayStack[rayIndex].in.objectColour;
 
 #ifdef USE_REFRACTION
-			float4 transparentColor = (float4){shaderInputData.material->transparencyInteriorColor.s0,
+			REAL4 transparentColor = (REAL4){shaderInputData.material->transparencyInteriorColor.s0,
 				shaderInputData.material->transparencyInteriorColor.s1,
-				shaderInputData.material->transparencyInteriorColor.s2, 0.0f};
+				shaderInputData.material->transparencyInteriorColor.s2, 0.0};
 			resultShader = transparentColor;
 #endif
 
-			float3 objectShader;
-			float3 backgroundShader;
-			float3 volumetricShader;
-			float3 specular;
-			float3 iridescence;
+			REAL3 objectShader;
+			REAL3 backgroundShader;
+			REAL3 volumetricShader;
+			REAL3 specular;
+			REAL3 iridescence;
 
 			shaderInputData.normal = recursionOut.normal;
 
@@ -776,33 +776,39 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 // color texture
 #ifdef USE_TEXTURES
 #ifdef USE_COLOR_TEXTURE
-				shaderInputData.texColor = TextureShader(consts, &calcParam, &shaderInputData, renderData,
-					objectData, shaderInputData.material->colorTextureIndex, 1.0f);
+				shaderInputData.texColor = TO_CL_FLOAT3(
+					TextureShader(consts, &calcParam, &shaderInputData, renderData, objectData,
+						shaderInputData.material->colorTextureIndex, 1.0));
 #endif
 
 #ifdef USE_DIFFUSION_TEXTURE
-				shaderInputData.texDiffuse = TextureShader(consts, &calcParam, &shaderInputData, renderData,
-					objectData, shaderInputData.material->diffusionTextureIndex, 1.0f);
+				shaderInputData.texDiffuse = TO_CL_FLOAT3(
+					TextureShader(consts, &calcParam, &shaderInputData, renderData, objectData,
+						shaderInputData.material->diffusionTextureIndex, 1.0));
 #endif
 
 #ifdef USE_LUMINOSITY_TEXTURE
-				shaderInputData.texLuminosity = TextureShader(consts, &calcParam, &shaderInputData,
-					renderData, objectData, shaderInputData.material->luminosityTextureIndex, 0.0f);
+				shaderInputData.texLuminosity = TO_CL_FLOAT3(
+					TextureShader(consts, &calcParam, &shaderInputData, renderData, objectData,
+						shaderInputData.material->luminosityTextureIndex, 0.0));
 #endif
 
 #ifdef USE_REFLECTANCE_TEXTURE
-				shaderInputData.texReflectance = TextureShader(consts, &calcParam, &shaderInputData,
-					renderData, objectData, shaderInputData.material->reflectanceTextureIndex, 1.0f);
+				shaderInputData.texReflectance = TO_CL_FLOAT3(
+					TextureShader(consts, &calcParam, &shaderInputData, renderData, objectData,
+						shaderInputData.material->reflectanceTextureIndex, 1.0));
 #endif
 
 #ifdef USE_TRANSPARENCY_TEXTURE
-				shaderInputData.texTransparency = TextureShader(consts, &calcParam, &shaderInputData,
-					renderData, objectData, shaderInputData.material->transparencyTextureIndex, 1.0f);
+				shaderInputData.texTransparency = TO_CL_FLOAT3(
+					TextureShader(consts, &calcParam, &shaderInputData, renderData, objectData,
+						shaderInputData.material->transparencyTextureIndex, 1.0));
 #endif
 
 #ifdef USE_TRANSPARENCY_ALPHA_TEXTURE
-				shaderInputData.texTransparencyAlpha = TextureShader(consts, &calcParam, &shaderInputData,
-					renderData, objectData, shaderInputData.material->transparencyAlphaTextureIndex, 1.0f);
+				shaderInputData.texTransparencyAlpha = TO_CL_FLOAT3(
+					TextureShader(consts, &calcParam, &shaderInputData, renderData, objectData,
+						shaderInputData.material->transparencyAlphaTextureIndex, 1.0));
 #endif
 #endif
 
@@ -815,16 +821,16 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 				sClGradientsCollection gradients;
 
-				specular = 0.0f;
-				float alpha = 1.0f;
-				float3 outLuminosityEmissive = 0.0f;
+				specular = 0.0;
+				REAL alpha = 1.0;
+				REAL3 outLuminosityEmissive = 0.0;
 				objectShader =
 					ObjectShader(consts, renderData, &shaderInputData, &calcParam, &objectColour, &specular,
 						&iridescence, &recursionOut.outShadow, &outLuminosityEmissive, &alpha, &gradients);
 				recursionOut.specular = specular;
 
 #ifdef MONTE_CARLO_DOF_GLOBAL_ILLUMINATION
-				float3 globalIllumination = GlobalIlumination(
+				REAL3 globalIllumination = GlobalIlumination(
 					consts, renderData, &shaderInputData, &calcParam, image2dBackground, objectColour, false);
 				objectShader += globalIllumination;
 				recursionOut.outGlobalIllumination = globalIllumination;
@@ -834,35 +840,35 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 #if defined(USE_REFRACTION) || defined(USE_REFLECTANCE)
 				// prepare refraction values
-				float n1, n2;
+				REAL n1, n2;
 				if (rayStack[rayIndex].in.calcInside) // if trace is inside the object
 				{
 					n1 =
 						shaderInputData.material->transparencyIndexOfRefraction; // reverse refractive indices
-					n2 = 1.0f;
+					n2 = 1.0;
 				}
 				else
 				{
-					n1 = 1.0f;
+					n1 = 1.0;
 					n2 = shaderInputData.material->transparencyIndexOfRefraction;
 				}
 
-				float reflectance = 1.0f;
-				float reflectanceN = 1.0f; // TODO to check if 1.0 is correct value
+				REAL reflectance = 1.0;
+				REAL reflectanceN = 1.0; // TODO to check if 1.0 is correct value
 
 				if (shaderInputData.material->fresnelReflectance)
 				{
 					reflectance = Reflectance(
 						shaderInputData.normal, rayStack[rayIndex].in.rayMarchingIn.direction, n1, n2);
-					if (reflectance < 0.0f) reflectance = 0.0f;
-					if (reflectance > 1.0f) reflectance = 1.0f;
-					reflectanceN = 1.0f - reflectance;
+					if (reflectance < 0.0) reflectance = 0.0;
+					if (reflectance > 1.0) reflectance = 1.0;
+					reflectanceN = 1.0 - reflectance;
 				}
 
 				if (rayIndex == renderData->reflectionsMax)
 				{
-					reflectance = 0.0f;
-					reflectanceN = 1.0f;
+					reflectance = 0.0;
+					reflectanceN = 1.0;
 				}
 #endif
 
@@ -874,22 +880,22 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 				if (shaderInputData.material->useColorsFromPalette
 						&& shaderInputData.material->transparencyGradientEnable
 						&& !shaderInputData.material->perlinNoiseTransparencyColorEnable)
-					transparentShader *= (float4){
-						gradients.transparency.s0, gradients.transparency.s1, gradients.transparency.s2, 1.0f};
+					transparentShader *= (REAL4){
+						gradients.transparency.s0, gradients.transparency.s1, gradients.transparency.s2, 1.0};
 				else
 #endif // USE_TRANSPARENCY_GRADIENT
-					transparentShader *= (float4){shaderInputData.material->transparencyColor.s0,
+					transparentShader *= (REAL4){shaderInputData.material->transparencyColor.s0,
 						shaderInputData.material->transparencyColor.s1,
-						shaderInputData.material->transparencyColor.s2, 1.0f};
+						shaderInputData.material->transparencyColor.s2, 1.0};
 
 #ifdef USE_TRANSPARENCY_TEXTURE
 				if (shaderInputData.material->useTransparencyTexture)
 				{
-					float texTransInt = shaderInputData.material->transparencyTextureIntensity;
-					float texTransIntN = 1.0f - shaderInputData.material->transparencyTextureIntensity;
-					float3 texTransparencyIntens =
-						shaderInputData.texTransparency * texTransInt + texTransIntN;
-					transparentShader *= (float4){texTransparencyIntens.s0, texTransparencyIntens.s1,
+					REAL texTransInt = shaderInputData.material->transparencyTextureIntensity;
+					REAL texTransIntN = 1.0 - shaderInputData.material->transparencyTextureIntensity;
+					REAL3 texTransparencyIntens = TO_REAL3(shaderInputData.texTransparency) * texTransInt
+													 + texTransIntN;
+					transparentShader *= (REAL4){texTransparencyIntens.s0, texTransparencyIntens.s1,
 						texTransparencyIntens.s2, transparentShader.s3};
 				}
 #endif // USE_TRANSPARENCY_TEXTURE
@@ -910,11 +916,11 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 				if (renderData->reflectionsMax > 0)
 				{
 #if (defined(USE_DIFFUSION_TEXTURE) || defined(USE_DIFFUSE_GRADIENT)) && defined(USE_REFLECTANCE)
-					float3 reflectDiffused = reflect;
+					REAL3 reflectDiffused = reflect;
 
 #ifdef USE_DIFFUSION_TEXTURE
-					float diffusionIntensity = shaderInputData.material->diffusionTextureIntensity;
-					float diffusionIntensityN = 1.0f - diffusionIntensity;
+					REAL diffusionIntensity = shaderInputData.material->diffusionTextureIntensity;
+					REAL diffusionIntensityN = 1.0 - diffusionIntensity;
 
 					reflectDiffused = reflect * shaderInputData.texDiffuse * diffusionIntensity
 														+ reflect * diffusionIntensityN;
@@ -930,9 +936,9 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 #else // not USE_DIFFUSION_TEXTURE or USE_DIFFUSE_GRADIENT
 #ifdef USE_REFLECTANCE
-					float3 reflectDiffused = reflect;
+					REAL3 reflectDiffused = reflect;
 #else
-					float3 reflectDiffused = 0.0f;
+					REAL3 reflectDiffused = 0.0;
 #endif // USE_REFLECTANCE
 #endif // USE_DIFFUSION_TEXTURE
 
@@ -952,7 +958,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 					if (shaderInputData.material->useTransparencyAlphaTexture)
 					{
 						transparent = transparent
-													* (1.0f
+													* (1.0
 														 - shaderInputData.texTransparencyAlpha.s0
 																 * shaderInputData.material->transparencyAlphaTextureIntensity);
 					}
@@ -963,26 +969,27 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 					if (shaderInputData.material->perlinNoiseEnable
 							&& shaderInputData.material->perlinNoiseTransparencyAlphaEnable)
 					{
-						float alpha = (shaderInputData.material->perlinNoiseTransparencyAlphaInvert)
-														? 1.0f - shaderInputData.perlinNoise
+						REAL alpha = (shaderInputData.material->perlinNoiseTransparencyAlphaInvert)
+														? 1.0 - shaderInputData.perlinNoise
 														: shaderInputData.perlinNoise;
 						alpha = clamp(
-							alpha * shaderInputData.material->perlinNoiseTransparencyAlphaIntensity, 0.0f, 1.0f);
-						transparent = transparent * (1.0f - alpha);
+							alpha * shaderInputData.material->perlinNoiseTransparencyAlphaIntensity, 0.0, 1.0);
+						transparent = transparent * (1.0 - alpha);
 					}
 #endif
 
 					resultShader = transparentShader * transparent * reflectanceN
-												 + (1.0f - transparent * reflectanceN) * resultShader;
+												 + (1.0 - transparent * reflectanceN) * resultShader;
 #endif // USE_REFRACTION
 
 #ifdef USE_REFLECTANCE
 #ifdef USE_REFLECTANCE_TEXTURE
 					if (shaderInputData.material->useReflectanceTexture)
 					{
-						float texReflInt = shaderInputData.material->reflectanceTextureIntensity;
-						float texReflIntN = 1.0f - shaderInputData.material->reflectanceTextureIntensity;
-						reflectDiffused *= shaderInputData.texReflectance * texReflInt + texReflIntN;
+						REAL texReflInt = shaderInputData.material->reflectanceTextureIntensity;
+						REAL texReflIntN = 1.0 - shaderInputData.material->reflectanceTextureIntensity;
+						reflectDiffused *=
+							TO_REAL3(shaderInputData.texReflectance) * texReflInt + texReflIntN;
 					}
 #endif // USE_REFLECTANCE_TEXTURE
 
@@ -995,17 +1002,17 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 					}
 #endif // USE_PERLIN_NOISE
 
-					float reflectDiffusedAvg =
-						(reflectDiffused.s0 + reflectDiffused.s1 + reflectDiffused.s2) / 3.0f;
+					REAL reflectDiffusedAvg =
+						(reflectDiffused.s0 + reflectDiffused.s1 + reflectDiffused.s2) / 3.0;
 
-					float4 reflectDiffused4 =
-						(float4){reflectDiffused.s0, reflectDiffused.s1, reflectDiffused.s2, 1.0f};
+					REAL4 reflectDiffused4 =
+						(REAL4){reflectDiffused.s0, reflectDiffused.s1, reflectDiffused.s2, 1.0};
 					resultShader = reflectShader * reflectDiffused4 * reflectance
-												 + (1.0f - reflectDiffusedAvg * reflectance) * resultShader;
+												 + (1.0 - reflectDiffusedAvg * reflectance) * resultShader;
 #endif // USE_REFLECTANCE
 				}
 #endif // USE_REFRACTION || USE_REFLECTANCE
-				resultShader = max(resultShader, 0.0f);
+				resultShader = max(resultShader, 0.0);
 				resultShader.w = alpha;
 			}
 			else
@@ -1013,15 +1020,15 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 				backgroundShader =
 					BackgroundShader(consts, renderData, image2dBackground, &shaderInputData);
 				resultShader.xyz = backgroundShader;
-				resultShader.w = 0.0f;
-				rayMarchingOut.depth = 1e20f;
+				resultShader.w = 0.0;
+				rayMarchingOut.depth = 1e20;
 				shaderInputData.normal = shaderInputData.viewVector;
-				recursionOut.outShadow = 1.0f;
-				recursionOut.outGlobalIllumination = 0.0f;
+				recursionOut.outShadow = 1.0;
+				recursionOut.outGlobalIllumination = 0.0;
 				// vn = mRot.RotateVector(CVector3(0.0, -1.0, 0.0));
 			}
 
-			float opacityOut = 0.0f;
+			REAL opacityOut = 0.0;
 
 #ifdef USE_REFRACTION
 
@@ -1030,25 +1037,25 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			{
 				sShaderInputDataCl input2 = shaderInputData;
 
-				float delta = CalcDistThresh(shaderInputData.point, consts);
-				float depth = min(rayMarchingOut.depth, consts->params.viewDistanceMax);
-				float startStep = min(max(depth / 10.0f, delta), delta * 100);
-				float endStep = shaderInputData.material->transparencyOfInterior * delta;
-				float step = startStep;
+				REAL delta = CalcDistThresh(shaderInputData.point, consts);
+				REAL depth = min(rayMarchingOut.depth, consts->params.viewDistanceMax);
+				REAL startStep = min(max(depth / 10.0, delta), delta * 100);
+				REAL endStep = shaderInputData.material->transparencyOfInterior * delta;
+				REAL step = startStep;
 
-				float scan = 0.0;
+				REAL scan = 0.0;
 
 				for (int i = 0; i < MAX_RAYMARCHING; i++)
 				{
 					if (scan >= depth) break;
 
-					float4 transparentColor = (float4){shaderInputData.material->transparencyInteriorColor.s0,
+					REAL4 transparentColor = (REAL4){shaderInputData.material->transparencyInteriorColor.s0,
 						shaderInputData.material->transparencyInteriorColor.s1,
-						shaderInputData.material->transparencyInteriorColor.s2, 0.0f};
+						shaderInputData.material->transparencyInteriorColor.s2, 0.0};
 
-					float3 insidePoint = shaderInputData.point - shaderInputData.viewVector * scan;
+					REAL3 insidePoint = shaderInputData.point - shaderInputData.viewVector * scan;
 					input2.point = insidePoint;
-					float opacityGradient = 1.0f;
+					REAL opacityGradient = 1.0;
 
 #ifdef USE_INNER_COLORING
 					if (shaderInputData.material->insideColoringEnable)
@@ -1069,23 +1076,23 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 #ifdef USE_TRANSPARENCY_TEXTURE
 					if (shaderInputData.material->useTransparencyTexture)
 					{
-						float3 tex = TextureShader(consts, &calcParam, &input2, renderData, objectData,
-							shaderInputData.material->transparencyTextureIndex, 1.0f);
-						float intensN = 1.0f - shaderInputData.material->transparencyTextureIntensityVol;
+						REAL3 tex = TextureShader(consts, &calcParam, &input2, renderData, objectData,
+							shaderInputData.material->transparencyTextureIndex, 1.0);
+						REAL intensN = 1.0 - shaderInputData.material->transparencyTextureIntensityVol;
 						transparentColor.xyz *=
 							tex * shaderInputData.material->transparencyTextureIntensityVol + intensN;
 					}
 #endif
 
-					float texOpacity = 0.0f;
+					REAL texOpacity = 0.0;
 #ifdef USE_TRANSPARENCY_ALPHA_TEXTURE
 					if (shaderInputData.material->useTransparencyAlphaTexture)
 					{
-						float3 tex = TextureShader(consts, &calcParam, &input2, renderData, objectData,
-							shaderInputData.material->transparencyAlphaTextureIndex, 1.0f);
+						REAL3 tex = TextureShader(consts, &calcParam, &input2, renderData, objectData,
+							shaderInputData.material->transparencyAlphaTextureIndex, 1.0);
 						texOpacity =
-							(1.0f - tex.s0) * shaderInputData.material->transparencyAlphaTextureIntensityVol
-							+ 1e-6f;
+							(1.0 - tex.s0) * shaderInputData.material->transparencyAlphaTextureIntensityVol
+							+ 1e-6;
 					}
 #endif
 
@@ -1104,7 +1111,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 					}
 #endif // USE_PERLIN_NOISE
 
-					float opacityCollected =
+					REAL opacityCollected =
 						shaderInputData.material->transparencyOfInterior * opacityGradient * (1.0 - texOpacity)
 						+ texOpacity;
 
@@ -1112,21 +1119,21 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 					if (shaderInputData.material->perlinNoiseEnable
 							&& shaderInputData.material->perlinNoiseTransparencyAlphaEnable)
 					{
-						float alpha = (shaderInputData.material->perlinNoiseTransparencyColorInvert)
-														? 1.0f - shaderInputData.perlinNoise
+						REAL alpha = (shaderInputData.material->perlinNoiseTransparencyColorInvert)
+														? 1.0 - shaderInputData.perlinNoise
 														: input2.perlinNoise;
 						alpha =
 							clamp(alpha * shaderInputData.material->perlinNoiseTransparencyAlphaIntensityVol,
-								0.0f, 1.0f);
-						alpha = 1.0f - alpha;
-						opacityCollected = opacityCollected * (1.0f - alpha) + alpha + 1e-6f;
+								0.0, 1.0);
+						alpha = 1.0 - alpha;
+						opacityCollected = opacityCollected * (1.0 - alpha) + alpha + 1e-6;
 					}
 #endif
 
-					float opacity = (-1.0f + 1.0f / opacityCollected) * step;
-					if (opacity > 1.0f) opacity = 1.0f;
+					REAL opacity = (-1.0 + 1.0 / opacityCollected) * step;
+					if (opacity > 1.0) opacity = 1.0;
 
-					float4 lightColor = 0.0f;
+					REAL4 lightColor = 0.0;
 
 #ifdef USE_SUBSURFACE_SCATTERING
 					if (shaderInputData.material->subsurfaceScattering)
@@ -1139,28 +1146,28 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 							__global sLightCl *light = &renderData->lights[i];
 							if (light->enabled)
 							{
-								float distanceLight = 0.0f;
+								REAL distanceLight = 0.0;
 
-								float3 lightVectorTemp =
+								REAL3 lightVectorTemp =
 									CalculateLightVector(light, input2.point, input2.delta, consts->params.resolution,
 										consts->params.viewDistanceMax, &distanceLight, &input2.randomSeed);
 
-								float intensity = 0.0f;
+								REAL intensity = 0.0;
 								if (light->type == lightDirectional)
 									intensity = light->intensity;
 								else if (light->type == lightConical)
-									intensity = 10.0f * light->intensity;
+									intensity = 10.0 * light->intensity;
 								else
-									intensity = 100.0f * light->intensity
-															/ LightDecay(distanceLight, light->decayFunction) / 6.0f;
+									intensity = 100.0 * light->intensity
+															/ LightDecay(distanceLight, light->decayFunction) / 6.0;
 
-								float3 textureColor;
+								REAL3 textureColor;
 								intensity *= CalculateLightCone(
 									light, renderData, input2.point, lightVectorTemp, &textureColor);
 
-								float3 lightShadow = 1.0f;
+								REAL3 lightShadow = 1.0;
 #ifdef SHADOWS
-								if (consts->params.iterFogShadows && light->castShadows && intensity > 1e-3f)
+								if (consts->params.iterFogShadows && light->castShadows && intensity > 1e-3)
 								{
 									calcParam.distThresh = input2.distThresh;
 									calcParam.detailSize = input2.distThresh;
@@ -1177,16 +1184,16 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 					else
 #endif // USE_SUBSURFACE_SCATTERING
 					{
-						lightColor = 1.0f;
+						lightColor = 1.0;
 					}
 
-					resultShader = opacity * lightColor * transparentColor + (1.0f - opacity) * resultShader;
+					resultShader = opacity * lightColor * transparentColor + (1.0 - opacity) * resultShader;
 
 					endStep = opacityCollected * CalcDistThresh(shaderInputData.point, consts);
 
 					step = max((endStep - startStep) * (scan / depth) + startStep, max(depth / 1000.0, 1e-6));
 #ifdef MONTE_CARLO
-					step *= (1.0f - Random(1000, &shaderInputData.randomSeed) / 4000.0f);
+					step *= (1.0 - Random(1000, &shaderInputData.randomSeed) / 4000.0);
 #endif
 
 					scan += step;

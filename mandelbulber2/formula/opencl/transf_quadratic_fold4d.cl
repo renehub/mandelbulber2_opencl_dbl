@@ -19,34 +19,34 @@ REAL4 TransfQuadraticFold4dIteration(REAL4 z, __global sFractalCl *fractal, sExt
 	REAL4 a = fractal->transformCommon.offset1111;
 	if (fractal->transformCommon.functionEnabledAx)
 	{
-		z.x = 1.0f - fabs(z.x);
-		a.x = a.x - 1.0f;
-		REAL bx = 1.0f - a.x;
-		if (z.x > 0.0f) z.x = a.x * z.x * z.x + bx * z.x;
+		z.x = 1.0 - fabs(z.x);
+		a.x = a.x - 1.0;
+		REAL bx = 1.0 - a.x;
+		if (z.x > 0.0) z.x = a.x * z.x * z.x + bx * z.x;
 	} // x = 0 -> newx = 0 and x = 1 -> newx = 1
 
 	if (fractal->transformCommon.functionEnabledAyFalse)
 	{
-		z.y = 1.0f - fabs(z.y);
-		a.y = a.y - 1.0f;
-		REAL by = 1.0f - a.y;
-		if (z.y > 0.0f) z.y = a.y * z.y * z.y + by * z.y;
+		z.y = 1.0 - fabs(z.y);
+		a.y = a.y - 1.0;
+		REAL by = 1.0 - a.y;
+		if (z.y > 0.0) z.y = a.y * z.y * z.y + by * z.y;
 	}
 
 	if (fractal->transformCommon.functionEnabledAzFalse)
 	{
-		z.z = 1.0f - fabs(z.z);
-		a.z = a.z - 1.0f;
-		REAL bz = 1.0f - a.z;
-		if (z.z > 0.0f) z.z = a.z * z.z * z.z + bz * z.z;
+		z.z = 1.0 - fabs(z.z);
+		a.z = a.z - 1.0;
+		REAL bz = 1.0 - a.z;
+		if (z.z > 0.0) z.z = a.z * z.z * z.z + bz * z.z;
 	}
 
 	if (fractal->transformCommon.functionEnabledAwFalse)
 	{
-		z.w = 1.0f - fabs(z.w);
-		a.w = a.w - 1.0f;
-		REAL bw = 1.0f - a.w;
-		if (z.w > 0.0f) z.w = a.w * z.w * z.w + bw * z.w;
+		z.w = 1.0 - fabs(z.w);
+		a.w = a.w - 1.0;
+		REAL bw = 1.0 - a.w;
+		if (z.w > 0.0) z.w = a.w * z.w * z.w + bw * z.w;
 	}
 
 	z += fractal->transformCommon.offset0000;

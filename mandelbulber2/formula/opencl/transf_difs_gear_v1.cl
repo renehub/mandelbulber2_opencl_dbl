@@ -24,7 +24,7 @@ REAL4 TransfDIFSGearV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	}
 
 	REAL angle = M_PI_2x_F / (fractal->transformCommon.int16);
-	REAL sector = round(atan2(z.x, z.y) / angle) + fractal->transformCommon.intA * 1.0f;
+	REAL sector = round(atan2(z.x, z.y) / angle) + fractal->transformCommon.intA * 1.0;
 	REAL4 zc = z;
 	REAL an = sector * angle;
 	REAL sinan = native_sin(an);
@@ -86,13 +86,13 @@ REAL4 TransfDIFSGearV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		zc.z += zc.y * fractal->transformCommon.scale0000.w;
 	}
 
-	zc.x = max(zc.x, 0.0f);
-	zc.y = max(zc.y, 0.0f);
-	zc.z = max(zc.z, 0.0f);
+	zc.x = max(zc.x, 0.0);
+	zc.y = max(zc.y, 0.0);
+	zc.z = max(zc.z, 0.0);
 	REAL zcd = length(zc) + fractal->analyticDE.offset0;
 
 	// cylinder
-	REAL sdTor = 1000.0f;
+	REAL sdTor = 1000.0;
 	if (fractal->transformCommon.functionEnabled)
 	{
 		sdTor = fabs(native_sqrt(z.x * z.x + z.y * z.y) - fractal->transformCommon.offsetA1
@@ -103,7 +103,7 @@ REAL4 TransfDIFSGearV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 	REAL d = min(zcd, sdTor) - fractal->transformCommon.offset0005;
 	REAL colDist = aux->dist;
-	aux->dist = min(aux->dist, d / (aux->DE + 1.0f));
+	aux->dist = min(aux->dist, d / (aux->DE + 1.0));
 
 	// aux->color
 	if (fractal->foldColor.auxColorEnabledFalse && colDist != aux->dist

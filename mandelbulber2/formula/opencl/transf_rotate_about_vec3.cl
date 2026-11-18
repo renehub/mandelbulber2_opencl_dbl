@@ -21,9 +21,9 @@ REAL4 TransfRotateAboutVec3Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 	{
 		if (aux->i > fractal->transformCommon.startIterationsRV)
 		{
-			useAngle *= (1.0f
-										- 1.0f
-												/ (1.0f
+			useAngle *= (1.0
+										- 1.0
+												/ (1.0
 													 + (aux->i - fractal->transformCommon.startIterationsRV)
 															 / fractal->transformCommon.offset0))
 									* fractal->transformCommon.scale1;
@@ -36,9 +36,9 @@ REAL4 TransfRotateAboutVec3Iteration(REAL4 z, __global sFractalCl *fractal, sExt
 		REAL4 v = fractal->transformCommon.vec111;
 		v = v / length(v); // normalise
 		REAL c = native_cos(useAngle);
-		REAL temp = 1.0f - c;
+		REAL temp = 1.0 - c;
 		REAL s = native_sin(useAngle);
-		REAL4 rotVec = (REAL4){0.0f, 0.0f, 0.0f, z.w};
+		REAL4 rotVec = (REAL4){0.0, 0.0, 0.0, z.w};
 
 		rotVec.x = z.x * (c + temp * v.x * v.x) + z.y * (temp * v.x * v.y + s * v.z)
 							 + z.z * (temp * v.x * v.z - s * v.y);

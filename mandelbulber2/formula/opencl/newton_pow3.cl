@@ -25,7 +25,7 @@ REAL4 NewtonPow3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		if (fractal->transformCommon.functionEnabledAzFalse) z.z = fabs(z.z);
 	}
 	// Preparation operations
-	REAL fac_eff = 0.6666666666f;
+	REAL fac_eff = 0.6666666666;
 
 	// MB2 needs a potentially diverging value of z to work correctly.
 	// However the Newton method for z^3-1 is so far always converging.
@@ -34,23 +34,23 @@ REAL4 NewtonPow3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	// to the z used for the Newton calculations
 	REAL sq_r = fractal->transformCommon.scaleA1 / (aux->r * aux->r);
 	// aux->DE *= (sq_r);
-	z.x = z.x * sq_r + 1.0f;
-	z.y = -z.y * sq_r; // 0.0f
-	z.z = -z.z * sq_r; // 0.0f
+	z.x = z.x * sq_r + 1.0;
+	z.y = -z.y * sq_r; // 0.0
+	z.z = -z.z * sq_r; // 0.0
 
 	// Calculate the inverse power of z=(z.x,z.y,z.z),
 	// and use it for the Newton method calculations for z^3 + 1 = 0
 	// i.e. z(n+1) = 2*z(n)/3 - 1/3*z(n)^2
 	REAL4 tp = z * z;
 	sq_r = tp.x + tp.y + tp.z; // dot
-	sq_r = 1.0f / (3.0f * sq_r * sq_r);
+	sq_r = 1.0 / (3.0 * sq_r * sq_r);
 
 	REAL r_xy = tp.x + tp.y;
-	REAL h1 = 1.0f - tp.z / r_xy;
+	REAL h1 = 1.0 - tp.z / r_xy;
 
 	REAL tmpx = h1 * (tp.x - tp.y) * sq_r;
-	REAL tmpy = -2.0f * h1 * z.x * z.y * sq_r;
-	REAL tmpz = 2.0f * z.z * native_sqrt(r_xy) * sq_r;
+	REAL tmpy = -2.0 * h1 * z.x * z.y * sq_r;
+	REAL tmpz = 2.0 * z.z * native_sqrt(r_xy) * sq_r;
 
 	tp.x = -tmpx;
 	tp.y = -tmpy;
@@ -61,7 +61,7 @@ REAL4 NewtonPow3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	// Below the z used for (converging) Newton calculation
 	// is transformed back to the potentially diverging z used by MB2
 	// (see also the notes above)
-	tp.x = z.x - 1.0f;
+	tp.x = z.x - 1.0;
 	tp.y = z.y;
 	tp.z = z.z;
 	sq_r = fractal->transformCommon.scaleB1 / dot(tp, tp);
@@ -73,7 +73,7 @@ REAL4 NewtonPow3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 	// However, in hybrids this setting can be used as a variable only for this fractal formula
 	z += fractal->transformCommon.offset000;
 
-	aux->DE *= aux->r * 2.0f;
+	aux->DE *= aux->r * 2.0;
 	if (fractal->analyticDE.enabledFalse)
 	{
 		aux->DE = aux->DE * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
@@ -86,9 +86,9 @@ REAL4 NewtonPow3Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		REAL r = length(q) + fractal->transformCommon.offsetA1;
 
 		if (!fractal->transformCommon.functionEnabledYFalse)
-			aux->dist = min(aux->dist, 0.5f * log(r) * r / aux->DE);
+			aux->dist = min(aux->dist, 0.5 * log(r) * r / aux->DE);
 		else
-			aux->dist = 0.5f * log(r) * r / aux->DE;
+			aux->dist = 0.5 * log(r) * r / aux->DE;
 	}
 	return z;
 }

@@ -19,12 +19,12 @@
 REAL4 TransfSphericalFoldV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	z += fractal->transformCommon.offset000;
-	REAL m = 1.0f;
+	REAL m = 1.0;
 	REAL rr = dot(z, z);
 	if (rr < fractal->transformCommon.invert0)
 		m = fractal->transformCommon.inv0;
 	else if (rr < fractal->transformCommon.invert1)
-		m = 1.0f / rr;
+		m = 1.0 / rr;
 	else
 		m = fractal->transformCommon.inv1;
 	z *= m;

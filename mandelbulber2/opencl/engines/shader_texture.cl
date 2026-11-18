@@ -36,19 +36,19 @@
 #if defined(USE_COLOR_TEXTURE) || defined(USE_DIFFUSION_TEXTURE)         \
 	|| defined(USE_LUMINOSITY_TEXTURE) || defined(USE_REFLECTANCE_TEXTURE) \
 	|| defined(USE_TRANSPARENCY_TEXTURE) || defined(USE_TRANSPARENCY_ALPHA_TEXTURE)
-float3 TextureShader(__constant sClInConstants *consts, sClCalcParams *calcParams,
+REAL3 TextureShader(__constant sClInConstants *consts, sClCalcParams *calcParams,
 	sShaderInputDataCl *input, sRenderData *renderData, __global sObjectDataCl *objectData,
-	int textureIndex, float3 substituteColor)
+	int textureIndex, REAL3 substituteColor)
 {
-	float3 texOut = substituteColor;
+	REAL3 texOut = substituteColor;
 
 	if (textureIndex >= 0)
 	{
-		float3 textureVectorX = 0.0f;
-		float3 textureVectorY = 0.0f;
+		REAL3 textureVectorX = 0.0;
+		REAL3 textureVectorY = 0.0;
 
-		float3 shaderPoint = input->point;
-		float3 pointModified = shaderPoint;
+		REAL3 shaderPoint = input->point;
+		REAL3 pointModified = shaderPoint;
 
 #ifdef FRACTALIZE_TEXTURE
 		// texture fractalize requires a valid fractal sequence; primitives (sequenceIndex < 0)
@@ -57,7 +57,7 @@ float3 TextureShader(__constant sClInConstants *consts, sClCalcParams *calcParam
 		{
 			formulaOut outF;
 
-			float3 fractalPoint = input->hasTransformedPoint ? input->transformedPoint : shaderPoint;
+			REAL3 fractalPoint = input->hasTransformedPoint ? input->transformedPoint : shaderPoint;
 			outF = Fractal(consts, fractalPoint, calcParams, calcModeCubeOrbitTrap, input->material, -1,
 				renderData, input->sequenceIndex, input->transformedPoint, input->hasTransformedPoint);
 			pointModified = outF.z.xyz;
@@ -70,16 +70,18 @@ float3 TextureShader(__constant sClInConstants *consts, sClCalcParams *calcParam
 			pointModified = Matrix33MulFloat3(consts->params.common.mRotFractalRotation, pointModified);
 		}
 
-		float2 texturePoint = TextureMapping(
+		REAL2 texturePoint = TextureMapping(
 			pointModified, input->normal, objectData, input->material, &textureVectorX, &textureVectorY);
 
-		texturePoint += (float2){0.5f, 0.5f};
+		texturePoint += (REAL2){0.5, 0.5};
 
 		int2 textureSize = renderData->textureSizes[textureIndex];
 		__global uchar4 *texture = renderData->textures[textureIndex];
 
-		texOut =
-			BicubicInterpolation(texturePoint.x, texturePoint.y, texture, textureSize.x, textureSize.y);
+		// Texture data stays single precision; promote the sampled color for
+		// REAL shading calculations.
+		texOut = TO_REAL3(
+			BicubicInterpolation(texturePoint.x, texturePoint.y, texture, textureSize.x, textureSize.y));
 	}
 
 	return texOut;

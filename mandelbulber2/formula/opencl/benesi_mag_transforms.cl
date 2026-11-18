@@ -29,7 +29,7 @@ REAL4 BenesiMagTransformsIteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 		REAL tempL = length(z);
 		z = fabs(z) * fractal->transformCommon.scale3D222;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
 		aux->DE = aux->DE * avgScale;
 
@@ -49,14 +49,14 @@ REAL4 BenesiMagTransformsIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	{
 		REAL4 zz = z * z;
 		aux->r = native_sqrt(zz.x + zz.y + zz.z); // needed when alternating pwr2s
-		aux->DE = aux->r * aux->DE * 2.0f + 1.0f;
+		aux->DE = aux->r * aux->DE * 2.0 + 1.0;
 
-		REAL t = 1.0f;
+		REAL t = 1.0;
 		REAL temp = zz.y + zz.z;
-		if (temp > 0.0f) t = 2.0f * z.x / native_sqrt(temp);
+		if (temp > 0.0) t = 2.0 * z.x / native_sqrt(temp);
 		temp = z.z;
 		z.x = (zz.x - zz.y - zz.z);
-		z.y = (2.0f * t * z.y * temp);
+		z.y = (2.0 * t * z.y * temp);
 		z.z = (t * (zz.y - zz.z));
 
 		// swap c.yz then add cPixel
@@ -117,7 +117,7 @@ REAL4 BenesiMagTransformsIteration(REAL4 z, __global sFractalCl *fractal, sExten
 						z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, z.w};
 					z = fabs(z) * fractal->transformCommon.scale3Da222;
 					tempL = length(temp);
-					// if (tempL < 1e-21f) tempL = 1e-21f;
+					// if (tempL < 1e-21) tempL = 1e-21;
 					avgScale = length(z) / tempL;
 					aux->DE = aux->DE * avgScale;
 					tempXZ = (z.y + z.x) * SQRT_1_2_F;
@@ -132,7 +132,7 @@ REAL4 BenesiMagTransformsIteration(REAL4 z, __global sFractalCl *fractal, sExten
 						z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, z.w};
 					z = fabs(z) * fractal->transformCommon.scale3D333;
 					tempL = length(temp);
-					// if (tempL < 1e-21f) tempL = 1e-21f;
+					// if (tempL < 1e-21) tempL = 1e-21;
 					avgScale = length(z) / tempL;
 					aux->DE = aux->DE * avgScale;
 					z = (fabs(z + fractal->transformCommon.offset111)
@@ -154,7 +154,7 @@ REAL4 BenesiMagTransformsIteration(REAL4 z, __global sFractalCl *fractal, sExten
 					temp = z;
 					tempL = length(temp);
 					z = fabs(z) * fractal->transformCommon.scale3D444;
-					// if (tempL < 1e-21f) tempL = 1e-21f;
+					// if (tempL < 1e-21) tempL = 1e-21;
 					avgScale = length(z) / tempL;
 					aux->DE = aux->DE * avgScale;
 					tempXZ = (z.y + z.x) * SQRT_1_2_F;
@@ -202,12 +202,12 @@ REAL4 BenesiMagTransformsIteration(REAL4 z, __global sFractalCl *fractal, sExten
 					tempXZ = z.x * SQRT_2_3_F - z.z * SQRT_1_3_F;
 					z = (REAL4){(tempXZ - z.y) * SQRT_1_2_F, (tempXZ + z.y) * SQRT_1_2_F,
 						z.x * SQRT_1_3_F + z.z * SQRT_2_3_F, z.w};
-					// if (z.x > -1e-21f && z.x < 1e-21f)
-					//	z.x = (z.x > 0) ? 1e-21f : -1e-21f;
-					// if (z.y > -1e-21f && z.y < 1e-21f)
-					//	z.y = (z.y > 0) ? 1e-21f : -1e-21f;
-					// if (z.z > -1e-21f && z.z < 1e-21f)
-					//	z.z = (z.z > 0) ? 1e-21f : -1e-21f;
+					// if (z.x > -1e-21 && z.x < 1e-21)
+					//	z.x = (z.x > 0) ? 1e-21 : -1e-21;
+					// if (z.y > -1e-21 && z.y < 1e-21)
+					//	z.y = (z.y > 0) ? 1e-21 : -1e-21;
+					// if (z.z > -1e-21 && z.z < 1e-21)
+					//	z.z = (z.z > 0) ? 1e-21 : -1e-21;
 					tempV2 = z;
 					tempV2.x = fabs(
 						pow(pow(z.y, fractal->transformCommon.int8X) + pow(z.z, fractal->transformCommon.int8X),

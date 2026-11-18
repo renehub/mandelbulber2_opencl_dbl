@@ -29,27 +29,27 @@ REAL4 TransfBoxWrap4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	{
 		z.x += box_size.x;
 		if (!fractal->transformCommon.functionEnabledFalse)
-			wrap_mode.x = fmod(z.x, 2.0f * box_size.x);
+			wrap_mode.x = fmod(z.x, 2.0 * box_size.x);
 		else
-			wrap_mode.x = z.x - 2.0f * box_size.x * floor(z.x / 2.0f * box_size.x);
+			wrap_mode.x = z.x - 2.0 * box_size.x * floor(z.x / 2.0 * box_size.x);
 		z.x = wrap_mode.x - box_size.x;
 	}
 	if (fractal->transformCommon.functionEnabledByFalse)
 	{
 		z.y += box_size.y;
 		if (!fractal->transformCommon.functionEnabledFalse)
-			wrap_mode.y = fmod(z.y, 2.0f * box_size.y);
+			wrap_mode.y = fmod(z.y, 2.0 * box_size.y);
 		else
-			wrap_mode.y = z.y - 2.0f * box_size.y * floor(z.y / 2.0f * box_size.y);
+			wrap_mode.y = z.y - 2.0 * box_size.y * floor(z.y / 2.0 * box_size.y);
 		z.y = wrap_mode.y - box_size.y;
 	}
 	if (fractal->transformCommon.functionEnabledBzFalse)
 	{
 		z.z += box_size.z;
 		if (!fractal->transformCommon.functionEnabledFalse)
-			wrap_mode.z = fmod(z.z, 2.0f * box_size.z);
+			wrap_mode.z = fmod(z.z, 2.0 * box_size.z);
 		else
-			wrap_mode.z = z.z - 2.0f * box_size.z * floor(z.z / 2.0f * box_size.z);
+			wrap_mode.z = z.z - 2.0 * box_size.z * floor(z.z / 2.0 * box_size.z);
 		z.z = wrap_mode.z - box_size.z;
 	}
 
@@ -57,9 +57,9 @@ REAL4 TransfBoxWrap4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	{
 		z.w += box_size.w;
 		if (!fractal->transformCommon.functionEnabledFalse)
-			wrap_mode.w = fmod(z.w, 2.0f * box_size.w);
+			wrap_mode.w = fmod(z.w, 2.0 * box_size.w);
 		else
-			wrap_mode.w = z.w - 2.0f * box_size.w * floor(z.w / 2.0f * box_size.w);
+			wrap_mode.w = z.w - 2.0 * box_size.w * floor(z.w / 2.0 * box_size.w);
 		z.w = wrap_mode.w - box_size.w;
 	}
 

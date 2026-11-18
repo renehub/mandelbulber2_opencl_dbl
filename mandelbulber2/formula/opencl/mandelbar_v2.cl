@@ -24,18 +24,18 @@ REAL4 MandelbarV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	}
 
 	REAL m2 = z.x * z.x + z.y * z.y;
-	aux->DE = aux->DE * 2.0f * native_sqrt(m2 + z.z * z.z) + 1.0f;
-	if (m2 == 0.0f)
+	aux->DE = aux->DE * 2.0 * native_sqrt(m2 + z.z * z.z) + 1.0;
+	if (m2 == 0.0)
 	{
 		z.y = -z.z * z.z;
-		z.z = 0.0f;
+		z.z = 0.0;
 	}
 	else
 	{
 		REAL temp = m2 - z.z * z.z;
-		z.z = 2.0f * native_sqrt(m2) * z.z;
+		z.z = 2.0 * native_sqrt(m2) * z.z;
 		m2 = temp / m2;
-		temp = 2.0f * z.x * z.y * m2;
+		temp = 2.0 * z.x * z.y * m2;
 
 		z.y = (z.y * z.y - z.x * z.x) * m2;
 		z.x = -temp;

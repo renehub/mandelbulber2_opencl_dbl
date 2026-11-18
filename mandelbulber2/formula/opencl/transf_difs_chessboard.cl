@@ -34,7 +34,7 @@ REAL4 TransfDIFSChessboardIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		{
 			auxCol = repeats.x + repeats.y + repeats.z;
 		}
-		auxCol = (auxCol * 0.5f - floor(auxCol * 0.5f)) * 2.0f;
+		auxCol = (auxCol * 0.5 - floor(auxCol * 0.5)) * 2.0;
 		if (!fractal->foldColor.auxColorEnabledAFalse)
 		{
 			aux->color = auxCol;

@@ -18,7 +18,7 @@
 
 REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL4 Col = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+	REAL4 Col = (REAL4){0.0, 0.0, 0.0, 0.0};
 	REAL t;
 	if (fractal->transformCommon.functionEnabledSwFalse)
 	{
@@ -48,56 +48,56 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		{
 			case comboCl_mode0:
 			default:
-				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.x -= t * -SQRT_3_F - tempOff;
 				z.y = fabs(z.y - t);
 				break;
 			case comboCl_mode1:
-				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.y -= t * -SQRT_3_F - tempOff;
 				z.x = fabs(z.x - t); // x y swap
 				break;
 			case comboCl_mode2:
-				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.z -= t * -SQRT_3_F - tempOff;
 				z.y = fabs(z.y - t); // z y swap
 				break;
 			case comboCl_mode3:
-				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.y -= t * -SQRT_3_F - tempOff;
 				z.z = fabs(z.z - t); // z y swap
 				break;
 			case comboCl_mode4:
-				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.y -= t * -SQRT_3_F - tempOff;
 				z.z -= t * -SQRT_3_F - tempOff;
 				z.x = fabs(z.x - t); // x y swap and other things
 				z.y = fabs(z.y - t);
 				break;
 			case comboCl_mode5:
-				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.x -= t * -SQRT_3_F - tempOff;
 				z.y -= t * -SQRT_3_F - tempOff;
 				z.y = fabs(z.y - t); // x y swap and other things
 				z.z = fabs(z.z - t);
 				break;
 			case comboCl_mode6:
-				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.y -= t * -SQRT_3_F - (fractal->transformCommon.offset0);
 				z.z -= t * -SQRT_3_F - (fractal->transformCommon.offset0);
 				z.x = fabs(z.y - t); // x y swap and other things and swizzle
 				z.y = fabs(z.x - t);
 				break;
 			case comboCl_mode7:
-				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scale;
-				t = max(0.0f, dot1);
+				dot1 = (z.z * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scale;
+				t = max(0.0, dot1);
 				z.x -= t * -SQRT_3_F - (fractal->transformCommon.offset0);
 				z.y -= t * -SQRT_3_F - (fractal->transformCommon.offset0);
 				z.y = fabs(z.z - t); // x y swap and other things and swizzle
@@ -113,7 +113,7 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		}
 		z.y -= fractal->transformCommon.offsetB0;
 
-		z -= gap * (REAL4){SQRT_3_4_F, 1.5f, 1.5f, 0.0f};
+		z -= gap * (REAL4){SQRT_3_4_F, 1.5, 1.5, 0.0};
 
 		if (z.z > z.x)
 		{
@@ -122,20 +122,20 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 				z.z = z.x;
 				z.x = temp;
 			}
-			Col.x = 1.0f;
+			Col.x = 1.0;
 		}
 
 		if (fractal->transformCommon.functionEnabledyFalse)
 		{
-			z.y = max(0.0f, z.y) * fractal->transformCommon.scaleA1;
-			z.z = max(0.0f, z.z) * fractal->transformCommon.scaleB1;
+			z.y = max(0.0, z.y) * fractal->transformCommon.scaleA1;
+			z.z = max(0.0, z.z) * fractal->transformCommon.scaleB1;
 		}
 		if (fractal->transformCommon.functionEnabledzFalse)
 		{
-			if (z.x >= 0.0f)
+			if (z.x >= 0.0)
 			{
-				z.y = max(0.0f, z.y) * fractal->transformCommon.scaleA1;
-				z.z = max(0.0f, z.z) * fractal->transformCommon.scaleB1;
+				z.y = max(0.0, z.y) * fractal->transformCommon.scaleA1;
+				z.z = max(0.0, z.z) * fractal->transformCommon.scaleB1;
 			}
 		}
 		z *= fractal->transformCommon.scale1;
@@ -155,8 +155,8 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		{
 			z.x = fabs(z.x);
 		}
-		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scaleD1;
-		t = max(0.0f, dot1);
+		REAL dot1 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scaleD1;
+		t = max(0.0, dot1);
 		z.x -= t * -SQRT_3_F;
 		if (fractal->transformCommon.functionEnabledBzFalse)
 		{
@@ -167,20 +167,20 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			z.y = fabs(z.y - t);
 		}
 		z.x -= SQRT_3_4_F;
-		REAL dy = 0.0f;
-		REAL dz = 0.0f;
-		if (z.y > 0.5f && z.z > 0.5f)
+		REAL dy = 0.0;
+		REAL dz = 0.0;
+		if (z.y > 0.5 && z.z > 0.5)
 		{
-			dy = 1.5f;
-			dz = 1.5f;
+			dy = 1.5;
+			dz = 1.5;
 		}
 		else if (z.z < z.y)
-		// else if ((z.y - 1.5f) * (z.y - 1.5f) + z.z * z.z < z.y * z.y + (z.z - 1.5f) * (z.z - 1.5f))
+		// else if ((z.y - 1.5) * (z.y - 1.5) + z.z * z.z < z.y * z.y + (z.z - 1.5) * (z.z - 1.5))
 		{
-			dy = 1.5f;
+			dy = 1.5;
 		}
 		else
-			dz = 1.5f;
+			dz = 1.5;
 
 		z.y -= dy;
 		z.z -= dz;
@@ -218,8 +218,8 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		z.y = fabs(z.y);
 		z.z = fabs(z.z);
 
-		REAL dot2 = (z.x * -SQRT_3_4_F + z.y * 0.5f) * fractal->transformCommon.scaleF1;
-		REAL t2 = max(0.0f, dot2);
+		REAL dot2 = (z.x * -SQRT_3_4_F + z.y * 0.5) * fractal->transformCommon.scaleF1;
+		REAL t2 = max(0.0, dot2);
 
 		z.x -= t2 * -SQRT_3_F;
 		z.y = fabs(z.y - t2);
@@ -231,14 +231,14 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			z.z = temp;
 		}
 
-		z.y = fabs(z.y - 0.5f) + 0.5f;
+		z.y = fabs(z.y - 0.5) + 0.5;
 
-		z -= (REAL4){0.5f * SQRT_3_F, 1.5f, 1.5f, 0.0f};
+		z -= (REAL4){0.5 * SQRT_3_F, 1.5, 1.5, 0.0};
 
 		z *= fractal->transformCommon.scaleB3;
 		aux->DE *= fractal->transformCommon.scaleB3;
 
-		z += (REAL4){0.5f * SQRT_3_F, 1.5f, 1.5f, 0.0f};
+		z += (REAL4){0.5 * SQRT_3_F, 1.5, 1.5, 0.0};
 	}
 
 	if (fractal->transformCommon.benesiT1EnabledFalse
@@ -252,9 +252,9 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		REAL4 tempZ = z;
 		REAL tempL = length(tempZ);
 		z = fabs(z) * fractal->transformCommon.scale3D222;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
-		aux->DE = aux->DE * avgScale + 1.0f;
+		aux->DE = aux->DE * avgScale + 1.0;
 
 		tempXZ = (z.y + z.x) * SQRT_1_2_F;
 
@@ -274,9 +274,9 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		REAL4 temp = z;
 		REAL tempL = length(temp);
 		z = fabs(z) * fractal->transformCommon.scale3D333;
-		// if (tempL < 1e-21f) tempL = 1e-21f;
+		// if (tempL < 1e-21) tempL = 1e-21;
 		REAL avgScale = length(z) / tempL;
-		aux->DE = aux->DE * avgScale + 1.0f;
+		aux->DE = aux->DE * avgScale + 1.0;
 
 		z = (fabs(z + fractal->transformCommon.additionConstant111)
 				 - fabs(z - fractal->transformCommon.additionConstant111) - z);
@@ -291,8 +291,8 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			&& aux->i >= fractal->transformCommon.startIterationsF
 			&& aux->i < fractal->transformCommon.stopIterationsF)
 	{
-		REAL4 tempA = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
-		REAL4 tempB = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 tempA = (REAL4){0.0, 0.0, 0.0, 0.0};
+		REAL4 tempB = (REAL4){0.0, 0.0, 0.0, 0.0};
 
 		if (fractal->transformCommon.functionEnabledAx)
 			tempA.x = fabs(z.x + fractal->transformCommon.offsetF000.x);
@@ -337,14 +337,14 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			t = z.y;
 			z.y = z.x;
 			z.x = t;
-			Col.y = 1.0f;
+			Col.y = 1.0;
 		}
 		if (z.x < z.z)
 		{
 			t = z.z;
 			z.z = z.x;
 			z.x = t;
-			Col.z = 1.0f;
+			Col.z = 1.0;
 		}
 		if (z.y < z.z)
 		{
@@ -353,12 +353,12 @@ REAL4 MengerPrismShape2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			z.y = t;
 		}
 		z *= fractal->transformCommon.scale3;
-		z.x -= 2.0f * fractal->transformCommon.constantMultiplierA111.x;
-		z.y -= 2.0f * fractal->transformCommon.constantMultiplierA111.y;
-		if (z.z > 1.0f)
+		z.x -= 2.0 * fractal->transformCommon.constantMultiplierA111.x;
+		z.y -= 2.0 * fractal->transformCommon.constantMultiplierA111.y;
+		if (z.z > 1.0)
 		{
-			z.z -= 2.0f * fractal->transformCommon.constantMultiplierA111.z;
-			Col.w = 1.0f;
+			z.z -= 2.0 * fractal->transformCommon.constantMultiplierA111.z;
+			Col.w = 1.0;
 		}
 		aux->DE *= fractal->transformCommon.scale3;
 

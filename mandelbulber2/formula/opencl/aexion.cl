@@ -29,11 +29,11 @@ REAL4 AexionIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		z = fabs(temp) + cadd;
 		aux->const_c = z;
 	}
-	t = 2.0f * z.w * z.z;
+	t = 2.0 * z.w * z.z;
 	temp.x = z.x * z.x - z.y * z.y;
 	temp.y = t - temp.x;
 	temp.x += t;
-	t = 2.0f * z.x * z.y;
+	t = 2.0 * z.x * z.y;
 	temp.z = z.z * z.z - z.w * z.w;
 	temp.w = t - temp.z;
 	temp.z += t;
@@ -41,9 +41,9 @@ REAL4 AexionIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 
 	if (fractal->analyticDE.enabled)
 	{
-		REAL de1 = 1.1f * aux->r;
+		REAL de1 = 1.1 * aux->r;
 		de1 = de1 + (length(z) / aux->r - de1) * fractal->analyticDE.scale1;
-		aux->DE = de1 * 2.0f * aux->DE + fractal->analyticDE.offset1;
+		aux->DE = de1 * 2.0 * aux->DE + fractal->analyticDE.offset1;
 	}
 	return z;
 }

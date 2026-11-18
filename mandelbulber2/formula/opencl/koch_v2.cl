@@ -44,7 +44,7 @@ REAL4 KochV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		{
 			z.x = fabs(z.x);
 			REAL psi = M_PI_F / fractal->transformCommon.int6;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -127,12 +127,12 @@ REAL4 KochV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 		REAL4 c = aux->const_c;
 		if (!fractal->transformCommon.functionEnabledEFalse)
 		{
-			REAL4 f = fabs(c) - (REAL4){e, e, e, 0.0f};
+			REAL4 f = fabs(c) - (REAL4){e, e, e, 0.0};
 			e = max(f.x, max(f.y, f.z));
 		}
 		else
 		{
-			e = clamp(length(c) - e, 0.0f, 100.0f); // sphere
+			e = clamp(length(c) - e, 0.0, 100.0); // sphere
 		}
 		d = fabs(z.z - Offset.z);
 		d = max(d, e);

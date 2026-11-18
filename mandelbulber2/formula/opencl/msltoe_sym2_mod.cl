@@ -18,7 +18,7 @@ REAL4 MsltoeSym2ModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 {
 	REAL4 c = aux->const_c;
 
-	aux->DE = aux->DE * 2.0f * aux->r;
+	aux->DE = aux->DE * 2.0 * aux->r;
 	REAL4 temp = z;
 
 	if (fabs(z.y) < fabs(z.z)) // then swap
@@ -33,12 +33,12 @@ REAL4 MsltoeSym2ModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 
 	REAL4 z2 = z * z;								// squares
 	REAL v3 = (z2.x + z2.y + z2.z); // sum of squares
-	// if (v3 < 1e-21f && v3 > -1e-21f)
-	//	v3 = (v3 > 0) ? 1e-21f : -1e-21f;
-	REAL zr = 1.0f - z2.z / v3;
+	// if (v3 < 1e-21 && v3 > -1e-21)
+	//	v3 = (v3 > 0) ? 1e-21 : -1e-21;
+	REAL zr = 1.0 - z2.z / v3;
 	temp.x = (z2.x - z2.y) * zr;
-	temp.y = 2.0f * z.x * z.y * zr * fractal->transformCommon.scale; // scaling temp.y
-	temp.z = 2.0f * z.z * native_sqrt(z2.x + z2.y);
+	temp.y = 2.0 * z.x * z.y * zr * fractal->transformCommon.scale; // scaling temp.y
+	temp.z = 2.0 * z.z * native_sqrt(z2.x + z2.y);
 	z = temp + fractal->transformCommon.additionConstant000;
 
 	if (fractal->transformCommon.addCpixelEnabledFalse)
@@ -56,9 +56,9 @@ REAL4 MsltoeSym2ModIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 	}
 
 	REAL lengthTempZ = -length(z);
-	// if (lengthTempZ > -1e-21f)
-	//	lengthTempZ = -1e-21f;   //  z is neg.)
-	z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+	// if (lengthTempZ > -1e-21)
+	//	lengthTempZ = -1e-21;   //  z is neg.)
+	z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 	z *= fractal->transformCommon.scale1;
 	aux->DE *= fabs(fractal->transformCommon.scale1);
 	return z;

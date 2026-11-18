@@ -72,7 +72,7 @@ REAL4 MsltoeToroidalMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	REAL x1 = r1 * native_cos(ph0);
 	REAL y1 = r1 * native_sin(ph0);
 
-	aux->r = (z.x - x1) * (z.x - x1) + (z.y - y1) * (z.y - y1) + z.z * z.z; //+ 1e-030f
+	aux->r = (z.x - x1) * (z.x - x1) + (z.y - y1) * (z.y - y1) + z.z * z.z; //+ 1e-030
 
 	REAL sqrT = aux->r;
 	if (fractal->transformCommon.functionEnabledAy) // sqrt
@@ -113,7 +113,7 @@ REAL4 MsltoeToroidalMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	// DEcalc
 	if (!fractal->analyticDE.enabledFalse)
 	{
-		aux->DE = rp * aux->DE * (fractal->transformCommon.pwr4 + 1.0f) + 1.0f;
+		aux->DE = rp * aux->DE * (fractal->transformCommon.pwr4 + 1.0) + 1.0;
 	}
 	else
 	{
@@ -125,10 +125,10 @@ REAL4 MsltoeToroidalMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	if (fractal->transformCommon.functionEnabledAxFalse) // spherical offset
 	{
 		REAL lengthTempZ = -length(z);
-		// if (lengthTempZ > -1e-21f) lengthTempZ = -1e-21f;   //  z is neg.)
-		z *= 1.0f + fractal->transformCommon.offset / lengthTempZ;
+		// if (lengthTempZ > -1e-21) lengthTempZ = -1e-21;   //  z is neg.)
+		z *= 1.0 + fractal->transformCommon.offset / lengthTempZ;
 		z *= fractal->transformCommon.scale;
-		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0f;
+		aux->DE = aux->DE * fabs(fractal->transformCommon.scale) + 1.0;
 	}
 	// then add Cpixel constant vector
 	return z;

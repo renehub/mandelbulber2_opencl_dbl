@@ -25,7 +25,7 @@ REAL4 MsltoeToroidalV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	}
 
 	// Toroidal bulb
-	REAL r1 = fractal->transformCommon.minR05; // default 0.5f
+	REAL r1 = fractal->transformCommon.minR05; // default 0.5
 	REAL theta = atan2(z.y, z.x);
 	REAL x1 = r1 * native_cos(theta);
 	REAL y1 = r1 * native_sin(theta);
@@ -33,7 +33,7 @@ REAL4 MsltoeToroidalV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	REAL r = native_sqrt(rr + z.z * z.z);
 	REAL temp = r;
 
-	REAL phi = 0.0f;
+	REAL phi = 0.0;
 	if (!fractal->transformCommon.functionEnabledYFalse)
 	{
 		phi = asin(z.z / temp);
@@ -54,8 +54,8 @@ REAL4 MsltoeToroidalV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 	r = r + (aux->r - r) * fractal->transformCommon.offsetR0;
 
-	REAL rp = pow(r, fractal->bulb.power - 1.0f) / fractal->transformCommon.scaleB1;
-	aux->DE = rp * aux->DE * (fractal->bulb.power + fractal->analyticDE.offset0) + 1.0f;
+	REAL rp = pow(r, fractal->bulb.power - 1.0) / fractal->transformCommon.scaleB1;
+	aux->DE = rp * aux->DE * (fractal->bulb.power + fractal->analyticDE.offset0) + 1.0;
 	rp *= r;
 
 	phi *= fractal->transformCommon.pwr8;
@@ -82,9 +82,9 @@ REAL4 MsltoeToroidalV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	if (fractal->transformCommon.functionEnabledAxFalse) // spherical offset
 	{
 		// REAL lengthTempZ = -length(z);
-		//  if (lengthTempZ > -1e-21f) lengthTempZ = -1e-21f;   //  z is neg.)
-		z *= 1.0f - fractal->transformCommon.offset / length(z);
-		// aux->DE = aux->DE * fabs(1.0f + fractal->transformCommon.offset / -length(z));
+		//  if (lengthTempZ > -1e-21) lengthTempZ = -1e-21;   //  z is neg.)
+		z *= 1.0 - fractal->transformCommon.offset / length(z);
+		// aux->DE = aux->DE * fabs(1.0 + fractal->transformCommon.offset / -length(z));
 		z *= fractal->transformCommon.scale;
 		aux->DE = aux->DE * fabs(fractal->transformCommon.scale);
 	}
@@ -93,10 +93,10 @@ REAL4 MsltoeToroidalV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	if (fractal->transformCommon.functionEnabledOFalse)
 	{
 		aux->DE0 = length(z);
-		if (aux->DE0 > 1.0f)
-			aux->DE0 = 0.5f * log(aux->DE0) * aux->DE0 / aux->DE;
+		if (aux->DE0 > 1.0)
+			aux->DE0 = 0.5 * log(aux->DE0) * aux->DE0 / aux->DE;
 		else
-			aux->DE0 = 0.0f;
+			aux->DE0 = 0.0;
 		if (!fractal->transformCommon.functionEnabledCFalse)
 			aux->dist = aux->DE0;
 		else

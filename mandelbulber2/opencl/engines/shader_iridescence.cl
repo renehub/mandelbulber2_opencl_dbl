@@ -34,27 +34,27 @@
 
 //------------- Iridescence shader -------------
 #ifdef USE_IRIDESCENCE
-float3 IridescenceShader(__constant sClInConstants *consts, sRenderData *renderData,
+REAL3 IridescenceShader(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParam)
 {
-	float3 rainbowColor = 1.0f;
-	if (input->material->iridescenceIntensity > 0.0f)
+	REAL3 rainbowColor = 1.0;
+	if (input->material->iridescenceIntensity > 0.0)
 	{
-		float dist1 = input->lastDist;
-		float3 pointTemp = input->point - input->viewVector * input->delta;
+		REAL dist1 = input->lastDist;
+		REAL3 pointTemp = input->point - input->viewVector * input->delta;
 
 		calcParam->distThresh = input->distThresh;
 		formulaOut outF;
 		outF = CalculateDistance(consts, pointTemp, calcParam, renderData);
-		float dist2 = outF.distance;
+		REAL dist2 = outF.distance;
 
-		float diff = fabs(dist1 - dist2);
-		float surfaceThickness =
-			(diff > 0.0f) ? input->delta * input->material->iridescenceSubsurfaceThickness / diff : 1e6f;
-		float rainbowIndex = fmod(surfaceThickness, 1.0f) * 360.0f;
-		float sat = input->material->iridescenceIntensity / (0.1f + surfaceThickness);
-		if (sat > 1.0f) sat = 1.0f;
-		rainbowColor = Hsv2rgb(rainbowIndex, sat, 1.0f);
+		REAL diff = fabs(dist1 - dist2);
+		REAL surfaceThickness =
+			(diff > 0.0) ? input->delta * input->material->iridescenceSubsurfaceThickness / diff : 1e6;
+		REAL rainbowIndex = fmod(surfaceThickness, 1.0) * 360.0;
+		REAL sat = input->material->iridescenceIntensity / (0.1 + surfaceThickness);
+		if (sat > 1.0) sat = 1.0;
+		rainbowColor = TO_REAL3(Hsv2rgb(rainbowIndex, sat, 1.0));
 	}
 	return rainbowColor;
 }

@@ -80,13 +80,13 @@ REAL4 TransfSurfFoldMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		REAL4 zCol = fabs(z - oldZ);
 
 		if (!fractal->foldColor.auxColorEnabledAFalse)
 		{
-			if (zCol.x > 0.0f) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
-			if (zCol.y > 0.0f) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
+			if (zCol.x > 0.0) colorAdd += fractal->foldColor.difs0000.x * zCol.x;
+			if (zCol.y > 0.0) colorAdd += fractal->foldColor.difs0000.y * zCol.y;
 		}
 		else
 		{
@@ -97,7 +97,7 @@ REAL4 TransfSurfFoldMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 			else
 			{
 				colorAdd += fractal->foldColor.difs0000.x
-										* (1.0f
+										* (1.0
 											 - (fractal->transformCommon.additionConstant111.x - fabs(z.x))
 													 / fractal->transformCommon.additionConstant111.x);
 			}
@@ -109,7 +109,7 @@ REAL4 TransfSurfFoldMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 			else
 			{
 				colorAdd += fractal->foldColor.difs0000.y
-										* (1.0f
+										* (1.0
 											 - (fractal->transformCommon.additionConstant111.y - fabs(z.y))
 													 / fractal->transformCommon.additionConstant111.y);
 			}

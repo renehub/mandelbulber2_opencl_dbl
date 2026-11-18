@@ -16,8 +16,8 @@
 
 REAL4 TransfDEControlsIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rd = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rd = 0.0;
 	REAL4 tZ;
 	// distance functions
 	switch (fractal->combo4.combo4)
@@ -53,7 +53,7 @@ REAL4 TransfDEControlsIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	}
 	if (fractal->transformCommon.functionEnabledCFalse)
 	{
-		rd = 0.5f * rd * log(rd) / aux->DE;
+		rd = 0.5 * rd * log(rd) / aux->DE;
 	}
 
 	if (fractal->transformCommon.functionEnabledMFalse)
@@ -66,7 +66,7 @@ REAL4 TransfDEControlsIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 			case multi_combo3Cl_type1:
 			default:
 				mixA = rd;
-				mixB = 0.5f * rd * log(rd);
+				mixB = 0.5 * rd * log(rd);
 				break;
 			case multi_combo3Cl_type2:
 				rxy = native_sqrt(z.x * z.x + z.y * z.y);
@@ -74,7 +74,7 @@ REAL4 TransfDEControlsIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				mixB = rd;
 				break;
 			case multi_combo3Cl_type3:
-				mixA = 0.5f * rd * log(rd);
+				mixA = 0.5 * rd * log(rd);
 				rxy = native_sqrt(z.x * z.x + z.y * z.y);
 				mixB = max(rxy - fractal->transformCommon.offsetA1, fabs(rxy * z.z) / rd);
 				break;

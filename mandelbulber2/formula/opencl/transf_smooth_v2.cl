@@ -32,21 +32,21 @@ REAL4 TransfSmoothV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	if (fractal->transformCommon.functionEnabledx)
 	{
 		t = z.x - z.y;
-		t = 0.5f * (t - native_sqrt(t * t + OffsetS + tc.x));
+		t = 0.5 * (t - native_sqrt(t * t + OffsetS + tc.x));
 		z.x = z.x - t;
 		z.y = z.y + t;
 	}
 	if (fractal->transformCommon.functionEnabledy)
 	{
 		t = z.y - z.z;
-		t = 0.5f * (t - native_sqrt(t * t + OffsetS + tc.y));
+		t = 0.5 * (t - native_sqrt(t * t + OffsetS + tc.y));
 		z.y = z.y - t;
 		z.z = z.z + t;
 	}
 	if (fractal->transformCommon.functionEnabledz)
 	{
 		t = z.z - z.x;
-		t = 0.5f * (t - native_sqrt(t * t + OffsetS + tc.z));
+		t = 0.5 * (t - native_sqrt(t * t + OffsetS + tc.z));
 		z.z = z.z - t;
 		z.x = z.x + t;
 	}

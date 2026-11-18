@@ -26,7 +26,7 @@ REAL4 TransfSphericalFoldVaryV1Iteration(REAL4 z, __global sFractalCl *fractal, 
 		int iterationRange =
 			fractal->transformCommon.stopIterationsA - fractal->transformCommon.startIterationsA;
 		int currentIteration = (aux->i - fractal->transformCommon.startIterationsA);
-		tempVCf += fractal->transformCommon.offset * (1.0f * currentIteration) / iterationRange;
+		tempVCf += fractal->transformCommon.offset * (1.0 * currentIteration) / iterationRange;
 	}
 	if (aux->i >= fractal->transformCommon.stopIterationsA)
 	{
@@ -39,7 +39,7 @@ REAL4 TransfSphericalFoldVaryV1Iteration(REAL4 z, __global sFractalCl *fractal, 
 		int iterationRange =
 			fractal->transformCommon.stopIterationsB - fractal->transformCommon.startIterationsB;
 		int currentIteration = (aux->i - fractal->transformCommon.startIterationsB);
-		tempVCm += fractal->transformCommon.offset0 * (1.0f * currentIteration) / iterationRange;
+		tempVCm += fractal->transformCommon.offset0 * (1.0 * currentIteration) / iterationRange;
 	}
 	if (aux->i >= fractal->transformCommon.stopIterationsB)
 	{

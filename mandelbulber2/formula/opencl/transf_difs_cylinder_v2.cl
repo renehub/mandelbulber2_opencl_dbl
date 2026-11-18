@@ -87,8 +87,8 @@ REAL4 TransfDIFSCylinderV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	{
 		temp = cylRm;
 	}
-	temp = max(temp, 0.0f);
-	REAL cylHm = max(cylH, 0.0f);
+	temp = max(temp, 0.0);
+	REAL cylHm = max(cylH, 0.0);
 	REAL cylD = native_sqrt(temp * temp + cylHm * cylHm);
 
 	// rings
@@ -98,7 +98,7 @@ REAL4 TransfDIFSCylinderV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 	{
 		cylD = native_sqrt(cylRm * cylRm + cylH * cylH);
 	}
-	cylD = min(max(cylRm, cylH) - fractal->transformCommon.offsetR0, 0.0f) + cylD;
+	cylD = min(max(cylRm, cylH) - fractal->transformCommon.offsetR0, 0.0) + cylD;
 	REAL colDist = aux->dist;
 	aux->dist = min(
 		aux->dist, cylD / (aux->DE + fractal->analyticDE.offset0) - fractal->transformCommon.offsetB0);
@@ -112,7 +112,7 @@ REAL4 TransfDIFSCylinderV2Iteration(REAL4 z, __global sFractalCl *fractal, sExte
 		if (fractal->foldColor.auxColorEnabledAFalse)
 		{
 			temp = fractal->transformCommon.offsetA1 + fractal->transformCommon.offsetB0;
-			if (fractal->foldColor.difs0000.x != 0.0f) temp = temp - fractal->foldColor.difs0000.x;
+			if (fractal->foldColor.difs0000.x != 0.0) temp = temp - fractal->foldColor.difs0000.x;
 
 			if (t < -fractal->transformCommon.offset0 - fractal->transformCommon.offsetB0
 					&& temp > fabs(zc.z))

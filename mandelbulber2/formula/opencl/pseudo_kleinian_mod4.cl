@@ -18,7 +18,7 @@
 
 REAL4 PseudoKleinianMod4Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	// sphere inversion
 	if (fractal->transformCommon.sphereInversionEnabledFalse
@@ -44,11 +44,11 @@ REAL4 PseudoKleinianMod4Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	}
 
 	// Pseudo kleinian
-	REAL k = 0.0f;
+	REAL k = 0.0;
 	z = fabs(z + fractal->transformCommon.additionConstant0777)
 			- fabs(z - fractal->transformCommon.additionConstant0777) - z;
 
-	k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0f);
+	k = max(fractal->transformCommon.minR05 / dot(z, z), 1.0);
 	z *= k;
 	aux->DE *= k + fractal->analyticDE.tweak005;
 	aux->pseudoKleinianDE = fractal->analyticDE.scale1; // pK DE
@@ -104,8 +104,8 @@ REAL4 PseudoKleinianMod4Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 		t = z.x;
 		z.x = z.x + z.y;
 		z.y = t - z.y;
-		z.x *= 0.5f;
-		z.y *= 0.5f;
+		z.x *= 0.5;
+		z.y *= 0.5;
 		if (fractal->transformCommon.functionEnabledAx
 				&& aux->i >= fractal->transformCommon.startIterationsR
 				&& aux->i < fractal->transformCommon.stopIterationsR)

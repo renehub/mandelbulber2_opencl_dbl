@@ -16,12 +16,12 @@
 
 REAL4 FoldBoxMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	if (aux->i >= fractal->transformCommon.startIterations
 			&& aux->i < fractal->transformCommon.stopIterations)
 	{
-		REAL4 tempA = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
-		REAL4 tempB = (REAL4){0.0f, 0.0f, 0.0f, 0.0f};
+		REAL4 tempA = (REAL4){0.0, 0.0, 0.0, 0.0};
+		REAL4 tempB = (REAL4){0.0, 0.0, 0.0, 0.0};
 
 		REAL4 oldZ = z;
 		if (fractal->transformCommon.functionEnabledx)
@@ -73,8 +73,8 @@ REAL4 FoldBoxMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 			&& aux->i < fractal->transformCommon.stopIterationsB) // spherical fold
 	{
 		REAL r2 = dot(z, z);
-		// if (r2 < 1e-21f && r2 > -1e-21f)
-		//	r2 = (r2 > 0) ? 1e-21f : -1e-21f;
+		// if (r2 < 1e-21 && r2 > -1e-21)
+		//	r2 = (r2 > 0) ? 1e-21 : -1e-21;
 		if (r2 < fractal->mandelbox.mR2)
 		{
 			z *= fractal->mandelbox.mboxFactor1;
@@ -97,7 +97,7 @@ REAL4 FoldBoxMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	{
 		REAL useScale = aux->actualScaleA + fractal->mandelbox.scale;
 		z *= useScale;
-		aux->DE = aux->DE * fabs(useScale) + 1.0f;
+		aux->DE = aux->DE * fabs(useScale) + 1.0;
 
 		// update actualScale for next iteration
 		REAL vary = fractal->transformCommon.scaleVary0
@@ -110,7 +110,7 @@ REAL4 FoldBoxMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	else
 	{
 		z *= fractal->mandelbox.scale;
-		aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0f;
+		aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0;
 	}
 	if (fractal->mandelbox.mainRotationEnabled && aux->i >= fractal->transformCommon.startIterationsC
 			&& aux->i < fractal->transformCommon.stopIterationsC)

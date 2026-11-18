@@ -34,14 +34,14 @@
 
 #define MAX_RAYMARCHING 5000
 
-float3 NormalVector(__constant sClInConstants *consts, float3 point, float mainDistance,
-	float distThresh, sClCalcParams *calcParam, sRenderData *renderData)
+REAL3 NormalVector(__constant sClInConstants *consts, REAL3 point, REAL mainDistance,
+	REAL distThresh, sClCalcParams *calcParam, sRenderData *renderData)
 {
-	float delta = distThresh;
-	float s1 = CalculateDistance(consts, point + (float3){delta, 0.0f, 0.0f}, calcParam, renderData).distance;
-	float s2 = CalculateDistance(consts, point + (float3){0.0f, delta, 0.0f}, calcParam, renderData).distance;
-	float s3 = CalculateDistance(consts, point + (float3){0.0f, 0.0f, delta}, calcParam, renderData).distance;
-	float3 normal = (float3){s1 - mainDistance, s2 - mainDistance, s3 - mainDistance};
+	REAL delta = distThresh;
+	REAL s1 = CalculateDistance(consts, point + (REAL3){delta, 0.0, 0.0}, calcParam, renderData).distance;
+	REAL s2 = CalculateDistance(consts, point + (REAL3){0.0, delta, 0.0}, calcParam, renderData).distance;
+	REAL s3 = CalculateDistance(consts, point + (REAL3){0.0, 0.0, delta}, calcParam, renderData).distance;
+	REAL3 normal = (REAL3){s1 - mainDistance, s2 - mainDistance, s3 - mainDistance};
 	normal = normalize(normal);
 	return normal;
 }
@@ -60,47 +60,47 @@ kernel void fractal3D(__global sClPixel *out, __global sClInBuff *inBuff,
 
 	const int imageY = clamp(imageYTemp, 0, consts->params.imageHeight - 1);
 
-	float2 screenPoint = (float2){convert_float(imageX), convert_float(imageY)};
-	float width = convert_float(consts->params.imageWidth);
-	float height = convert_float(consts->params.imageHeight);
-	float resolution = 1.0f / width;
+	REAL2 screenPoint = (REAL2){convert_float(imageX), convert_float(imageY)};
+	REAL width = convert_float(consts->params.imageWidth);
+	REAL height = convert_float(consts->params.imageHeight);
+	REAL resolution = 1.0 / width;
 
 	// auxiliary vectors
-	const float3 one = (float3){1.0f, 0.0f, 0.0f};
-	const float3 ones = 1.0f;
+	const REAL3 one = (REAL3){1.0, 0.0, 0.0};
+	const REAL3 ones = 1.0;
 
 	// main rotation matrix
 	matrix33 rot;
-	rot.m1 = (float3){1.0f, 0.0f, 0.0f};
-	rot.m2 = (float3){0.0f, 1.0f, 0.0f};
-	rot.m3 = (float3){0.0f, 0.0f, 1.0f};
+	rot.m1 = (REAL3){1.0, 0.0, 0.0};
+	rot.m2 = (REAL3){0.0, 1.0, 0.0};
+	rot.m3 = (REAL3){0.0, 0.0, 1.0};
 
 	rot = RotateZ(rot, consts->params.viewAngle.x);
 	rot = RotateX(rot, consts->params.viewAngle.y);
 	rot = RotateY(rot, consts->params.viewAngle.z);
 
 	// starting point for ray-marching
-	float3 start = consts->params.camera;
+	REAL3 start = consts->params.camera;
 
 	// view vector
-	float aspectRatio = width / height;
-	float x2, z2;
-	x2 = (screenPoint.x / width - 0.5f) * aspectRatio;
-	z2 = -(screenPoint.y / height - 0.5f);
-	float3 viewVector = (float3){x2 * consts->params.fov, 1.0f, z2 * consts->params.fov};
+	REAL aspectRatio = width / height;
+	REAL x2, z2;
+	x2 = (screenPoint.x / width - 0.5) * aspectRatio;
+	z2 = -(screenPoint.y / height - 0.5);
+	REAL3 viewVector = (REAL3){x2 * consts->params.fov, 1.0, z2 * consts->params.fov};
 	viewVector = Matrix33MulFloat3(rot, viewVector);
 
 	bool found = false;
 	int count;
 
-	float3 point;
-	float scan, distThresh, distance;
+	REAL3 point;
+	REAL scan, distThresh, distance;
 
-	scan = 1e-10f;
+	scan = 1e-10;
 
 	sClCalcParams calcParam;
 	calcParam.N = consts->params.N;
-	distThresh = 1e-6f;
+	distThresh = 1e-6;
 
 	sRenderData renderData;
 	renderData.nodesData = 0;
@@ -115,7 +115,7 @@ kernel void fractal3D(__global sClPixel *out, __global sClInBuff *inBuff,
 	renderData.numberOfHybridSequences = 0;
 
 	formulaOut outF;
-	float step = 0.0f;
+	REAL step = 0.0;
 
 	// ray-marching
 	for (count = 0; count < MAX_RAYMARCHING && scan < consts->params.viewDistanceMax; count++)
@@ -132,17 +132,17 @@ kernel void fractal3D(__global sClPixel *out, __global sClInBuff *inBuff,
 			break;
 		}
 
-		step = (distance - 0.5f * distThresh) * consts->params.DEFactor;
+		step = (distance - 0.5 * distThresh) * consts->params.DEFactor;
 		scan += step;
 	}
 
 	// final binary searching
 	if (found)
 	{
-		step *= 0.5f;
+		step *= 0.5;
 		for (int i = 0; i < 5; i++)
 		{
-			if (distance < distThresh && distance > distThresh * 0.95f)
+			if (distance < distThresh && distance > distThresh * 0.95)
 			{
 				break;
 			}
@@ -152,56 +152,56 @@ kernel void fractal3D(__global sClPixel *out, __global sClInBuff *inBuff,
 				{
 					point += viewVector * step;
 				}
-				else if (distance < distThresh * 0.95f)
+				else if (distance < distThresh * 0.95)
 				{
 					point -= viewVector * step;
 				}
 			}
 			outF = CalculateDistance(consts, point, &calcParam, &renderData);
 			distance = outF.distance;
-			step *= 0.5f;
+			step *= 0.5;
 		}
 	}
 
-	float3 colour = 0.7f;
-	float3 surfaceColour = 1.0f;
+	REAL3 colour = 0.7;
+	REAL3 surfaceColour = 1.0;
 	if (found)
 	{
-		float3 normal = NormalVector(consts, point, distance, distThresh, &calcParam, &renderData);
+		REAL3 normal = NormalVector(consts, point, distance, distThresh, &calcParam, &renderData);
 
-		float3 lightVector = (float3){
-			cos(consts->params.mainLightAlpha - 0.5f * M_PI_F) * cos(-consts->params.mainLightBeta),
-			sin(consts->params.mainLightAlpha - 0.5f * M_PI_F) * cos(-consts->params.mainLightBeta),
+		REAL3 lightVector = (REAL3){
+			cos(consts->params.mainLightAlpha - 0.5 * M_PI_F) * cos(-consts->params.mainLightBeta),
+			sin(consts->params.mainLightAlpha - 0.5 * M_PI_F) * cos(-consts->params.mainLightBeta),
 			sin(-consts->params.mainLightBeta)};
 		lightVector = Matrix33MulFloat3(rot, lightVector);
-		float shade = dot(lightVector, normal);
-		if (shade < 0.0f) shade = 0.0f;
+		REAL shade = dot(lightVector, normal);
+		if (shade < 0.0) shade = 0.0;
 
-		float3 halfVector = lightVector - viewVector;
+		REAL3 halfVector = lightVector - viewVector;
 		halfVector = fast_normalize(halfVector);
-		float specular = dot(normal, halfVector);
-		if (specular < 0.0f) specular = 0.0f;
-		specular = pown(specular, 30.0f);
-		if (specular > 15.0f) specular = 15.0f;
+		REAL specular = dot(normal, halfVector);
+		if (specular < 0.0) specular = 0.0;
+		specular = pown(specular, 30.0);
+		if (specular > 15.0) specular = 15.0;
 
 		colour = colour * (shade + specular);
 	}
 	else
 	{
-		colour = 0.0f;
+		colour = 0.0;
 	}
 
 	sClPixel pixel;
 
-	float glow = count / 100.0f * consts->params.DEFactor;
+	REAL glow = count / 100.0 * consts->params.DEFactor;
 
 	pixel.R = colour.s0 + glow;
-	pixel.G = colour.s1 * glow * 10.0f;
+	pixel.G = colour.s1 * glow * 10.0;
 	pixel.B = colour.s2;
 	pixel.zBuffer = scan;
-	pixel.colR = 0.0f;
-	pixel.colG = 0.0f;
-	pixel.colB = 0.0f;
+	pixel.colR = 0.0;
+	pixel.colG = 0.0;
+	pixel.colB = 0.0;
 	pixel.opacity = 0;
 	pixel.alpha = 65535;
 

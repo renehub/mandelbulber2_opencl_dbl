@@ -16,7 +16,7 @@
 
 REAL4 PseudoKleinian4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 
 	// sphere inversion
 	if (fractal->transformCommon.sphereInversionEnabledFalse
@@ -39,7 +39,7 @@ REAL4 PseudoKleinian4dIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		if (fractal->transformCommon.functionEnabledAFalse)
 		{
 			z = (REAL4){z.x, z.y, z.z, length(z)};
-			aux->DE += 0.5f;
+			aux->DE += 0.5;
 		}
 		if (fractal->transformCommon.functionEnabledBFalse)
 		{
@@ -58,14 +58,14 @@ REAL4 PseudoKleinian4dIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		z.w -= fractal->transformCommon.scale0000.w * sign(z.w);
 	}
 
-	REAL k = 0.0f;
+	REAL k = 0.0;
 	// Pseudo kleinian
 	REAL4 cSize = fractal->transformCommon.offset1111;
 	if (aux->i >= fractal->transformCommon.startIterationsC
 			&& aux->i < fractal->transformCommon.stopIterations50)
 	{
 		z = fabs(z + cSize) - fabs(z - cSize) - z;
-		k = max(fractal->transformCommon.scale1 / dot(z, z), 1.0f);
+		k = max(fractal->transformCommon.scale1 / dot(z, z), 1.0);
 		z *= k;
 		aux->DE *= k + fractal->analyticDE.tweak005;
 		aux->pseudoKleinianDE = fractal->analyticDE.scale1;
@@ -98,7 +98,7 @@ REAL4 PseudoKleinian4dIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	}
 
 	REAL4 zz = z * z;
-	REAL d1 = 0.0f;
+	REAL d1 = 0.0;
 	if (!fractal->transformCommon.functionEnabledKFalse)
 		d1 = native_sqrt(zz.x + zz.y + zz.w);
 	else
@@ -109,7 +109,7 @@ REAL4 PseudoKleinian4dIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 	aux->DE0 = d2;
 	if (d1 < d2) aux->DE0 = d1;
 
-	aux->DE0 = 0.5f * (aux->DE0 - fractal->transformCommon.offset0) / aux->DE;
+	aux->DE0 = 0.5 * (aux->DE0 - fractal->transformCommon.offset0) / aux->DE;
 
 	if (fractal->transformCommon.functionEnabledDFalse) aux->DE0 = min(aux->dist, aux->DE0);
 

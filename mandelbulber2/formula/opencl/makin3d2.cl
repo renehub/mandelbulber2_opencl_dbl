@@ -17,14 +17,14 @@
 
 REAL4 Makin3d2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	aux->DE = aux->DE * 2.0f * aux->r * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
+	aux->DE = aux->DE * 2.0 * aux->r * fractal->analyticDE.scale1 + fractal->analyticDE.offset1;
 
 	REAL x2 = z.x * z.x;
 	REAL y2 = z.y * z.y;
 	REAL z2 = z.z * z.z;
-	REAL newx = x2 + 2.0f * z.y * z.z;
-	REAL newy = -y2 - 2.0f * z.x * z.z;
-	REAL newz = -z2 + 2.0f * z.x * z.y;
+	REAL newx = x2 + 2.0 * z.y * z.z;
+	REAL newy = -y2 - 2.0 * z.x * z.z;
+	REAL newz = -z2 + 2.0 * z.x * z.y;
 	z.x = newx;
 	z.y = newy;
 	z.z = newz;

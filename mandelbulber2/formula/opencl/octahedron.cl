@@ -20,8 +20,8 @@ REAL4 OctahedronIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 			&& aux->i < fractal->transformCommon.stopIterationsD1)
 	{
 		REAL4 a;
-		REAL colorAdd = 0.0f;
-		REAL b = 1.0f;
+		REAL colorAdd = 0.0;
+		REAL b = 1.0;
 		REAL d;
 		REAL limitA = fractal->transformCommon.offset0;
 		REAL limitB = fractal->transformCommon.offsetA0;
@@ -30,9 +30,9 @@ REAL4 OctahedronIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		{
 			REAL sizer1 = fractal->transformCommon.scale1 * b;
 			a = fabs(z);
-			z.x -= sign(z.x) * max(1.0f * sign(a.x - max(a.y, a.z)), limitA) * sizer1;
-			z.y -= sign(z.y) * max(1.0f * sign(a.y - max(a.z, a.x)), limitA) * sizer1;
-			z.z -= sign(z.z) * max(1.0f * sign(a.z - max(a.x, a.y)), limitA) * sizer1;
+			z.x -= sign(z.x) * max(1.0 * sign(a.x - max(a.y, a.z)), limitA) * sizer1;
+			z.y -= sign(z.y) * max(1.0 * sign(a.y - max(a.z, a.x)), limitA) * sizer1;
+			z.z -= sign(z.z) * max(1.0 * sign(a.z - max(a.x, a.y)), limitA) * sizer1;
 			b *= fractal->transformCommon.scale05;
 		}
 
@@ -41,9 +41,9 @@ REAL4 OctahedronIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 		{
 			REAL sizer2 = fractal->transformCommon.scaleA1 * b;
 			a = fabs(z);
-			z.x -= sign(z.x) * max(1.0f * sign(a.x - min(a.y, a.z)), limitB) * sizer2;
-			z.y -= sign(z.y) * max(1.0f * sign(a.y - min(a.z, a.x)), limitB) * sizer2;
-			z.z -= sign(z.z) * max(1.0f * sign(a.z - min(a.x, a.y)), limitB) * sizer2;
+			z.x -= sign(z.x) * max(1.0 * sign(a.x - min(a.y, a.z)), limitB) * sizer2;
+			z.y -= sign(z.y) * max(1.0 * sign(a.y - min(a.z, a.x)), limitB) * sizer2;
+			z.z -= sign(z.z) * max(1.0 * sign(a.z - min(a.x, a.y)), limitB) * sizer2;
 			b *= fractal->transformCommon.minR05;
 			colorAdd += dot(z, z);
 		}
@@ -72,7 +72,7 @@ REAL4 OctahedronIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl 
 			colorAdd += fractal->foldColor.difs0000.y * max(a.x, max(a.y, a.z));
 			colorAdd += fractal->foldColor.difs0000.z * length(a);
 			colorAdd += fractal->foldColor.difs0000.w * d;
-			aux->color += colorAdd * 100.0f;
+			aux->color += colorAdd * 100.0;
 		}
 	}
 	return z;

@@ -24,19 +24,19 @@ REAL4 ModulusMengerSpongeIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	z.y = fabs(z.y);
 	z.z = fabs(z.z);
 
-	if (z.x - z.y < 0.0f)
+	if (z.x - z.y < 0.0)
 	{
 		REAL temp = z.x;
 		z.x = z.y;
 		z.y = temp;
 	}
-	if (z.x - z.z < 0.0f)
+	if (z.x - z.z < 0.0)
 	{
 		REAL temp = z.x;
 		z.x = z.z;
 		z.z = temp;
 	}
-	if (z.y - z.z < 0.0f)
+	if (z.y - z.z < 0.0)
 	{
 		REAL temp = z.y;
 		z.y = z.z;
@@ -45,10 +45,10 @@ REAL4 ModulusMengerSpongeIteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 	z *= fractal->transformCommon.scale3;
 
-	z.x -= 2.0f;
-	z.y -= 2.0f;
+	z.x -= 2.0;
+	z.y -= 2.0;
 
-	if (fmod(z.z, M_PI_F) > 2.0f) z.z -= 2.0f;
+	if (fmod(z.z, M_PI_F) > 2.0) z.z -= 2.0;
 
 	aux->DE *= fractal->transformCommon.scale3;
 	return z;

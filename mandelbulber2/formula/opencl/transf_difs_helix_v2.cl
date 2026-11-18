@@ -32,8 +32,8 @@ REAL4 TransfDIFSHelixV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	if (fractal->transformCommon.functionEnabledAx)
 	{
 		REAL Voff = fractal->transformCommon.offsetA2;
-		temp = zc.z - Voff * ang * fractal->transformCommon.int1 + Voff * 0.5f;
-		zc.z = temp - Voff * floor(temp / Voff) - Voff * 0.5f;
+		temp = zc.z - Voff * ang * fractal->transformCommon.int1 + Voff * 0.5;
+		zc.z = temp - Voff * floor(temp / Voff) - Voff * 0.5;
 	}
 	// stretch around helix
 	if (fractal->transformCommon.functionEnabledAy)
@@ -43,7 +43,7 @@ REAL4 TransfDIFSHelixV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		else
 		{
 			temp = fractal->transformCommon.scaleA2 * ang + fractal->transformCommon.offset1;
-			zc.x = temp - 2.0f * floor(temp * 0.5f) - 1.0f;
+			zc.x = temp - 2.0 * floor(temp * 0.5) - 1.0;
 		}
 	}
 
@@ -101,9 +101,9 @@ REAL4 TransfDIFSHelixV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 	}
 
 	REAL4 d = fabs(zc);
-	d.x = max(d.x - fractal->transformCommon.offsetA1, 0.0f);
-	d.y = max(d.y - fractal->transformCommon.offset01, 0.0f);
-	d.z = max(d.z - fractal->transformCommon.offsetp1, 0.0f);
+	d.x = max(d.x - fractal->transformCommon.offsetA1, 0.0);
+	d.y = max(d.y - fractal->transformCommon.offset01, 0.0);
+	d.z = max(d.z - fractal->transformCommon.offsetp1, 0.0);
 
 	REAL rDE;
 	if (!fractal->transformCommon.functionEnabledCFalse)
@@ -162,8 +162,8 @@ REAL4 TransfDIFSHelixV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		if (!fractal->transformCommon.functionEnabledGFalse)
 		{
 			ang =
-				(M_PI_F - 2.0f * fabs(atan(fractal->foldColor.difs1 * zc.y / zc.z))) * 4.0f * M_PI_2x_INV_F;
-			if (fmod(ang, 2.0f) < 1.0f)
+				(M_PI_F - 2.0 * fabs(atan(fractal->foldColor.difs1 * zc.y / zc.z))) * 4.0 * M_PI_2x_INV_F;
+			if (fmod(ang, 2.0) < 1.0)
 				colAdd += fractal->foldColor.difs0000.z;
 			else
 				colAdd += fractal->foldColor.difs0000.w;

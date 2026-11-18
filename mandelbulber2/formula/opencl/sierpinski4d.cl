@@ -18,42 +18,42 @@
 REAL4 Sierpinski4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL temp;
-	if (z.x + z.y < 0.0f)
+	if (z.x + z.y < 0.0)
 	{
 		temp = z.x;
 		z.x = -z.y;
 		z.y = -temp;
 	}
 
-	if (z.x + z.z < 0.0f)
+	if (z.x + z.z < 0.0)
 	{
 		temp = z.x;
 		z.x = -z.z;
 		z.z = -temp;
 	}
 
-	if (z.y + z.z < 0.0f)
+	if (z.y + z.z < 0.0)
 	{
 		temp = z.z;
 		z.z = -z.y;
 		z.y = -temp;
 	}
 
-	if (z.x + z.w < 0.0f)
+	if (z.x + z.w < 0.0)
 	{
 		temp = z.x;
 		z.x = -z.w;
 		z.w = -temp;
 	}
 
-	if (z.y + z.w < 0.0f)
+	if (z.y + z.w < 0.0)
 	{
 		temp = z.y;
 		z.y = -z.w;
 		z.w = -temp;
 	}
 
-	if (z.z + z.w < 0.0f)
+	if (z.z + z.w < 0.0)
 	{
 		temp = z.z;
 		z.z = -z.w;

@@ -23,42 +23,42 @@ REAL4 MixPinski4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 			&& aux->i < fractal->transformCommon.stopIterationsS)
 	{
 		REAL temp;
-		if (z.x + z.y < 0.0f)
+		if (z.x + z.y < 0.0)
 		{
 			temp = z.x;
 			z.x = -z.y;
 			z.y = -temp;
 		}
 
-		if (z.x + z.z < 0.0f)
+		if (z.x + z.z < 0.0)
 		{
 			temp = z.x;
 			z.x = -z.z;
 			z.z = -temp;
 		}
 
-		if (z.y + z.z < 0.0f)
+		if (z.y + z.z < 0.0)
 		{
 			temp = z.z;
 			z.z = -z.y;
 			z.y = -temp;
 		}
 
-		if (z.x + z.w < 0.0f)
+		if (z.x + z.w < 0.0)
 		{
 			temp = z.x;
 			z.x = -z.w;
 			z.w = -temp;
 		}
 
-		if (z.y + z.w < 0.0f)
+		if (z.y + z.w < 0.0)
 		{
 			temp = z.y;
 			z.y = -z.w;
 			z.w = -temp;
 		}
 
-		if (z.z + z.w < 0.0f)
+		if (z.z + z.w < 0.0)
 		{
 			temp = z.z;
 			z.z = -z.w;
@@ -127,12 +127,12 @@ REAL4 MixPinski4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	{
 		REAL scaleM = fractal->transformCommon.scale2;
 		REAL4 offsetM = fractal->transformCommon.additionConstant111d5;
-		z.x = scaleM * z.x - offsetM.x * (scaleM - 1.0f);
-		z.y = scaleM * z.y - offsetM.y * (scaleM - 1.0f);
-		z.w = scaleM * z.w - offsetM.w * (scaleM - 1.0f);
-		z.z -= 0.5f * offsetM.z * (scaleM - 1.0f) / scaleM;
+		z.x = scaleM * z.x - offsetM.x * (scaleM - 1.0);
+		z.y = scaleM * z.y - offsetM.y * (scaleM - 1.0);
+		z.w = scaleM * z.w - offsetM.w * (scaleM - 1.0);
+		z.z -= 0.5 * offsetM.z * (scaleM - 1.0) / scaleM;
 		z.z = -fabs(-z.z);
-		z.z += 0.5f * offsetM.z * (scaleM - 1.0f) / scaleM;
+		z.z += 0.5 * offsetM.z * (scaleM - 1.0) / scaleM;
 		z.z = scaleM * z.z;
 		aux->DE *= fabs(scaleM) * fractal->analyticDE.scale1;
 	}

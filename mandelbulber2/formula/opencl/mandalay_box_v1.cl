@@ -40,8 +40,8 @@ REAL4 MandalayBoxV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		p.y = p.z;
 		p.z = temp;
 	}
-	t1 = p.x - 2.0f * fo.x;
-	t2 = p.y - 4.0f * fo.x;
+	t1 = p.x - 2.0 * fo.x;
+	t2 = p.y - 4.0 * fo.x;
 	v = max(fabs(t1 + fo.x) - fo.x, t2);
 	v1 = max(t1 - g.x, p.y);
 	v = min(v, v1);
@@ -58,8 +58,8 @@ REAL4 MandalayBoxV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		p.z = p.x;
 		p.x = temp;
 	}
-	t1 = p.y - 2.0f * fo.y;
-	t2 = p.z - 4.0f * fo.y;
+	t1 = p.y - 2.0 * fo.y;
+	t2 = p.z - 4.0 * fo.y;
 	v = max(fabs(t1 + fo.y) - fo.y, t2);
 	v1 = max(t1 - g.y, p.z);
 	v = min(v, v1);
@@ -76,8 +76,8 @@ REAL4 MandalayBoxV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 		p.x = p.y;
 		p.y = temp;
 	}
-	t1 = p.z - 2.0f * fo.z;
-	t2 = p.x - 4.0f * fo.z;
+	t1 = p.z - 2.0 * fo.z;
+	t2 = p.x - 4.0 * fo.z;
 	v = max(fabs(t1 + fo.z) - fo.z, t2);
 	v1 = max(t1 - g.z, p.x);
 	v = min(v, v1);
@@ -91,9 +91,9 @@ REAL4 MandalayBoxV1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAux
 
 	// spherical fold and scale
 	REAL rr = dot(z, z);
-	REAL t = min(1.0f / fractal->transformCommon.minR2p25, max(1.0f, 1.0f / rr));
+	REAL t = min(1.0 / fractal->transformCommon.minR2p25, max(1.0, 1.0 / rr));
 	z *= fractal->transformCommon.scale2 * t;
-	aux->DE = aux->DE * fabs(fractal->transformCommon.scale2) * t + 1.0f;
+	aux->DE = aux->DE * fabs(fractal->transformCommon.scale2) * t + 1.0;
 
 	// rotation
 	z = Matrix33MulFloat4(fractal->transformCommon.rotationMatrix, z);

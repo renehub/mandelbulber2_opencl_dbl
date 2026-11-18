@@ -16,8 +16,8 @@
 
 REAL4 BoxFoldBulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL colorAdd = 0.0f;
-	REAL rrCol = 0.0f;
+	REAL colorAdd = 0.0;
+	REAL rrCol = 0.0;
 	REAL4 zCol = z;
 	REAL4 oldZ = z;
 	// tglad fold
@@ -42,7 +42,7 @@ REAL4 BoxFoldBulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 		z += fractal->mandelbox.offset;
 
-		// if (r2 < 1e-21f) r2 = 1e-21f;
+		// if (r2 < 1e-21) r2 = 1e-21;
 		if (rr < fractal->transformCommon.minR2p25)
 		{
 			REAL tglad_factor1 = fractal->transformCommon.maxR2d1 / fractal->transformCommon.minR2p25;
@@ -58,7 +58,7 @@ REAL4 BoxFoldBulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		z -= fractal->mandelbox.offset;
 	}
 	// scale
-	REAL useScale = 1.0f;
+	REAL useScale = 1.0;
 	if (aux->i >= fractal->transformCommon.startIterationsC
 			&& aux->i < fractal->transformCommon.stopIterationsC)
 	{
@@ -85,21 +85,21 @@ REAL4 BoxFoldBulbPow2V2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 			&& aux->i < fractal->transformCommon.stopIterationsA)
 	{
 		aux->r = length(z);
-		aux->DE = aux->r * aux->DE * 16.0f * fractal->analyticDE.scale1
-								* native_sqrt(fractal->foldingIntPow.zFactor * fractal->foldingIntPow.zFactor + 2.0f
+		aux->DE = aux->r * aux->DE * 16.0 * fractal->analyticDE.scale1
+								* native_sqrt(fractal->foldingIntPow.zFactor * fractal->foldingIntPow.zFactor + 2.0
 															+ fractal->analyticDE.offset2)
 								/ SQRT_3_F
 							+ fractal->analyticDE.offset1;
 
-		z *= 2.0f;
+		z *= 2.0;
 		REAL x2 = z.x * z.x;
 		REAL y2 = z.y * z.y;
 		REAL z2 = z.z * z.z;
-		REAL temp = 1.0f - z2 / (x2 + y2);
+		REAL temp = 1.0 - z2 / (x2 + y2);
 		REAL4 zTemp;
 		zTemp.x = (x2 - y2) * temp;
-		zTemp.y = 2.0f * z.x * z.y * temp;
-		zTemp.z = -2.0f * z.z * native_sqrt(x2 + y2);
+		zTemp.y = 2.0 * z.x * z.y * temp;
+		zTemp.z = -2.0 * z.z * native_sqrt(x2 + y2);
 		zTemp.w = z.w;
 		z = zTemp;
 		z.z *= fractal->foldingIntPow.zFactor;

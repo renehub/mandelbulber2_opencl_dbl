@@ -29,7 +29,7 @@ REAL4 TransfDIFSTorusTwistIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		if (fractal->transformCommon.functionEnabledCx)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8X;
-			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.y, z.x) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.x * z.x + z.y * z.y);
 			z.x = native_cos(psi) * len;
 			z.y = native_sin(psi) * len;
@@ -38,7 +38,7 @@ REAL4 TransfDIFSTorusTwistIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		if (fractal->transformCommon.functionEnabledCyFalse)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8Y;
-			psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.z, z.y) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.y * z.y + z.z * z.z);
 			z.y = native_cos(psi) * len;
 			z.z = native_sin(psi) * len;
@@ -47,7 +47,7 @@ REAL4 TransfDIFSTorusTwistIteration(REAL4 z, __global sFractalCl *fractal, sExte
 		if (fractal->transformCommon.functionEnabledCzFalse)
 		{
 			REAL psi = M_PI_F / fractal->transformCommon.int8Z;
-			psi = fabs(fmod(atan2(z.x, z.z) + psi, 2.0f * psi) - psi);
+			psi = fabs(fmod(atan2(z.x, z.z) + psi, 2.0 * psi) - psi);
 			REAL len = native_sqrt(z.z * z.z + z.x * z.x);
 			z.z = native_cos(psi) * len;
 			z.x = native_sin(psi) * len;
@@ -65,18 +65,18 @@ REAL4 TransfDIFSTorusTwistIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	REAL temp;
 	REAL4 zc = z;
 	REAL ang = atan2(zc.y, zc.x);
-	REAL spiral = 0.0f;
+	REAL spiral = 0.0;
 	if (fractal->transformCommon.functionEnabledAFalse)
 	{
 		REAL Voff = fractal->transformCommon.offset02;
-		temp = zc.z - 2.0f * Voff * ang * M_PI_2x_INV_F + Voff;
-		zc.z = temp - 2.0f * Voff * floor(temp / (2.0f * Voff)) - Voff;
+		temp = zc.z - 2.0 * Voff * ang * M_PI_2x_INV_F + Voff;
+		zc.z = temp - 2.0 * Voff * floor(temp / (2.0 * Voff)) - Voff;
 		spiral = z.z * fractal->transformCommon.scaleC0;
 	}
 	temp = zc.y;
 	zc.y = native_sqrt(zc.x * zc.x + zc.y * zc.y) - fractal->transformCommon.radius1 + spiral;
 
-	ang = atan2(temp, zc.x) * fractal->transformCommon.int6 * 0.25f;
+	ang = atan2(temp, zc.x) * fractal->transformCommon.int6 * 0.25;
 	REAL cosA = native_cos(ang);
 	REAL sinB = native_sin(ang);
 	temp = zc.z;
@@ -96,9 +96,9 @@ REAL4 TransfDIFSTorusTwistIteration(REAL4 z, __global sFractalCl *fractal, sExte
 	if (fractal->transformCommon.functionEnabledKFalse) // z axis
 		lenZ += d.y * fractal->transformCommon.scale3D000.z;
 
-	d.x = 0.0f;
-	d.y = max(d.y - lenY, 0.0f);
-	d.z = max(d.z - lenZ, 0.0f);
+	d.x = 0.0;
+	d.y = max(d.y - lenY, 0.0);
+	d.z = max(d.z - lenZ, 0.0);
 	aux->DE0 =
 		length(d) / (aux->DE + fractal->analyticDE.offset0) - fractal->transformCommon.offset0005;
 

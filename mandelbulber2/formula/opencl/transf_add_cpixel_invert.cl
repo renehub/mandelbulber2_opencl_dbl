@@ -17,9 +17,9 @@ REAL4 TransfAddCpixelInvertIteration(REAL4 z, __global sFractalCl *fractal, sExt
 {
 	REAL4 cv = aux->const_c;
 
-	if (!fractal->transformCommon.functionEnabledAxFalse) cv.x = 1.0f / cv.x;
-	if (!fractal->transformCommon.functionEnabledAyFalse) cv.y = 1.0f / cv.y;
-	if (!fractal->transformCommon.functionEnabledAzFalse) cv.z = 1.0f / cv.z;
+	if (!fractal->transformCommon.functionEnabledAxFalse) cv.x = 1.0 / cv.x;
+	if (!fractal->transformCommon.functionEnabledAyFalse) cv.y = 1.0 / cv.y;
+	if (!fractal->transformCommon.functionEnabledAzFalse) cv.z = 1.0 / cv.z;
 
 	if (fractal->transformCommon.functionEnabledAFalse)
 	{

@@ -31,7 +31,7 @@ REAL4 MandelbulbIqV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	}
 	else
 	{
-		wo = acos(wo) * (1.0f - fractal->transformCommon.scale0)
+		wo = acos(wo) * (1.0 - fractal->transformCommon.scale0)
 				 + asin(wo) * fractal->transformCommon.scale0;
 	}
 
@@ -47,7 +47,7 @@ REAL4 MandelbulbIqV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	z.y = swo * native_cos(wi);
 	z *= wr;
 
-	aux->DE = pow(aux->r, Pow - 1.0f) * aux->DE * Pow + 1.0f;
+	aux->DE = pow(aux->r, Pow - 1.0) * aux->DE * Pow + 1.0;
 	z.z *= fractal->transformCommon.scale1;
 	z += fractal->transformCommon.offset000;
 	return z;

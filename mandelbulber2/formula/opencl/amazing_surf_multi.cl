@@ -19,7 +19,7 @@
 REAL4 AmazingSurfMultiIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 c = aux->const_c;
-	REAL colorAdd = 0.0f;
+	REAL colorAdd = 0.0;
 	REAL4 oldZ = z;
 	bool functionEnabledN[5] = {fractal->transformCommon.functionEnabledAx,
 		fractal->transformCommon.functionEnabledAyFalse,
@@ -128,10 +128,10 @@ REAL4 AmazingSurfMultiIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				aux->DE *= fractal->transformCommon.mboxFactor1;
 				colorAdd += fractal->mandelbox.color.factorSp1;
 			}
-			else if (rr < 1.0f)
+			else if (rr < 1.0)
 			{
-				z *= 1.0f / rr;
-				aux->DE *= 1.0f / rr;
+				z *= 1.0 / rr;
+				aux->DE *= 1.0 / rr;
 				colorAdd += fractal->mandelbox.color.factorSp2;
 			}
 			z -= fractal->mandelbox.offset;
@@ -164,8 +164,8 @@ REAL4 AmazingSurfMultiIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 				&& aux->i < fractal->transformCommon.stopIterationsS)
 		{ // scale
 			z *= fractal->mandelbox.scale * fractal->transformCommon.scale1
-					 + 1.0f * (1.0f - fractal->transformCommon.scale1);
-			aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0f;
+					 + 1.0 * (1.0 - fractal->transformCommon.scale1);
+			aux->DE = aux->DE * fabs(fractal->mandelbox.scale) + 1.0;
 		}
 	}
 	if (fractal->transformCommon.addCpixelEnabledFalse

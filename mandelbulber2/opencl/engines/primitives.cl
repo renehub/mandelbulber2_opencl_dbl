@@ -35,45 +35,45 @@
 #ifdef USE_PRIMITIVES
 
 #ifdef USE_PRIMITIVE_PLANE
-float PrimitivePlane(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitivePlane(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
-	float dist = point.z;
+	REAL3 point = _point;
+	REAL dist = point.z;
 	dist = primitive->data.plane.empty ? fabs(dist) : dist;
-	dist = max(dist - primitive->object.wallThickness, 0.0f);
+	dist = max(dist - primitive->object.wallThickness, 0.0);
 	return dist;
 }
 #endif
 
 #ifdef USE_PRIMITIVE_BOX
-float PrimitiveBox(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveBox(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
+	REAL3 point = _point;
 
-	float boxDist = -1e6f;
+	REAL boxDist = -1e6;
 	if (primitive->data.box.empty)
 	{
-		boxDist = max(fabs(point.x) - primitive->object.size.x * 0.5f, boxDist);
-		boxDist = max(fabs(point.y) - primitive->object.size.y * 0.5f, boxDist);
-		boxDist = max(fabs(point.z) - primitive->object.size.z * 0.5f, boxDist);
+		boxDist = max(fabs(point.x) - primitive->object.size.x * 0.5, boxDist);
+		boxDist = max(fabs(point.y) - primitive->object.size.y * 0.5, boxDist);
+		boxDist = max(fabs(point.z) - primitive->object.size.z * 0.5, boxDist);
 		boxDist = fabs(boxDist);
 	}
 	else
 	{
-		float3 boxTemp;
-		boxTemp.x = max(fabs(point.x) - primitive->object.size.x * 0.5f, 0.0f);
-		boxTemp.y = max(fabs(point.y) - primitive->object.size.y * 0.5f, 0.0f);
-		boxTemp.z = max(fabs(point.z) - primitive->object.size.z * 0.5f, 0.0f);
+		REAL3 boxTemp;
+		boxTemp.x = max(fabs(point.x) - primitive->object.size.x * 0.5, 0.0);
+		boxTemp.y = max(fabs(point.y) - primitive->object.size.y * 0.5, 0.0);
+		boxTemp.z = max(fabs(point.z) - primitive->object.size.z * 0.5, 0.0);
 		boxDist = length(boxTemp) - primitive->data.box.rounding;
 	}
 
-	boxDist = max(boxDist - primitive->object.wallThickness, 0.0f);
+	boxDist = max(boxDist - primitive->object.wallThickness, 0.0);
 
 	if (primitive->data.box.limitsEnable)
 	{
-		float3 distanceAxial =
+		REAL3 distanceAxial =
 			max(point - primitive->data.box.limitsMax, primitive->data.box.limitsMin - point);
-		float limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
+		REAL limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
 		boxDist = max(boxDist, limitBoxDist);
 	}
 	return boxDist;
@@ -81,18 +81,18 @@ float PrimitiveBox(__global sPrimitiveCl *primitive, float3 _point)
 #endif
 
 #ifdef USE_PRIMITIVE_SPHERE
-float PrimitiveSphere(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveSphere(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
-	float dist = length(point) - primitive->data.sphere.radius;
+	REAL3 point = _point;
+	REAL dist = length(point) - primitive->data.sphere.radius;
 	dist = primitive->data.sphere.empty ? fabs(dist) : dist;
-	dist = max(dist - primitive->object.wallThickness, 0.0f);
+	dist = max(dist - primitive->object.wallThickness, 0.0);
 
 	if (primitive->data.sphere.limitsEnable)
 	{
-		float3 distanceAxial =
+		REAL3 distanceAxial =
 			max(point - primitive->data.sphere.limitsMax, primitive->data.sphere.limitsMin - point);
-		float limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
+		REAL limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
 		dist = max(dist, limitBoxDist);
 	}
 	return dist;
@@ -100,33 +100,33 @@ float PrimitiveSphere(__global sPrimitiveCl *primitive, float3 _point)
 #endif
 
 #ifdef USE_PRIMITIVE_RECTANGLE
-float PrimitiveRectangle(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveRectangle(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
-	float3 boxTemp;
-	boxTemp.x = max(fabs(point.x) - primitive->data.rectangle.width * 0.5f, 0.0f);
-	boxTemp.y = max(fabs(point.y) - primitive->data.rectangle.height * 0.5f, 0.0f);
+	REAL3 point = _point;
+	REAL3 boxTemp;
+	boxTemp.x = max(fabs(point.x) - primitive->data.rectangle.width * 0.5, 0.0);
+	boxTemp.y = max(fabs(point.y) - primitive->data.rectangle.height * 0.5, 0.0);
 	boxTemp.z = fabs(point.z);
 	return length(boxTemp);
 }
 #endif
 
 #ifdef USE_PRIMITIVE_CYLINDER
-float PrimitiveCylinder(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveCylinder(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
-	float2 cylTemp = (float2){point.x, point.y};
-	float dist = length(cylTemp) - primitive->data.cylinder.radius;
+	REAL3 point = _point;
+	REAL2 cylTemp = (REAL2){point.x, point.y};
+	REAL dist = length(cylTemp) - primitive->data.cylinder.radius;
 	if (!primitive->data.cylinder.caps) dist = fabs(dist);
-	dist = max(fabs(point.z) - primitive->data.cylinder.height * 0.5f, dist);
+	dist = max(fabs(point.z) - primitive->data.cylinder.height * 0.5, dist);
 	dist = primitive->data.cylinder.empty ? fabs(dist) : dist;
-	dist = max(dist - primitive->object.wallThickness, 0.0f);
+	dist = max(dist - primitive->object.wallThickness, 0.0);
 
 	if (primitive->data.cylinder.limitsEnable)
 	{
-		float3 distanceAxial =
+		REAL3 distanceAxial =
 			max(point - primitive->data.cylinder.limitsMax, primitive->data.cylinder.limitsMin - point);
-		float limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
+		REAL limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
 		dist = max(dist, limitBoxDist);
 	}
 	return dist;
@@ -134,34 +134,34 @@ float PrimitiveCylinder(__global sPrimitiveCl *primitive, float3 _point)
 #endif
 
 #ifdef USE_PRIMITIVE_CIRCLE
-float PrimitiveCircle(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveCircle(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
-	float2 circleTemp = (float2){point.x, point.y};
-	float distTemp = length(circleTemp) - primitive->data.circle.radius;
+	REAL3 point = _point;
+	REAL2 circleTemp = (REAL2){point.x, point.y};
+	REAL distTemp = length(circleTemp) - primitive->data.circle.radius;
 	distTemp = max(fabs(point.z), distTemp);
 	return distTemp;
 }
 #endif
 
 #ifdef USE_PRIMITIVE_CONE
-float PrimitiveCone(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveCone(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
+	REAL3 point = _point;
 	point.z -= primitive->data.cone.height;
-	float q = sqrt(point.x * point.x + point.y * point.y);
-	float2 vect = (float2){q, point.z};
-	float dist = dot(primitive->data.cone.wallNormal, vect);
+	REAL q = sqrt(point.x * point.x + point.y * point.y);
+	REAL2 vect = (REAL2){q, point.z};
+	REAL dist = dot(primitive->data.cone.wallNormal, vect);
 	if (!primitive->data.cone.caps) dist = fabs(dist);
 	dist = max(-point.z - primitive->data.cone.height, dist);
 	dist = primitive->data.cone.empty ? fabs(dist) : dist;
-	dist = max(dist - primitive->object.wallThickness, 0.0f);
+	dist = max(dist - primitive->object.wallThickness, 0.0);
 
 	if (primitive->data.cone.limitsEnable)
 	{
-		float3 distanceAxial =
+		REAL3 distanceAxial =
 			max(point - primitive->data.cone.limitsMax, primitive->data.cone.limitsMin - point);
-		float limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
+		REAL limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
 		dist = max(dist, limitBoxDist);
 	}
 	return dist;
@@ -169,68 +169,68 @@ float PrimitiveCone(__global sPrimitiveCl *primitive, float3 _point)
 #endif
 
 #ifdef USE_PRIMITIVE_WATER
-float PrimitiveWater(__global sPrimitiveCl *primitive, float3 _point, float distanceFromAnother)
+REAL PrimitiveWater(__global sPrimitiveCl *primitive, REAL3 _point, REAL distanceFromAnother)
 {
-	float3 point = _point;
+	REAL3 point = _point;
 
-	float length = primitive->data.water.length;
+	REAL length = primitive->data.water.length;
 	if (primitive->data.water.waveFromObjectsEnable)
 	{
-		point.x += length * 20.0f * exp(-distanceFromAnother / length / 5.0f)
+		point.x += length * 20.0 * exp(-distanceFromAnother / length / 5.0)
 							 * primitive->data.water.waveFromObjectsRelativeAmplitude;
 	}
 
-	float amplitude = length * primitive->data.water.relativeAmplitude;
-	float objectWave = 0.0f;
+	REAL amplitude = length * primitive->data.water.relativeAmplitude;
+	REAL objectWave = 0.0;
 
-	float planeDistance = point.z;
-	if (planeDistance < amplitude * 10.0f)
+	REAL planeDistance = point.z;
+	if (planeDistance < amplitude * 10.0)
 	{
-		float phase = -primitive->data.water.animSpeed * primitive->data.water.animFrame * 0.1f;
+		REAL phase = -primitive->data.water.animSpeed * primitive->data.water.animFrame * 0.1;
 
 		if (primitive->data.water.waveFromObjectsEnable)
 		{
-			objectWave = sin(distanceFromAnother / length * 5.0f - phase * 2.0f)
-									 * exp(-distanceFromAnother / length / 5.0f)
+			objectWave = sin(distanceFromAnother / length * 5.0 - phase * 2.0)
+									 * exp(-distanceFromAnother / length / 5.0)
 									 * primitive->data.water.waveFromObjectsRelativeAmplitude;
 		}
 
-		float k = 0.23f;
-		float waveXTemp;
-		float waveYTemp;
-		float waveX = objectWave;
-		float waveY = -objectWave;
-		float p = 1.0f;
-		float p2 = 0.05f;
+		REAL k = 0.23;
+		REAL waveXTemp;
+		REAL waveYTemp;
+		REAL waveX = objectWave;
+		REAL waveY = -objectWave;
+		REAL p = 1.0;
+		REAL p2 = 0.05;
 
-		point.x += phase * 0.05f * (primitive->data.water.animProgressionSpeed * 3.0f - 3.0f);
+		point.x += phase * 0.05 * (primitive->data.water.animProgressionSpeed * 3.0 - 3.0);
 
 		for (int i = 1; i <= primitive->data.water.iterations; i++)
 		{
-			float p3 = p * p2;
-			float shift = phase / (i / 2.697f + 1.0f);
-			waveXTemp = sin(i + 0.4f * (waveX)*p3 + sin(k * point.y / length * p3 + shift * 0.134f * p3)
+			REAL p3 = p * p2;
+			REAL shift = phase / (i / 2.697 + 1.0);
+			waveXTemp = sin(i + 0.4 * (waveX)*p3 + sin(k * point.y / length * p3 + shift * 0.134 * p3)
 											+ point.x / length * p3 + shift * p3)
 									/ p;
-			waveYTemp = cos(i + 0.4f * (waveY)*p3 + sin(point.x / length * p3 + shift * 0.0179f * p3)
-											+ k * point.y / length * p3 + shift * 0.023f * p3)
+			waveYTemp = cos(i + 0.4 * (waveY)*p3 + sin(point.x / length * p3 + shift * 0.0179 * p3)
+											+ k * point.y / length * p3 + shift * 0.023 * p3)
 									/ p;
 			waveX += waveXTemp;
 			waveY += waveYTemp;
-			p2 = p2 + (1.0f - p2 + 0.5f * sin(shift * 0.0323f)) * 0.7f;
-			p *= 1.872f;
+			p2 = p2 + (1.0 - p2 + 0.5 * sin(shift * 0.0323)) * 0.7;
+			p *= 1.872;
 		}
 
 		planeDistance += (waveX + waveY) * amplitude;
 	}
 	planeDistance = primitive->data.water.empty ? fabs(planeDistance) : planeDistance;
-	planeDistance = max(planeDistance - primitive->object.wallThickness, 0.0f);
+	planeDistance = max(planeDistance - primitive->object.wallThickness, 0.0);
 
 	if (primitive->data.water.limitsEnable)
 	{
-		float3 distanceAxial =
+		REAL3 distanceAxial =
 			max(point - primitive->data.water.limitsMax, primitive->data.water.limitsMin - point);
-		float limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
+		REAL limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
 		planeDistance = max(planeDistance, limitBoxDist);
 	}
 	return planeDistance;
@@ -238,25 +238,25 @@ float PrimitiveWater(__global sPrimitiveCl *primitive, float3 _point, float dist
 #endif
 
 #ifdef USE_PRIMITIVE_TORUS
-float PrimitiveTorus(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveTorus(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
+	REAL3 point = _point;
 
-	float2 pointXY = (float2){point.x, point.y};
-	float d1 =
-		LengthPow(pointXY, pow(2.0f, primitive->data.torus.radiusLPow)) - primitive->data.torus.radius;
-	float2 pointDZ = (float2){d1, point.z};
+	REAL2 pointXY = (REAL2){point.x, point.y};
+	REAL d1 =
+		LengthPow(pointXY, pow(2.0, primitive->data.torus.radiusLPow)) - primitive->data.torus.radius;
+	REAL2 pointDZ = (REAL2){d1, point.z};
 
-	float dist = LengthPow(pointDZ, pow(2.0f, primitive->data.torus.tubeRadiusLPow))
+	REAL dist = LengthPow(pointDZ, pow(2.0, primitive->data.torus.tubeRadiusLPow))
 							 - primitive->data.torus.tubeRadius;
 	dist = primitive->data.torus.empty ? fabs(dist) : dist;
-	dist = max(dist - primitive->object.wallThickness, 0.0f);
+	dist = max(dist - primitive->object.wallThickness, 0.0);
 
 	if (primitive->data.torus.limitsEnable)
 	{
-		float3 distanceAxial =
+		REAL3 distanceAxial =
 			max(point - primitive->data.torus.limitsMax, primitive->data.torus.limitsMin - point);
-		float limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
+		REAL limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
 		dist = max(dist, limitBoxDist);
 	}
 	return dist;
@@ -264,50 +264,50 @@ float PrimitiveTorus(__global sPrimitiveCl *primitive, float3 _point)
 #endif
 
 #ifdef USE_PRIMITIVE_PRISM
-float PrimitivePrism(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitivePrism(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
+	REAL3 point = _point;
 
-	float3 q = fabs(point);
+	REAL3 q = fabs(point);
 
-	float prismDistance = max(q.z - primitive->data.prism.height,
+	REAL prismDistance = max(q.z - primitive->data.prism.height,
 		max(q.x * primitive->data.prism.normals.y + point.y * primitive->data.prism.normals.z,
 			-point.y + primitive->data.prism.triangleHeight)
 			- primitive->data.prism.triangleHeight);
 
 	prismDistance = primitive->data.prism.empty ? fabs(prismDistance) : prismDistance;
-	prismDistance = max(prismDistance - primitive->object.wallThickness, 0.0f);
+	prismDistance = max(prismDistance - primitive->object.wallThickness, 0.0);
 
 	return prismDistance;
 }
 #endif
 
 #ifdef USE_PRIMITIVE_ELLIPSOID
-float PrimitiveEllipsoid(__global sPrimitiveCl *primitive, float3 _point)
+REAL PrimitiveEllipsoid(__global sPrimitiveCl *primitive, REAL3 _point)
 {
-	float3 point = _point;
+	REAL3 point = _point;
 
-	float k0 = length(point / primitive->object.size);
-	float k1 = length(point / (primitive->object.size * primitive->object.size));
-	float dist = k0 * (k0 - 1.0f) / k1;
+	REAL k0 = length(point / primitive->object.size);
+	REAL k1 = length(point / (primitive->object.size * primitive->object.size));
+	REAL dist = k0 * (k0 - 1.0) / k1;
 
 	dist = primitive->data.ellipsoid.empty ? fabs(dist) : dist;
-	dist = max(dist - primitive->object.wallThickness, 0.0f);
+	dist = max(dist - primitive->object.wallThickness, 0.0);
 
 	if (primitive->data.ellipsoid.limitsEnable)
 	{
-		float3 distanceAxial =
+		REAL3 distanceAxial =
 			max(point - primitive->data.ellipsoid.limitsMax, primitive->data.ellipsoid.limitsMin - point);
-		float limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
+		REAL limitBoxDist = max(max(distanceAxial.x, distanceAxial.y), distanceAxial.z);
 		dist = max(dist, limitBoxDist);
 	}
 	return dist;
 }
 #endif
 
-float PrimitiveDistanceByType(__global sPrimitiveCl *primitive, float3 point, float distFromAnother)
+REAL PrimitiveDistanceByType(__global sPrimitiveCl *primitive, REAL3 point, REAL distFromAnother)
 {
-	float distTemp = 0.0f;
+	REAL distTemp = 0.0;
 	switch (primitive->object.objectType)
 	{
 #ifdef USE_PRIMITIVE_PLANE

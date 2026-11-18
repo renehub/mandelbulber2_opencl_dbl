@@ -32,9 +32,9 @@ REAL4 TransfBenesiT2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	REAL4 temp = z;
 	REAL tempL = length(temp);
 	z = fabs(z) * fractal->transformCommon.scale3D444;
-	// if (tempL < 1e-21f) tempL = 1e-21f;
+	// if (tempL < 1e-21) tempL = 1e-21;
 	REAL avgScale = length(z) / tempL;
-	aux->DE = aux->DE * avgScale + 1.0f;
+	aux->DE = aux->DE * avgScale + 1.0;
 
 	if (fractal->transformCommon.rotationEnabled)
 	{

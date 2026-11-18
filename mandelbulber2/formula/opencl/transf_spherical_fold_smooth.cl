@@ -16,8 +16,8 @@
 REAL4 TransfSphericalFoldSmoothIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL4 oldZ = z;
-	REAL m = 1.0f;
-	REAL t = 1.0f;
+	REAL m = 1.0;
+	REAL t = 1.0;
 	REAL rr = dot(z, z);
 
 	z += fractal->transformCommon.offset000;
@@ -42,15 +42,15 @@ REAL4 TransfSphericalFoldSmoothIteration(REAL4 z, __global sFractalCl *fractal, 
 		z += fractal->transformCommon.offsetA000;
 		REAL rk1 = SmoothConditionALessB(
 			rr, fractal->transformCommon.minR2p25, fractal->transformCommon.scaleA3);
-		REAL sm1 = fractal->transformCommon.maxMinR2factor * rk1 + 1.0f - rk1;
-		t = 1.0f;
+		REAL sm1 = fractal->transformCommon.maxMinR2factor * rk1 + 1.0 - rk1;
+		t = 1.0;
 		if (aux->i >= fractal->transformCommon.startIterationsY
 				&& aux->i < fractal->transformCommon.stopIterationsY)
 		{
 			REAL rk2 = SmoothConditionALessB(
 				rr, fractal->transformCommon.maxR2d1, fractal->transformCommon.scaleB3);
-			REAL rk21 = (1.0f - rk1) * rk2;
-			t = 1.0f - rk21 + fractal->transformCommon.maxR2d1 / rr * rk21;
+			REAL rk21 = (1.0 - rk1) * rk2;
+			t = 1.0 - rk21 + fractal->transformCommon.maxR2d1 / rr * rk21;
 		}
 		t *= sm1;
 		z *= t;
@@ -63,7 +63,7 @@ REAL4 TransfSphericalFoldSmoothIteration(REAL4 z, __global sFractalCl *fractal, 
 	if (fractal->foldColor.auxColorEnabledFalse && aux->i >= fractal->foldColor.startIterationsA
 			&& aux->i < fractal->foldColor.stopIterationsA)
 	{
-		REAL colorAdd = 0.0f;
+		REAL colorAdd = 0.0;
 		oldZ = fabs(oldZ - z);
 		colorAdd += oldZ.x * fractal->foldColor.difs0000.x;
 		colorAdd += oldZ.y * fractal->foldColor.difs0000.y;
