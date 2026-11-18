@@ -27,7 +27,10 @@ bool doublePrecisionMode = (precision == "double");
 
 The setting is exposed in Preferences as **OpenCL precision**. The combo box is
 enabled only when every selected OpenCL device supports FP64. If FP64 is not
-available, the UI shows a warning and resets the selection to `single`.
+available, the UI shows a warning and resets the selection to `single`. The gate
+is recomputed when the dialog is shown and whenever the device selection
+changes. Temporarily disabling OpenCL only disables the combo box; it does not
+discard the saved precision, so re-enabling OpenCL restores the double option.
 
 ## FP64 device gating
 
