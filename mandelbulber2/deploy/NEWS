@@ -44,7 +44,9 @@ v2.35 (November 2026)
 - OpenCL: custom formulas supported in the objects tree (hybrid) path; fixed
   data structures alignment for NVidia OpenCL 3.0; fixed reflections, clouds,
   perlin noise displacement, iterFog and fake lights in the full engine;
-  for debugging, the merged kernel source is saved as the file
+  runtime-selectable single/double precision for geometry, DE and rays
+  (Preferences > OpenCL precision, requires FP64 device support); for
+  debugging, the merged kernel source is saved as the file
   openclKernelCombined.cl in the ~/.mandelbulber directory
 - UI: added tabs in the Rendering Engine dock; new "UI Layout Spacing" setting
   in Preferences; render statistics shown for OpenCL rendering; many new and

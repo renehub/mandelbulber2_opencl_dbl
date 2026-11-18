@@ -44,6 +44,7 @@ The possibilities are literally **infinite**!
 ## Features
 
 - High-Performance computing with multiple graphics accelerator cards (multi-GPU support via OpenCL)
+- OpenCL rendering with runtime-selectable single or double (FP64) precision for deep zooms
 - Mathematical Models and Monte Carlo Algorithms for photo-realistic scenes
 - [Enlightening Documentation](https://github.com/buddhi1980/mandelbulber_doc/)
 - Renders trigonometric, hyper-complex, Mandelbox, IFS, and many other 3D fractals
