@@ -2,7 +2,8 @@ This folder contains files and folders for compiling and packaging mandelbulber.
 
 - linux
 
-		folder contains install/uninstall script and a .desktop description file
+		folder contains install/uninstall and AppImage creation scripts, a
+		.desktop description file and AppStream metadata
 
 - share/mandelbulber2
 

@@ -66,6 +66,7 @@ x64/
 *.exe
 *.out
 *.app
+*.AppImage
 
 # Qt related files
 moc_*.cpp
