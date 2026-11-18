@@ -115,6 +115,18 @@ public:
 	bool IsNVidia() const { return isNVidia; }
 	bool IsAMD() const { return isAMD; }
 
+	// Double precision is only usable when every enabled device supports FP64.
+	bool IsDoublePrecisionSupported() const
+	{
+		if (selectedDevicesIndices.isEmpty()) return false;
+		for (int index : selectedDevicesIndices)
+		{
+			if (index < 0 || index >= clDeviceWorkers.size()) return false;
+			if (!clDeviceWorkers[index].getDeviceInformation().IsDoublePrecisionSupported()) return false;
+		}
+		return true;
+	}
+
 protected:
 	static bool checkErr(cl_int err, QString functionName);
 

@@ -158,7 +158,7 @@ public:
 	// render 3D fractal
 	bool RenderMulti(std::shared_ptr<cImage> image, bool *stopRequest, sRenderData *renderData);
 	// calculate distance using OpenCL
-	float CalculateDistance(CVector3 point);
+	double CalculateDistance(CVector3 point);
 
 	// render 2D slice with fractal
 	bool Render(std::vector<double> *distances, std::vector<double> *colors,
@@ -171,7 +171,8 @@ public:
 
 	void ReleaseMemory();
 	size_t CalcNeededMemory() override;
-	void SetMeshExportParameters(const sClMeshExport *meshParams);
+	void SetMeshExportParameters(const sClMeshExport *meshParams, const CVector3 &limitMin,
+		const CVector3 &limitMax, double distThresh);
 
 	static inline sRGBFloat clFloat3TosRGBFloat(const cl_float3 &clPixel)
 	{
@@ -234,9 +235,11 @@ private:
 	static void ConcurentProcessTile(sConcurentTileProcess &data);
 
 	std::unique_ptr<sClInConstants> constantInBuffer;
+	std::unique_ptr<sClInConstantsD> constantInBufferD;
 	QList<std::shared_ptr<cl::Buffer>> inCLConstBuffer;
 
 	std::unique_ptr<sClMeshExport> constantInMeshExportBuffer;
+	std::unique_ptr<sClMeshExportD> constantInMeshExportBufferD;
 	QList<std::shared_ptr<cl::Buffer>> inCLConstMeshExportBuffer;
 
 	// FIXME: replace QByteArray with std::vector
@@ -269,6 +272,7 @@ private:
 	bool meshExportMode;
 	bool hasBooleanNodes;
 	cl_float3 pointToCalculateDistance;
+	cl_double3 pointToCalculateDistanceDouble;
 	bool distanceMode;
 	bool useOptionalImageChannels;
 	double reservedGpuTime;

@@ -234,9 +234,9 @@ bool cOpenClEngineRenderNebula::LoadSourcesAndCompile(
 		// pass through define constants
 		programEngine.append("#define USE_OPENCL 1\n");
 
-		if (params->Get<bool>("opencl_precision"))
-			programEngine.append(
-				QString("#define DOUBLE_PRECISION " + QString::number(1) + "\n").toUtf8());
+		// The nebula renderer is a single-precision image pipeline (float4 image
+		// buffers, sClInConstants single layout) and must never be compiled with
+		// DOUBLE_PRECISION, regardless of the fractal render precision.
 
 #ifdef _WIN32
 		QString openclPathSlash = openclPath.replace("/", "\\"); // replace single slash with backslash

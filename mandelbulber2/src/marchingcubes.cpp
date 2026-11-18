@@ -168,7 +168,7 @@ void MarchingCubes::RunMarchingCube()
 		gOpenCl->openClEngineRenderFractal->Lock();
 		gOpenCl->openClEngineRenderFractal->SetParameters(
 			paramsContainer, fractalContainer, params, hybridFractals, renderData, true);
-		gOpenCl->openClEngineRenderFractal->SetMeshExportParameters(&clMeshParams);
+		gOpenCl->openClEngineRenderFractal->SetMeshExportParameters(&clMeshParams, lower, upper, dist_thresh);
 		if (gOpenCl->openClEngineRenderFractal->LoadSourcesAndCompile(paramsContainer))
 		{
 			gOpenCl->openClEngineRenderFractal->CreateKernel4Program(paramsContainer);

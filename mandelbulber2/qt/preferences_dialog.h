@@ -81,6 +81,7 @@ private:
 #ifdef USE_OPENCL
 	void UpdateOpenCLListBoxes(bool refreshOpenClPlatforms);
 	void UpdateOpenCLMemoryLimits();
+	void UpdateOpenCLPrecisionComboBox();
 #endif
 
 	Ui::cPreferencesDialog *ui;

@@ -154,7 +154,7 @@ void cVoxelExport::ProcessVolume()
 		gOpenCl->openClEngineRenderFractal->Lock();
 		gOpenCl->openClEngineRenderFractal->SetParameters(
 			gPar, gParFractal, params, hybridFractals, renderData, true);
-		gOpenCl->openClEngineRenderFractal->SetMeshExportParameters(&clMeshParams);
+		gOpenCl->openClEngineRenderFractal->SetMeshExportParameters(&clMeshParams, limitMin, limitMax, dist_thresh);
 		if (gOpenCl->openClEngineRenderFractal->LoadSourcesAndCompile(gPar))
 		{
 			gOpenCl->openClEngineRenderFractal->CreateKernel4Program(gPar);

@@ -59,6 +59,7 @@ cOpenClEngine::cOpenClEngine(cOpenClHardware *_hardware) : QObject(_hardware), h
 	locked = false;
 	useBuildCache = true;
 	useFastRelaxedMath = false;
+	doublePrecision = false;
 
 	clKernels.append(std::shared_ptr<cl::Kernel>());
 	clQueues.append(std::shared_ptr<cl::CommandQueue>());
@@ -104,11 +105,19 @@ bool cOpenClEngine::Build(const QByteArray &programString, QString *errorText, b
 			QByteArray deviceHash = hardware->getClWorkers()[d].getDeviceInformation().hash;
 			hashCryptProgram.addData(deviceHash);
 		}
+		// Kernel cache must be keyed by precision too. The generated source normally
+		// contains the DOUBLE_PRECISION define, but including an explicit marker in
+		// this hash guarantees that a cached binary can never be reused across
+		// precisions, even if the source text is identical.
+		hashCryptProgram.addData(doublePrecision ? "-DDOUBLE_PRECISION" : "-DOPENCL_SINGLE");
 		QByteArray hashProgram = hashCryptProgram.result();
 
 		// calculating hash code of build parameters
 		QCryptographicHash hashCryptBuildParams(QCryptographicHash::Md4);
 		hashCryptBuildParams.addData(definesCollector.toLocal8Bit());
+		// Kernel cache must be keyed by precision: the generated source and the
+		// host-side constant/dynamic layouts both depend on it.
+		hashCryptBuildParams.addData(doublePrecision ? "-DDOUBLE_PRECISION" : "-DOPENCL_SINGLE");
 		QByteArray hashBuildParams = hashCryptBuildParams.result();
 
 		definesCollector += " -DCODEHASH=" + QString(hashProgram.toHex());
@@ -147,8 +156,10 @@ bool cOpenClEngine::Build(const QByteArray &programString, QString *errorText, b
 
 			if (checkErr(err, "cl::Program()"))
 			{
-				std::string buildParams =
-					"-w -cl-single-precision-constant -cl-denorms-are-zero -cl-mad-enable";
+				std::string buildParams = "-w -cl-denorms-are-zero -cl-mad-enable";
+				// -cl-single-precision-constant would silently truncate every double
+				// literal to float, so it must never be used in double precision mode.
+				if (!doublePrecision) buildParams += " -cl-single-precision-constant";
 
 				if (useFastRelaxedMath) buildParams += " -cl-fast-relaxed-math";
 

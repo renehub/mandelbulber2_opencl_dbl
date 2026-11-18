@@ -90,6 +90,11 @@ public:
 	bool CreateCommandQueue();
 	void SetUseBuildCache(bool useCache) { useBuildCache = useCache; }
 	void SetUseFastRelaxedMath(bool usefastMath) { useFastRelaxedMath = usefastMath; }
+	void SetDoublePrecision(bool doublePrecisionEnabled)
+	{
+		doublePrecision = doublePrecisionEnabled;
+	}
+	bool GetDoublePrecision() const { return doublePrecision; }
 	void ReleaseMemory();
 	bool AssignParametersToKernel(int deviceIndex);
 	virtual bool AssignParametersToKernelAdditional(uint argIterator, int deviceIndex)
@@ -149,6 +154,7 @@ private:
 	bool locked;
 	bool useBuildCache;
 	bool useFastRelaxedMath;
+	bool doublePrecision;
 	QByteArray lastProgramHash;
 	QByteArray lastBuildParametersHash;
 

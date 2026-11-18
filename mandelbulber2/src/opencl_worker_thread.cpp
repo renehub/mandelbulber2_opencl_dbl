@@ -356,9 +356,20 @@ bool cOpenClWorkerThread::AddAntiAliasingParameters(int actualDepth, int repeatI
 		offset.y = 0.0f;
 	}
 
-	cl_float2 antiAliasingOffset = {{offset.x, offset.y}};
-	cl_int err = clKernel->setArg(7, antiAliasingOffset);
-	if (!checkErr(err, "kernel->setArg(7, cl_int(actualDepth))"))
+	cl_int err = CL_SUCCESS;
+	if (engine->GetDoublePrecision())
+	{
+		// The kernel argument is REAL2, i.e. double2 when double precision is
+		// enabled. Passing cl_float2 here would give CL_INVALID_ARG_VALUE.
+		cl_double2 antiAliasingOffset = {{offset.x, offset.y}};
+		err = clKernel->setArg(7, antiAliasingOffset);
+	}
+	else
+	{
+		cl_float2 antiAliasingOffset = {{offset.x, offset.y}};
+		err = clKernel->setArg(7, antiAliasingOffset);
+	}
+	if (!checkErr(err, "kernel->setArg(7, antiAliasingOffset)"))
 	{
 		EmitErrorMessage(tr("Cannot set OpenCL argument for %1").arg(tr("antiAliasingDepth")),
 			cErrorMessage::errorMessage, nullptr);

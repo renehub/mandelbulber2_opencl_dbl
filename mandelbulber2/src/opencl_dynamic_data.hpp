@@ -56,6 +56,12 @@ public:
 	cOpenClDynamicData(int numberOfItems);
 	~cOpenClDynamicData();
 
+	// Selects the precision of the dynamic data structures. The kernel-side
+	// structures are controlled by DOUBLE_PRECISION; the host has to build the
+	// matching layout (and the matching 16/32-byte alignment).
+	void SetDoublePrecision(bool enabled) { doublePrecision = enabled; }
+	bool GetDoublePrecision() const { return doublePrecision; }
+
 	int BuildMaterialsData(const std::vector<cMaterial> &materials,
 		const QMap<QString, int> &textureIndexes); // returns array size
 	void BuildAOVectorsData(const sVectorsAround *AOVectors, int verctorsCount);
@@ -81,6 +87,26 @@ public:
 	const int nebulaGradientsItemIndex = 0; // only one data set for nebulas
 	const int nebulaSequencesItemIndex = 1; // only one data set for nebulas
 
+private:
+	template <typename Policy>
+	int BuildMaterialsDataImpl(const std::vector<cMaterial> &materials,
+		const QMap<QString, int> &textureIndexes);
+	template <typename Policy>
+	void BuildAOVectorsDataImpl(const sVectorsAround *AOVectors, int vectorsCount);
+	template <typename Policy>
+	void BuildLightsDataImpl(const cLights *lights, const QMap<QString, int> &textureIndexes);
+	template <typename Policy>
+	QString BuildPrimitivesDataImpl(const cPrimitives *primitivesContainer);
+	template <typename Policy>
+	void BuildObjectsDataImpl(const std::vector<cObjectData> *objectData);
+	template <typename Policy>
+	void BuildNodesDataImpl(const std::vector<cObjectsTree::sNodeDataForRendering> *nodesData);
+	template <typename Policy>
+	void BuildHybridSequencesDataImpl(const cHybridFractalSequences *hybridSequences);
+	template <typename Policy>
+	void BuildFractalDataImpl(const cHybridFractalSequences *hybridSequences);
+
+	bool doublePrecision = false;
 }; // class cOpenClDynamicData
 
 #endif // USE_OPENCL

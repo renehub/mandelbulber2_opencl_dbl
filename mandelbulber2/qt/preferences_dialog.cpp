@@ -106,6 +106,9 @@ cPreferencesDialog::cPreferencesDialog(QWidget *parent)
 #ifdef USE_OPENCL
 	UpdateOpenCLListBoxes(false);
 	UpdateOpenCLMemoryLimits();
+	UpdateOpenCLPrecisionComboBox();
+	connect(ui->listWidget_opencl_device_list, &QListWidget::itemSelectionChanged, this,
+		&cPreferencesDialog::UpdateOpenCLPrecisionComboBox);
 #else	 // USE_OPENCL
 	ui->tabWidget->removeTab(2); // hide GPU tab for now
 #endif // USE_OPENCL
@@ -552,6 +555,7 @@ void cPreferencesDialog::on_groupCheck_opencl_enabled_toggled(bool state)
 	}
 
 	gMainInterface->mainWindow->GetWidgetDockNavigation()->EnableOpenCLModeComboBox(state);
+	UpdateOpenCLPrecisionComboBox();
 }
 
 void cPreferencesDialog::UpdateOpenCLListBoxes(bool refreshOpenClPlatforms)
@@ -603,6 +607,52 @@ void cPreferencesDialog::UpdateOpenCLListBoxes(bool refreshOpenClPlatforms)
 				selected = true;
 			}
 			item->setSelected(selected);
+		}
+	}
+
+	UpdateOpenCLPrecisionComboBox();
+}
+
+void cPreferencesDialog::UpdateOpenCLPrecisionComboBox()
+{
+	const bool openclEnabled = gPar->Get<bool>("opencl_enabled");
+	const bool doubleSupported =
+		openclEnabled && gOpenCl->openClHardware->IsDoublePrecisionSupported();
+
+	ui->comboBox_opencl_precision->setEnabled(doubleSupported);
+	if (doubleSupported)
+	{
+		ui->comboBox_opencl_precision->setToolTip(
+			tr("<p>Floating point precision of the OpenCL kernels: single is faster, double is more "
+				 "accurate and slower. Double requires FP64 device support.</p>"));
+		ui->label_explanation_opencl_missing_features->setText(
+			tr("<html><head/><body><p>Mandelbulber can use OpenCL to accelerate rendering.<br/>For "
+				 "more information about setup and workflow see the User Manual<br/>under Menu &gt; Help "
+				 "&gt; User Manual.<br/></p></body></html>"));
+	}
+	else
+	{
+		// Reflect the effective precision: the renderer will fall back to single
+		// precision when FP64 is unavailable.
+		ui->comboBox_opencl_precision->setCurrentIndex(0);
+		ui->comboBox_opencl_precision->setToolTip(
+			tr("<p>Double precision (FP64) is not supported by the selected OpenCL device(s). "
+				 "Only single precision can be used.</p>"));
+		if (openclEnabled)
+		{
+			ui->label_explanation_opencl_missing_features->setText(
+				tr("<html><head/><body><p>Mandelbulber can use OpenCL to accelerate rendering.<br/>For "
+					 "more information about setup and workflow see the User Manual<br/>under Menu &gt; "
+					 "Help &gt; User Manual.<br/></p><p><b>Warning:</b> The selected OpenCL device(s) do "
+					 "not support FP64 (cl_khr_fp64), so double precision is disabled and renders will "
+					 "use single precision.</p></body></html>"));
+		}
+		else
+		{
+			ui->label_explanation_opencl_missing_features->setText(
+				tr("<html><head/><body><p>Mandelbulber can use OpenCL to accelerate rendering.<br/>For "
+					 "more information about setup and workflow see the User Manual<br/>under Menu &gt; "
+					 "Help &gt; User Manual.<br/></p></body></html>"));
 		}
 	}
 }

@@ -74,7 +74,17 @@ public:
 		QString deviceName;
 		QString deviceVersion;
 		QString driverVersion;
+		QString extensions;
 		QByteArray hash;
+
+		// FP64 support is advertised through the cl_khr_fp64 (or the legacy
+		// cl_amd_fp64) extension. CL_DEVICE_DOUBLE_FP_CONFIG alone is not a
+		// reliable indicator of whether double kernels can be compiled.
+		bool IsDoublePrecisionSupported() const
+		{
+			return extensions.contains("cl_khr_fp64", Qt::CaseInsensitive)
+							|| extensions.contains("cl_amd_fp64", Qt::CaseInsensitive);
+		}
 	};
 
 protected:

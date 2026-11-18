@@ -336,6 +336,10 @@ void cOpenClHardware::ListOpenClDevices(
 					clDevices[i].getInfo(CL_DRIVER_VERSION, &driverVersion);
 					deviceInformation.driverVersion = QString(driverVersion.c_str());
 
+					std::string extensions;
+					clDevices[i].getInfo(CL_DEVICE_EXTENSIONS, &extensions);
+					deviceInformation.extensions = QString(extensions.c_str());
+
 					WriteLogInt("OpenCL Device # ", i, 2);
 					WriteLogInt("CL_DEVICE_MAX_COMPUTE_UNITS", deviceInformation.deviceAvailable, 2);
 					WriteLogInt("CL_DEVICE_COMPILER_AVAILABLE", deviceInformation.compilerAvailable, 2);
@@ -355,6 +359,7 @@ void cOpenClHardware::ListOpenClDevices(
 					WriteLogString("CL_DEVICE_NAME", deviceInformation.deviceName, 2);
 					WriteLogString("CL_DEVICE_VERSION", deviceInformation.deviceVersion, 2);
 					WriteLogString("CL_DRIVER_VERSION", deviceInformation.driverVersion, 2);
+					WriteLogString("CL_DEVICE_EXTENSIONS", deviceInformation.extensions, 2);
 
 					// calculate hash code
 					QCryptographicHash hashCrypt(QCryptographicHash::Md4);

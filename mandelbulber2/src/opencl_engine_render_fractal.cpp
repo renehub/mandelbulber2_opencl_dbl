@@ -426,9 +426,9 @@ bool cOpenClEngineRenderFractal::LoadSourcesAndCompile(
 		// pass through define constants
 		programEngine.append("#define USE_OPENCL 1\n");
 
-		if (params->Get<bool>("opencl_precision"))
-			programEngine.append(
-				QString("#define DOUBLE_PRECISION " + QString::number(1) + "\n").toUtf8());
+		// Precision follows the effective engine setting (not the raw parameter), so a
+		// device without FP64 support still compiles a valid single-precision kernel.
+		if (GetDoublePrecision()) programEngine.append("#define DOUBLE_PRECISION 1\n");
 
 #ifdef _WIN32
 		QString openclPathSlash = openclPath.replace("/", "\\"); // replace single slash with backslash
@@ -1112,11 +1112,34 @@ void cOpenClEngineRenderFractal::SetParameters(
 	meshExportMode = meshExportModeEnable;
 	reservedGpuTime = paramContainer->Get<double>("opencl_reserved_gpu_time");
 
+	// Resolve the precision enumeration by name rather than by truthiness.
+	const QString precision =
+		paramContainer->GetAsOneParameter("opencl_precision").GetValueByEnumeration();
+	bool doublePrecisionMode = (precision == "double");
+
+	// Double precision cannot be compiled or run on devices without FP64 support.
+	// Never pass DOUBLE_PRECISION or the double-layout buffers to such a device;
+	// fall back to single precision with a clear diagnostic instead.
+	if (doublePrecisionMode && !hardware->IsDoublePrecisionSupported())
+	{
+		WriteLog(QString("Double precision was requested, but the selected OpenCL devices do not "
+										 "support FP64 (cl_khr_fp64). Falling back to single precision."),
+			0);
+		doublePrecisionMode = false;
+	}
+	SetDoublePrecision(doublePrecisionMode);
+
+	// The single-layout buffer is always populated: it is the upload buffer in
+	// single mode and is also used by host-side code which reads scalar render
+	// parameters. In double mode, the *D layout is additionally built directly
+	// from the CPU doubles and uploaded to the device.
 	constantInBuffer.reset(new sClInConstants);
+	if (doublePrecisionMode) constantInBufferD.reset(new sClInConstantsD);
 
 	if (meshExportMode)
 	{
 		constantInMeshExportBuffer.reset(new sClMeshExport);
+		if (doublePrecisionMode) constantInMeshExportBufferD.reset(new sClMeshExportD);
 	}
 
 	definesCollector.clear();
@@ -1178,6 +1201,9 @@ void cOpenClEngineRenderFractal::SetParameters(
 	//----------- create dynamic data -----------
 	WriteLog(QString("Creating dynamic data for OpenCL rendering"), 2);
 	dynamicData.reset(new cOpenClDynamicData(8));
+	// The dynamic data structures are built with the same precision as the
+	// constant buffer and the kernel structures.
+	dynamicData->SetDoublePrecision(doublePrecisionMode);
 	dynamicData->ReserveHeader();
 
 	// ------------ enabling shaders ----------
@@ -1187,7 +1213,9 @@ void cOpenClEngineRenderFractal::SetParameters(
 
 		SetParametersForStereoscopic(renderData.get());
 
-		WriteLogDouble("Constant buffer size [KB]", sizeof(sClInConstants) / 1024.0, 2);
+		WriteLogDouble("Constant buffer size [KB]",
+			(dynamicData->GetDoublePrecision() ? sizeof(sClInConstantsD) : sizeof(sClInConstants)) / 1024.0,
+			2);
 
 		//---------- DYNAMIC DATA -------------
 
@@ -1233,6 +1261,15 @@ void cOpenClEngineRenderFractal::SetParameters(
 
 	constantInBuffer->params.viewAngle = toClFloat3(paramRender->viewAngle * M_PI / 180.0);
 
+	if (constantInBufferD)
+	{
+		// Built directly from the CPU double structures so no precision has already
+		// been lost before the values reach the device.
+		constantInBufferD->params = clCopySParamRenderClD(*paramRender);
+		constantInBufferD->params.viewAngle =
+			toClDouble3(paramRender->viewAngle * M_PI / 180.0);
+	}
+
 	// buffer for Perlin noise seeds
 	perlinNoiseSeeds.resize(perlinNoiseArraySize);
 	std::unique_ptr<cPerlinNoiseOctaves> perlinNoise(
@@ -1254,13 +1291,16 @@ void cOpenClEngineRenderFractal::RegisterInputOutputBuffers(
 
 	if (meshExportMode)
 	{
+		const size_t realSize =
+			GetDoublePrecision() ? sizeof(cl_double) : sizeof(cl_float);
+
 		// buffer for distances
-		outputBuffers[0] << sClInputOutputBuffer(sizeof(float),
+		outputBuffers[0] << sClInputOutputBuffer(realSize,
 			constantInMeshExportBuffer->sliceHeight * constantInMeshExportBuffer->sliceWidth,
 			"mesh-distances-buffer");
 
 		// buffer for colors
-		outputBuffers[0] << sClInputOutputBuffer(sizeof(float),
+		outputBuffers[0] << sClInputOutputBuffer(realSize,
 			constantInMeshExportBuffer->sliceHeight * constantInMeshExportBuffer->sliceWidth,
 			"mesh-colors-buffer");
 
@@ -1272,7 +1312,8 @@ void cOpenClEngineRenderFractal::RegisterInputOutputBuffers(
 	else if (distanceMode)
 	{
 		// buffer for distances
-		outputBuffers[0] << sClInputOutputBuffer(sizeof(cl_float), 1, "distance-buffer");
+		const size_t realSize = GetDoublePrecision() ? sizeof(cl_double) : sizeof(cl_float);
+		outputBuffers[0] << sClInputOutputBuffer(realSize, 1, "distance-buffer");
 	}
 	else
 	{
@@ -1304,9 +1345,14 @@ bool cOpenClEngineRenderFractal::PreAllocateBuffers(
 		{
 			WriteLog(QString("Allocating OpenCL buffer for constants"), 2);
 
-			inCLConstBuffer.append(std::shared_ptr<cl::Buffer>(
-				new cl::Buffer(*hardware->getContext(d), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					sizeof(sClInConstants), constantInBuffer.get(), &err)));
+			const size_t constantBufferSize =
+				GetDoublePrecision() ? sizeof(sClInConstantsD) : sizeof(sClInConstants);
+			void *constantBufferData =
+				GetDoublePrecision() ? static_cast<void *>(constantInBufferD.get())
+														 : static_cast<void *>(constantInBuffer.get());
+			inCLConstBuffer.append(std::shared_ptr<cl::Buffer>(new cl::Buffer(
+				*hardware->getContext(d), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, constantBufferSize,
+				constantBufferData, &err)));
 			if (!checkErr(err,
 						"cl::Buffer(*hardware->getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, "
 						"sizeof(sClInConstants), constantInBuffer, &err)"))
@@ -1321,9 +1367,14 @@ bool cOpenClEngineRenderFractal::PreAllocateBuffers(
 			{
 				WriteLog(QString("Allocating OpenCL buffer for mesh constants"), 2);
 
-				inCLConstMeshExportBuffer.append(std::shared_ptr<cl::Buffer>(
-					new cl::Buffer(*hardware->getContext(d), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-						sizeof(sClMeshExport), constantInMeshExportBuffer.get(), &err)));
+				const size_t meshExportBufferSize =
+					GetDoublePrecision() ? sizeof(sClMeshExportD) : sizeof(sClMeshExport);
+				void *meshExportBufferData =
+					GetDoublePrecision() ? static_cast<void *>(constantInMeshExportBufferD.get())
+														 : static_cast<void *>(constantInMeshExportBuffer.get());
+				inCLConstMeshExportBuffer.append(std::shared_ptr<cl::Buffer>(new cl::Buffer(
+					*hardware->getContext(d), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, meshExportBufferSize,
+					meshExportBufferData, &err)));
 				if (!checkErr(err,
 							"cl::Buffer(*hardware->getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, "
 							"sizeof(inCLConstMeshExportBuffer), constantInBuffer, &err)"))
@@ -2657,7 +2708,10 @@ bool cOpenClEngineRenderFractal::AssignParametersToKernelAdditional(
 
 	if (distanceMode)
 	{
-		err = clKernels.at(deviceIndex)->setArg(argIterator++, pointToCalculateDistance); // random seed
+		if (GetDoublePrecision())
+			err = clKernels.at(deviceIndex)->setArg(argIterator++, pointToCalculateDistanceDouble);
+		else
+			err = clKernels.at(deviceIndex)->setArg(argIterator++, pointToCalculateDistance);
 		if (!checkErr(err, "kernel->setArg(4, pointToCalculateDistance)"))
 		{
 			emit EmitErrorMessage(QObject::tr("Cannot set OpenCL argument for %1")
@@ -2746,8 +2800,13 @@ bool cOpenClEngineRenderFractal::WriteBuffersToQueue()
 		}
 
 		WriteLog(QString("Writing OpenCL constant buffer"), 2);
-		err = clQueues.at(d)->enqueueWriteBuffer(
-			*inCLConstBuffer[d].get(), CL_TRUE, 0, sizeof(sClInConstants), constantInBuffer.get());
+		const size_t constantBufferSize =
+			GetDoublePrecision() ? sizeof(sClInConstantsD) : sizeof(sClInConstants);
+		void *constantBufferData =
+			GetDoublePrecision() ? static_cast<void *>(constantInBufferD.get())
+													 : static_cast<void *>(constantInBuffer.get());
+		err = clQueues.at(d)->enqueueWriteBuffer(*inCLConstBuffer[d].get(), CL_TRUE, 0,
+			constantBufferSize, constantBufferData);
 		if (!checkErr(err, "CommandQueue::enqueueWriteBuffer(inCLConstBuffer)"))
 		{
 			emit EmitErrorMessage(
@@ -2769,8 +2828,13 @@ bool cOpenClEngineRenderFractal::WriteBuffersToQueue()
 	if (meshExportMode)
 	{
 		WriteLog(QString("Writing OpenCL mesh constant buffer"), 2);
+		const size_t meshExportBufferSize =
+			GetDoublePrecision() ? sizeof(sClMeshExportD) : sizeof(sClMeshExport);
+		void *meshExportBufferData =
+			GetDoublePrecision() ? static_cast<void *>(constantInMeshExportBufferD.get())
+												 : static_cast<void *>(constantInMeshExportBuffer.get());
 		err = clQueues.at(0)->enqueueWriteBuffer(*inCLConstMeshExportBuffer[0].get(), CL_TRUE, 0,
-			sizeof(sClMeshExport), constantInMeshExportBuffer.get());
+			meshExportBufferSize, meshExportBufferData);
 		if (!checkErr(err, "CommandQueue::enqueueWriteBuffer(inCLConstMeshExportBuffer)"))
 		{
 			emit EmitErrorMessage(QObject::tr("Cannot enqueue writing OpenCL %1")
@@ -2890,6 +2954,8 @@ bool cOpenClEngineRenderFractal::Render(std::vector<double> *distances, std::vec
 	Q_UNUSED(stopRequest);
 
 	constantInMeshExportBuffer->sliceIndex = sliceIndex;
+	// The double layout is uploaded in double mode, so it must track per-slice updates too.
+	if (constantInMeshExportBufferD) constantInMeshExportBufferD->sliceIndex = sliceIndex;
 
 	// writing inOut to queue
 	if (!WriteBuffersToQueue()) return false;
@@ -2913,16 +2979,27 @@ bool cOpenClEngineRenderFractal::Render(std::vector<double> *distances, std::vec
 		for (int x = 0; x < constantInMeshExportBuffer->sliceWidth; x++)
 		{
 			size_t address = x + y * constantInMeshExportBuffer->sliceWidth;
-			double distance = (reinterpret_cast<cl_float *>(
-				outputBuffers[0][outputMeshDistancesIndex].ptr.get()))[address];
+			double distance;
+			double color = 0.0;
+			if (GetDoublePrecision())
+			{
+				distance = (reinterpret_cast<cl_double *>(
+					outputBuffers[0][outputMeshDistancesIndex].ptr.get()))[address];
+				if (colors)
+					color = (reinterpret_cast<cl_double *>(
+						outputBuffers[0][outputMeshColorsIndex].ptr.get()))[address];
+			}
+			else
+			{
+				distance = (reinterpret_cast<cl_float *>(
+					outputBuffers[0][outputMeshDistancesIndex].ptr.get()))[address];
+				if (colors)
+					color = (reinterpret_cast<cl_float *>(
+						outputBuffers[0][outputMeshColorsIndex].ptr.get()))[address];
+			}
 			(*distances)[address + dataOffset] = distance;
 
-			if (colors)
-			{
-				double color = (reinterpret_cast<cl_float *>(
-					outputBuffers[0][outputMeshColorsIndex].ptr.get()))[address];
-				(*colors)[address + dataOffset] = color;
-			}
+			if (colors) (*colors)[address + dataOffset] = color;
 
 			if (iterations)
 			{
@@ -2936,9 +3013,10 @@ bool cOpenClEngineRenderFractal::Render(std::vector<double> *distances, std::vec
 	return true;
 }
 
-float cOpenClEngineRenderFractal::CalculateDistance(CVector3 point)
+double cOpenClEngineRenderFractal::CalculateDistance(CVector3 point)
 {
 	pointToCalculateDistance = {{cl_float(point.x), cl_float(point.y), cl_float(point.z)}};
+	pointToCalculateDistanceDouble = toClDouble3(point);
 
 	// writing inOut to queue
 	if (!WriteBuffersToQueue()) return false;
@@ -2951,15 +3029,37 @@ float cOpenClEngineRenderFractal::CalculateDistance(CVector3 point)
 
 	if (!ReadBuffersFromQueue()) return false;
 
-	float distance =
-		(reinterpret_cast<cl_float *>(outputBuffers[0][outputMeshDistancesIndex].ptr.get()))[0];
+	double distance;
+	if (GetDoublePrecision())
+		distance =
+			(reinterpret_cast<cl_double *>(outputBuffers[0][outputMeshDistancesIndex].ptr.get()))[0];
+	else
+		distance =
+			(reinterpret_cast<cl_float *>(outputBuffers[0][outputMeshDistancesIndex].ptr.get()))[0];
 
 	return distance;
 }
 
-void cOpenClEngineRenderFractal::SetMeshExportParameters(const sClMeshExport *meshParams)
+void cOpenClEngineRenderFractal::SetMeshExportParameters(const sClMeshExport *meshParams,
+	const CVector3 &limitMin, const CVector3 &limitMax, double distThresh)
 {
 	*constantInMeshExportBuffer = *meshParams;
+
+	if (constantInMeshExportBufferD)
+	{
+		// Build the double layout directly from the CPU values, preserving the
+		// precision of the export bounds.
+		constantInMeshExportBufferD->limitMin = toClDouble3(limitMin);
+		constantInMeshExportBufferD->limitMax = toClDouble3(limitMax);
+		constantInMeshExportBufferD->distThresh = distThresh;
+		constantInMeshExportBufferD->size = toClInt3(meshParams->size.x, meshParams->size.y, meshParams->size.z);
+		constantInMeshExportBufferD->maxiter = meshParams->maxiter;
+		constantInMeshExportBufferD->sliceWidth = meshParams->sliceWidth;
+		constantInMeshExportBufferD->sliceHeight = meshParams->sliceHeight;
+		constantInMeshExportBufferD->sliceIndex = meshParams->sliceIndex;
+		constantInMeshExportBufferD->coloredMesh = meshParams->coloredMesh;
+	}
+
 	if (meshParams->coloredMesh)
 	{
 		definesCollector += " -DMESH_EXPORT_COLOR";
