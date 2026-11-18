@@ -46,8 +46,8 @@ Options:
 | `--jobs N` | Parallel make jobs |
 | `--keep-appdir` | Keep the staged AppDir for inspection |
 
-A quick smoke test (all 153 bundled examples use the full renderer; this runs
-one small image with OpenCL enabled):
+A quick smoke test with an OpenCL-enabled settings file (`opencl_mode` > 0)
+renders a small image without the GUI:
 
 ```sh
 ./Mandelbulber_v2-x86_64.AppImage --help
