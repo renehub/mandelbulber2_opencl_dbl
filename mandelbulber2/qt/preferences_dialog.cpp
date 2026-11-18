@@ -125,6 +125,16 @@ cPreferencesDialog::~cPreferencesDialog()
 	delete ui;
 }
 
+void cPreferencesDialog::showEvent(QShowEvent *event)
+{
+	QDialog::showEvent(event);
+#ifdef USE_OPENCL
+	// The dialog is reused after being closed, so recompute the precision gate
+	// from the current device list and checkbox state each time it is shown.
+	UpdateOpenCLPrecisionComboBox();
+#endif
+}
+
 void cPreferencesDialog::on_buttonBox_accepted()
 {
 	SynchronizeInterfaceWindow(this, gPar, qInterface::read);
@@ -526,6 +536,8 @@ void cPreferencesDialog::on_listWidget_opencl_platform_list_currentRowChanged(in
 			item->setSelected(selected);
 		}
 	}
+
+	UpdateOpenCLPrecisionComboBox();
 }
 
 void cPreferencesDialog::on_groupCheck_opencl_enabled_toggled(bool state)
@@ -613,11 +625,51 @@ void cPreferencesDialog::UpdateOpenCLListBoxes(bool refreshOpenClPlatforms)
 	UpdateOpenCLPrecisionComboBox();
 }
 
+bool cPreferencesDialog::IsDoublePrecisionSupportedBySelection() const
+{
+	const QList<cOpenClDevice::sDeviceInformation> &devicesInformation =
+		gOpenCl->openClHardware->getDevicesInformation();
+
+	if (devicesInformation.isEmpty()) return false;
+
+	QList<QListWidgetItem *> selectedItems = ui->listWidget_opencl_device_list->selectedItems();
+
+	if (selectedItems.isEmpty())
+	{
+		// The renderer falls back to the first available device when no device is
+		// selected, so use the same rule for the precision gate.
+		return devicesInformation.first().compilerAvailable
+					 && devicesInformation.first().IsDoublePrecisionSupported();
+	}
+
+	for (QListWidgetItem *item : selectedItems)
+	{
+		const QString selectedHash = item->data(1).toString();
+		bool found = false;
+		for (const cOpenClDevice::sDeviceInformation &deviceInformation : devicesInformation)
+		{
+			if (deviceInformation.hash.toHex() == selectedHash)
+			{
+				found = true;
+				if (!deviceInformation.compilerAvailable
+						|| !deviceInformation.IsDoublePrecisionSupported())
+				{
+					return false;
+				}
+				break;
+			}
+		}
+		if (!found) return false;
+	}
+	return true;
+}
+
 void cPreferencesDialog::UpdateOpenCLPrecisionComboBox()
 {
-	const bool openclEnabled = gPar->Get<bool>("opencl_enabled");
-	const bool doubleSupported =
-		openclEnabled && gOpenCl->openClHardware->IsDoublePrecisionSupported();
+	// Use the checkbox state instead of the parameter value: toggling OpenCL in
+	// the dialog must update the precision gate immediately, before OK is pressed.
+	const bool openclEnabled = ui->groupCheck_opencl_enabled->isChecked();
+	const bool doubleSupported = openclEnabled && IsDoublePrecisionSupportedBySelection();
 
 	ui->comboBox_opencl_precision->setEnabled(doubleSupported);
 	if (doubleSupported)
@@ -630,7 +682,7 @@ void cPreferencesDialog::UpdateOpenCLPrecisionComboBox()
 				 "more information about setup and workflow see the User Manual<br/>under Menu &gt; Help "
 				 "&gt; User Manual.<br/></p></body></html>"));
 	}
-	else
+	else if (openclEnabled)
 	{
 		// Reflect the effective precision: the renderer will fall back to single
 		// precision when FP64 is unavailable.
@@ -638,22 +690,23 @@ void cPreferencesDialog::UpdateOpenCLPrecisionComboBox()
 		ui->comboBox_opencl_precision->setToolTip(
 			tr("<p>Double precision (FP64) is not supported by the selected OpenCL device(s). "
 				 "Only single precision can be used.</p>"));
-		if (openclEnabled)
-		{
-			ui->label_explanation_opencl_missing_features->setText(
-				tr("<html><head/><body><p>Mandelbulber can use OpenCL to accelerate rendering.<br/>For "
-					 "more information about setup and workflow see the User Manual<br/>under Menu &gt; "
-					 "Help &gt; User Manual.<br/></p><p><b>Warning:</b> The selected OpenCL device(s) do "
-					 "not support FP64 (cl_khr_fp64), so double precision is disabled and renders will "
-					 "use single precision.</p></body></html>"));
-		}
-		else
-		{
-			ui->label_explanation_opencl_missing_features->setText(
-				tr("<html><head/><body><p>Mandelbulber can use OpenCL to accelerate rendering.<br/>For "
-					 "more information about setup and workflow see the User Manual<br/>under Menu &gt; "
-					 "Help &gt; User Manual.<br/></p></body></html>"));
-		}
+		ui->label_explanation_opencl_missing_features->setText(
+			tr("<html><head/><body><p>Mandelbulber can use OpenCL to accelerate rendering.<br/>For "
+				 "more information about setup and workflow see the User Manual<br/>under Menu &gt; "
+				 "Help &gt; User Manual.<br/></p><p><b>Warning:</b> The selected OpenCL device(s) do "
+				 "not support FP64 (cl_khr_fp64), so double precision is disabled and renders will "
+				 "use single precision.</p></body></html>"));
+	}
+	else
+	{
+		// Preserve the saved precision while OpenCL is disabled. It becomes
+		// effective again when OpenCL is enabled.
+		ui->comboBox_opencl_precision->setToolTip(
+			tr("<p>Enable OpenCL to choose the kernel precision.</p>"));
+		ui->label_explanation_opencl_missing_features->setText(
+			tr("<html><head/><body><p>Mandelbulber can use OpenCL to accelerate rendering.<br/>For "
+				 "more information about setup and workflow see the User Manual<br/>under Menu &gt; Help "
+				 "&gt; User Manual.<br/></p></body></html>"));
 	}
 }
 

@@ -36,6 +36,7 @@
 #define MANDELBULBER2_QT_PREFERENCES_DIALOG_H_
 
 #include <QDialog>
+#include <QShowEvent>
 
 // forward declarations
 class cAutomatedWidgets;
@@ -52,6 +53,9 @@ class cPreferencesDialog : public QDialog
 public:
 	explicit cPreferencesDialog(QWidget *parent = nullptr);
 	~cPreferencesDialog() override;
+
+protected:
+	void showEvent(QShowEvent *event) override;
 
 private slots:
 	void on_buttonBox_accepted();
@@ -82,6 +86,7 @@ private:
 	void UpdateOpenCLListBoxes(bool refreshOpenClPlatforms);
 	void UpdateOpenCLMemoryLimits();
 	void UpdateOpenCLPrecisionComboBox();
+	bool IsDoublePrecisionSupportedBySelection() const;
 #endif
 
 	Ui::cPreferencesDialog *ui;
