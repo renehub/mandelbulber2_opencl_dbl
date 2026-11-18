@@ -41,16 +41,16 @@
 #endif
 
 // object data
-typedef struct ALIGN16
+typedef struct ALIGN_REAL
 {
 	matrix33 rotationMatrix;
 	matrix44 worldToLocalMatrix;
-	cl_float3 position;
-	cl_float3 size;
-	cl_float3 repeat;
-	cl_float absScale;
-	cl_float detailLevelMultiplier;
-	cl_float wallThickness;
+	REAL3 position;
+	REAL3 size;
+	REAL3 repeat;
+	REAL absScale;
+	REAL detailLevelMultiplier;
+	REAL wallThickness;
 	
 	cl_int usedForVolumetric;
 	cl_int materialId;
@@ -58,5 +58,46 @@ typedef struct ALIGN16
 	cl_int enable;
 	enumObjectTypeCl objectType;
 } sObjectDataCl;
+
+#ifndef OPENCL_KERNEL_CODE
+// BEGIN OPENCL_D_STRUCTS
+typedef struct ALIGN_DOUBLE
+{
+	matrix33D rotationMatrix;
+	matrix44D worldToLocalMatrix;
+	cl_double3 position;
+	cl_double3 size;
+	cl_double3 repeat;
+	cl_double absScale;
+	cl_double detailLevelMultiplier;
+	cl_double wallThickness;
+	
+	cl_int usedForVolumetric;
+	cl_int materialId;
+	cl_int objectId;
+	cl_int enable;
+	enumObjectTypeCl objectType;
+} sObjectDataClD;
+
+inline sObjectDataClD clPromoteSObjectDataClD(const sObjectDataCl &source)
+{
+	sObjectDataClD target;
+	target.rotationMatrix = toClMatrix33D(source.rotationMatrix);
+	target.worldToLocalMatrix = toClMatrix44D(source.worldToLocalMatrix);
+	target.position = toClDouble3(source.position);
+	target.size = toClDouble3(source.size);
+	target.repeat = toClDouble3(source.repeat);
+	target.absScale = source.absScale;
+	target.detailLevelMultiplier = source.detailLevelMultiplier;
+	target.wallThickness = source.wallThickness;
+	target.usedForVolumetric = source.usedForVolumetric;
+	target.materialId = source.materialId;
+	target.objectId = source.objectId;
+	target.enable = source.enable;
+	target.objectType = static_cast<enumObjectTypeCl>(source.objectType);
+	return target;
+}
+// END OPENCL_D_STRUCTS
+#endif /* OPENCL_KERNEL_CODE */
 
 #endif /* MANDELBULBER2_OPENCL_OBJECT_DATA_CL_H_ */

@@ -86,16 +86,86 @@ typedef struct
 	cl_int iterThreshMode;
 	cl_int normalCalculationMode;
 	cl_int orbitTrapIndex;
-	cl_float3 orbitTrap;
-	cl_float distThresh;
-	cl_float detailSize;
+	REAL3 orbitTrap;
+	REAL distThresh;
+	REAL detailSize;
 } sClCalcParams;
 
 // ambient occlusion data
 typedef struct
 {
-	cl_float3 v;
-	cl_float3 color;
+	REAL3 v;
+	REAL3 color;
 } sVectorsAroundCl;
+
+#ifndef OPENCL_KERNEL_CODE
+// BEGIN OPENCL_D_STRUCTS
+typedef struct ALIGN_DOUBLE
+{
+	sParamRenderClD params;
+} sClInConstantsD;
+
+inline sClInConstantsD clPromoteSClInConstantsD(const sClInConstants &source)
+{
+	sClInConstantsD target;
+	target.params = clPromoteSParamRenderClD(source.params);
+	return target;
+}
+
+typedef struct ALIGN_DOUBLE
+{
+	cl_int dummy[256];
+} sClInBuffD;
+
+inline sClInBuffD clPromoteSClInBuffD(const sClInBuff &source)
+{
+	sClInBuffD target;
+	for(int i = 0; i < 256; i++){target.dummy[i] = source.dummy[i];}
+	return target;
+}
+
+typedef struct ALIGN_DOUBLE
+{
+	cl_uint N;
+	cl_uint deltaDEMaxN;
+	cl_int randomSeed;
+	cl_int iterThreshMode;
+	cl_int normalCalculationMode;
+	cl_int orbitTrapIndex;
+	cl_double3 orbitTrap;
+	cl_double distThresh;
+	cl_double detailSize;
+} sClCalcParamsD;
+
+inline sClCalcParamsD clPromoteSClCalcParamsD(const sClCalcParams &source)
+{
+	sClCalcParamsD target;
+	target.N = source.N;
+	target.deltaDEMaxN = source.deltaDEMaxN;
+	target.randomSeed = source.randomSeed;
+	target.iterThreshMode = source.iterThreshMode;
+	target.normalCalculationMode = source.normalCalculationMode;
+	target.orbitTrapIndex = source.orbitTrapIndex;
+	target.orbitTrap = toClDouble3(source.orbitTrap);
+	target.distThresh = source.distThresh;
+	target.detailSize = source.detailSize;
+	return target;
+}
+
+typedef struct ALIGN_DOUBLE
+{
+	cl_double3 v;
+	cl_double3 color;
+} sVectorsAroundClD;
+
+inline sVectorsAroundClD clPromoteSVectorsAroundClD(const sVectorsAroundCl &source)
+{
+	sVectorsAroundClD target;
+	target.v = toClDouble3(source.v);
+	target.color = toClDouble3(source.color);
+	return target;
+}
+// END OPENCL_D_STRUCTS
+#endif /* OPENCL_KERNEL_CODE */
 
 #endif // INPUT_DATA_STRUCTURES

@@ -55,34 +55,34 @@ typedef enum
 	lightDecay1R3 = 2,
 } enumLightDecayFunctionCl;
 
-typedef struct ALIGN16
+typedef struct ALIGN_REAL
 {
-	cl_float3 color;
+	REAL3 color;
 	
-	cl_float3 position;
-	cl_float3 rotation;
-	cl_float3 target;
-	cl_float3 lightDirection;
-	cl_float3 lightTopVector;
-	cl_float3 lightRightVector;
+	REAL3 position;
+	REAL3 rotation;
+	REAL3 target;
+	REAL3 lightDirection;
+	REAL3 lightTopVector;
+	REAL3 lightRightVector;
 		
 	matrix33 rotMatrix;
 
-	cl_float coneSoftAngle;
-	cl_float intensity;
-	cl_float visibility;
-	cl_float volumetricVisibility;
-	cl_float size;
-	cl_float softShadowCone;
-	cl_float contourSharpness;
+	REAL coneSoftAngle;
+	REAL intensity;
+	REAL visibility;
+	REAL volumetricVisibility;
+	REAL size;
+	REAL softShadowCone;
+	REAL contourSharpness;
 	
-	cl_float coneRatio;
-	cl_float coneSoftRatio;
+	REAL coneRatio;
+	REAL coneSoftRatio;
 	
-	cl_float projectionHorizontalRatio;
-	cl_float projectionVerticalRatio;
+	REAL projectionHorizontalRatio;
+	REAL projectionVerticalRatio;
 	
-	cl_float coneAngle;
+	REAL coneAngle;
 	
 	// booleans
 	cl_int enabled;
@@ -99,5 +99,88 @@ typedef struct ALIGN16
 	enumLightDecayFunctionCl decayFunction;
 
 } sLightCl;
+
+#ifndef OPENCL_KERNEL_CODE
+// BEGIN OPENCL_D_STRUCTS
+typedef struct ALIGN_DOUBLE
+{
+	cl_double3 color;
+	
+	cl_double3 position;
+	cl_double3 rotation;
+	cl_double3 target;
+	cl_double3 lightDirection;
+	cl_double3 lightTopVector;
+	cl_double3 lightRightVector;
+		
+	matrix33D rotMatrix;
+
+	cl_double coneSoftAngle;
+	cl_double intensity;
+	cl_double visibility;
+	cl_double volumetricVisibility;
+	cl_double size;
+	cl_double softShadowCone;
+	cl_double contourSharpness;
+	
+	cl_double coneRatio;
+	cl_double coneSoftRatio;
+	
+	cl_double projectionHorizontalRatio;
+	cl_double projectionVerticalRatio;
+	
+	cl_double coneAngle;
+	
+	// booleans
+	cl_int enabled;
+	cl_int castShadows;
+	cl_int penetrating;
+	cl_int relativePosition;
+	cl_int repeatTexture;
+	cl_int volumetric;
+	
+	cl_int colorTextureIndex;
+
+	// enums
+	enumLightTypeCl type;
+	enumLightDecayFunctionCl decayFunction;
+} sLightClD;
+
+inline sLightClD clPromoteSLightClD(const sLightCl &source)
+{
+	sLightClD target;
+	target.color = toClDouble3(source.color);
+	target.position = toClDouble3(source.position);
+	target.rotation = toClDouble3(source.rotation);
+	target.target = toClDouble3(source.target);
+	target.lightDirection = toClDouble3(source.lightDirection);
+	target.lightTopVector = toClDouble3(source.lightTopVector);
+	target.lightRightVector = toClDouble3(source.lightRightVector);
+	target.rotMatrix = toClMatrix33D(source.rotMatrix);
+	target.coneSoftAngle = source.coneSoftAngle;
+	target.intensity = source.intensity;
+	target.visibility = source.visibility;
+	target.volumetricVisibility = source.volumetricVisibility;
+	target.size = source.size;
+	target.softShadowCone = source.softShadowCone;
+	target.contourSharpness = source.contourSharpness;
+	target.coneRatio = source.coneRatio;
+	target.coneSoftRatio = source.coneSoftRatio;
+	target.projectionHorizontalRatio = source.projectionHorizontalRatio;
+	target.projectionVerticalRatio = source.projectionVerticalRatio;
+	target.coneAngle = source.coneAngle;
+	target.enabled = source.enabled;
+	target.castShadows = source.castShadows;
+	target.penetrating = source.penetrating;
+	target.relativePosition = source.relativePosition;
+	target.repeatTexture = source.repeatTexture;
+	target.volumetric = source.volumetric;
+	target.colorTextureIndex = source.colorTextureIndex;
+	target.type = static_cast<enumLightTypeCl>(source.type);
+	target.decayFunction = static_cast<enumLightDecayFunctionCl>(source.decayFunction);
+	return target;
+}
+// END OPENCL_D_STRUCTS
+#endif /* OPENCL_KERNEL_CODE */
 
 #endif /* MANDELBULBER2_OPENCL_LIGHT_CL_H_ */

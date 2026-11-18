@@ -85,10 +85,28 @@
 
 #if defined(__OPENCL_VERSION__)
 #define ALIGN16 __attribute__((aligned(16)))
+#define ALIGN_REAL __attribute__((aligned(16)))
+#define ALIGN_DOUBLE __attribute__((aligned(32)))
 #elif defined(_MSC_VER)
 #define ALIGN16 __declspec(align(16))
+#define ALIGN_REAL __declspec(align(16))
+#define ALIGN_DOUBLE __declspec(align(32))
 #else
 #define ALIGN16 alignas(16)
+#define ALIGN_REAL alignas(16)
+#define ALIGN_DOUBLE alignas(32)
+#endif
+
+// Host-side aliases for the kernel precision types. The host builds both
+// layouts, so the base (single precision) structures use these aliases and
+// the *D structures use cl_double/cl_doubleN directly.
+#if defined(USE_OPENCL) && !defined(OPENCL_KERNEL_CODE)
+#ifndef REAL
+#define REAL cl_float
+#define REAL2 cl_float2
+#define REAL3 cl_float3
+#define REAL4 cl_float4
+#endif
 #endif
 
 #endif /* MANDELBULBER2_SRC_HEADER_WRAPPER_HPP_ */

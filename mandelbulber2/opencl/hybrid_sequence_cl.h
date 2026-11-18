@@ -43,11 +43,11 @@
 
 // OpenCL version of cHybridFractalSequences::sFractalData
 // Note: fractalFormulaObject pointer is not transferred to OpenCL
-typedef struct ALIGN16
+typedef struct ALIGN_REAL
 {
 	sFractalCl fractalParameters;
-	cl_float formulaWeight;
-	cl_float bailout;
+	REAL formulaWeight;
+	REAL bailout;
 	cl_int formulaIterations;
 	cl_int formulaStartIteration;
 	cl_int formulaStopIteration;
@@ -58,12 +58,12 @@ typedef struct ALIGN16
 
 // OpenCL version of cHybridFractalSequences::sSequence
 // The variable-length arrays (seqence and fractData) are stored separately in dynamic data
-typedef struct ALIGN16
+typedef struct ALIGN_REAL
 {
-	cl_float3 juliaConstant;
-	cl_float3 constantMultiplier;
+	REAL3 juliaConstant;
+	REAL3 constantMultiplier;
 
-	cl_float initialWAxis;
+	REAL initialWAxis;
 
 	cl_int length;
 	cl_int tableLength; // number of entries in the sequence array (formulaMaxiter * 5)
@@ -83,5 +83,86 @@ typedef struct ALIGN16
 	enumDEAnalyticFunctionCl DEAnalyticFunction;
 	enumColoringFunctionCl coloringFunction;
 } sHybridSequenceCl;
+
+#ifndef OPENCL_KERNEL_CODE
+// BEGIN OPENCL_D_STRUCTS
+typedef struct ALIGN_DOUBLE
+{
+	sFractalClD fractalParameters;
+	cl_double formulaWeight;
+	cl_double bailout;
+	cl_int formulaIterations;
+	cl_int formulaStartIteration;
+	cl_int formulaStopIteration;
+	cl_int addCConstant;
+	cl_int checkForBailout;
+	cl_int useAdditionalBailoutCond;
+} sHybridFractalDataClD;
+
+inline sHybridFractalDataClD clPromoteSHybridFractalDataClD(const sHybridFractalDataCl &source)
+{
+	sHybridFractalDataClD target;
+	target.fractalParameters = clPromoteSFractalClD(source.fractalParameters);
+	target.formulaWeight = source.formulaWeight;
+	target.bailout = source.bailout;
+	target.formulaIterations = source.formulaIterations;
+	target.formulaStartIteration = source.formulaStartIteration;
+	target.formulaStopIteration = source.formulaStopIteration;
+	target.addCConstant = source.addCConstant;
+	target.checkForBailout = source.checkForBailout;
+	target.useAdditionalBailoutCond = source.useAdditionalBailoutCond;
+	return target;
+}
+
+typedef struct ALIGN_DOUBLE
+{
+	cl_double3 juliaConstant;
+	cl_double3 constantMultiplier;
+
+	cl_double initialWAxis;
+
+	cl_int length;
+	cl_int tableLength; // number of entries in the sequence array (formulaMaxiter * 5)
+	cl_int numberOfFractalsInTheSequence;
+	cl_int internalObjectId;
+
+	cl_int isHybrid;
+	cl_int juliaEnabled;
+	cl_int formulaMaxiter;
+
+	cl_int sequenceArrayOffset;	 // offset to sequence array (cl_int[]) in dynamic data
+	cl_int fractDataArrayOffset; // offset to fractData array (sHybridFractalDataClD[]) in dynamic data
+	cl_int formulaBaseIndex; // global index of first formula in consts->fractal[] for this sequence
+
+	enumDEFunctionTypeCl DEFunctionType;
+	enumDETypeCl DEType;
+	enumDEAnalyticFunctionCl DEAnalyticFunction;
+	enumColoringFunctionCl coloringFunction;
+} sHybridSequenceClD;
+
+inline sHybridSequenceClD clPromoteSHybridSequenceClD(const sHybridSequenceCl &source)
+{
+	sHybridSequenceClD target;
+	target.juliaConstant = toClDouble3(source.juliaConstant);
+	target.constantMultiplier = toClDouble3(source.constantMultiplier);
+	target.initialWAxis = source.initialWAxis;
+	target.length = source.length;
+	target.tableLength = source.tableLength;
+	target.numberOfFractalsInTheSequence = source.numberOfFractalsInTheSequence;
+	target.internalObjectId = source.internalObjectId;
+	target.isHybrid = source.isHybrid;
+	target.juliaEnabled = source.juliaEnabled;
+	target.formulaMaxiter = source.formulaMaxiter;
+	target.sequenceArrayOffset = source.sequenceArrayOffset;
+	target.fractDataArrayOffset = source.fractDataArrayOffset;
+	target.formulaBaseIndex = source.formulaBaseIndex;
+	target.DEFunctionType = static_cast<enumDEFunctionTypeCl>(source.DEFunctionType);
+	target.DEType = static_cast<enumDETypeCl>(source.DEType);
+	target.DEAnalyticFunction = static_cast<enumDEAnalyticFunctionCl>(source.DEAnalyticFunction);
+	target.coloringFunction = static_cast<enumColoringFunctionCl>(source.coloringFunction);
+	return target;
+}
+// END OPENCL_D_STRUCTS
+#endif /* OPENCL_KERNEL_CODE */
 
 #endif /* MANDELBULBER2_OPENCL_HYBRID_SEQUENCE_CL_H_ */

@@ -57,7 +57,44 @@ typedef uchar4 cl_uchar4;
 #define REAL2 double2
 #define REAL3 double3
 #define REAL4 double4
-#endif /*DOUBLE_PRECISION*/
+#endif
+
+/* Convert single-precision data (textures, palettes, image2d_t pixels) to the
+ * current REAL vector type. In single mode the conversion is a no-op. */
+#ifdef DOUBLE_PRECISION
+#define TO_REAL2(v) convert_double2(v)
+#define TO_REAL3(v) convert_double3(v)
+#define TO_REAL4(v) convert_double4(v)
+/* Convert REAL shading results back to the single-precision storage used by
+ * textures, palettes and image pixels. */
+#define TO_CL_FLOAT2(v) convert_float2(v)
+#define TO_CL_FLOAT3(v) convert_float3(v)
+#define TO_CL_FLOAT4(v) convert_float4(v)
+#else
+#define TO_REAL2(v) (v)
+#define TO_REAL3(v) (v)
+#define TO_REAL4(v) (v)
+#define TO_CL_FLOAT2(v) (v)
+#define TO_CL_FLOAT3(v) (v)
+#define TO_CL_FLOAT4(v) (v)
+#endif
+
+#ifdef DOUBLE_PRECISION
+/* Native math functions are float-only in OpenCL. In double precision mode
+ * map them to the standard functions so formula and engine code stays valid
+ * and does not silently fall back to single precision. */
+#define native_exp(x) exp(x)
+#define native_log(x) log(x)
+#define native_sqrt(x) sqrt(x)
+#define native_rsqrt(x) rsqrt(x)
+#define native_sin(x) sin(x)
+#define native_cos(x) cos(x)
+#define native_recip(x) (1.0 / (x))
+#define native_divide(a, b) ((a) / (b))
+#define native_powr(a, b) powr(a, b)
+#define fast_length(x) length(x)
+#define fast_normalize(x) normalize(x)
+#endif
 
 #ifndef NULL
 #define NULL 0

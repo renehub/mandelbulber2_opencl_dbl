@@ -112,10 +112,42 @@
 
 #if defined(__OPENCL_VERSION__)
 #define ALIGN16 __attribute__((aligned(16)))
+#ifdef DOUBLE_PRECISION
+#define ALIGN_REAL __attribute__((aligned(32)))
+#define ALIGN_DOUBLE __attribute__((aligned(32)))
+#else
+#define ALIGN_REAL __attribute__((aligned(16)))
+#define ALIGN_DOUBLE __attribute__((aligned(32)))
+#endif
 #elif defined(_MSC_VER)
 #define ALIGN16 __declspec(align(16))
+#define ALIGN_REAL __declspec(align(16))
+#define ALIGN_DOUBLE __declspec(align(32))
 #else
 #define ALIGN16 alignas(16)
+#define ALIGN_REAL alignas(16)
+#define ALIGN_DOUBLE alignas(32)
+#endif
+
+#ifdef DOUBLE_PRECISION
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327950288
+#endif
+#define M_PI_F M_PI
+#define M_PI_180_F M_PI_180
+#define M_PI_8_F M_PI_8
+#define M_PI_4_F M_PI_4
+#define M_PI_2_F M_PI_2
+#define M_PI_2x_F M_PI_2x
+#define M_PI_2x_INV_F M_PI_2x_INV
+#define SQRT_1_3_F SQRT_1_3
+#define SQRT_1_2_F SQRT_1_2
+#define SQRT_2_3_F SQRT_2_3
+#define SQRT_3_2_F SQRT_3_2
+#define SQRT_3_4_F SQRT_3_4
+#define SQRT_3_4d2_F SQRT_3_4d2
+#define SQRT_3_F SQRT_3
+#define FRAC_1_3_F FRAC_1_3
 #endif
 
 #endif /* MANDELBULBER2_OPENCL_OPENCL_DEFINES_CL_H_ */

@@ -38,7 +38,7 @@
 typedef struct
 {
 #if !defined(MESH_EXPORT) || 1
-	float3 viewVectorNotRotated;
+	REAL3 viewVectorNotRotated;
 #endif
 
 #ifdef CHROMATIC_ABERRATION

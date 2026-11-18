@@ -36,6 +36,7 @@
 #define MANDELBULBER2_OPENCL_ALGEBRA_HPP_
 
 #ifndef OPENCL_KERNEL_CODE
+#include "src/include_header_wrapper.hpp"
 #include <QString>
 
 #include "src/algebra.hpp"
@@ -44,18 +45,35 @@
 
 typedef struct
 {
-	cl_float3 m1;
-	cl_float3 m2;
-	cl_float3 m3;
+	REAL3 m1;
+	REAL3 m2;
+	REAL3 m3;
 } matrix33;
 
 typedef struct
 {
-	cl_float4 r1;
-	cl_float4 r2;
-	cl_float4 r3;
-	cl_float4 r4;
+	REAL4 r1;
+	REAL4 r2;
+	REAL4 r3;
+	REAL4 r4;
 } matrix44;
+
+#ifndef OPENCL_KERNEL_CODE
+typedef struct
+{
+	cl_double3 m1;
+	cl_double3 m2;
+	cl_double3 m3;
+} matrix33D;
+
+typedef struct
+{
+	cl_double4 r1;
+	cl_double4 r2;
+	cl_double4 r3;
+	cl_double4 r4;
+} matrix44D;
+#endif
 
 #ifndef OPENCL_KERNEL_CODE
 inline matrix33 toClMatrix33(CRotationMatrix source)
@@ -102,6 +120,99 @@ inline cl_float4 toClFloat4(sRGBAFloat v)
 	cl_float4 retVal = {{cl_float(v.R), cl_float(v.G), cl_float(v.B), cl_float(v.A)}};
 	return retVal;
 }
+inline cl_float2 toClFloat2(cl_float2 v)
+{
+	return v;
+}
+inline cl_float2 toClFloat2(cl_double2 v)
+{
+	cl_float2 retVal = {{cl_float(v.x), cl_float(v.y)}};
+	return retVal;
+}
+inline cl_float3 toClFloat3(cl_float3 v)
+{
+	return v;
+}
+inline cl_float3 toClFloat3(cl_double3 v)
+{
+	cl_float3 retVal = {{cl_float(v.x), cl_float(v.y), cl_float(v.z), cl_float(0.0)}};
+	return retVal;
+}
+inline cl_float4 toClFloat4(cl_float4 v)
+{
+	return v;
+}
+inline cl_float4 toClFloat4(cl_double4 v)
+{
+	cl_float4 retVal = {{cl_float(v.x), cl_float(v.y), cl_float(v.z), cl_float(v.w)}};
+	return retVal;
+}
+
+inline cl_double2 toClDouble2(CVector2<double> v)
+{
+	cl_double2 retVal = {{cl_double(v.x), cl_double(v.y)}};
+	return retVal;
+}
+inline cl_double3 toClDouble3(CVector3 v)
+{
+	cl_double3 retVal = {{cl_double(v.x), cl_double(v.y), cl_double(v.z), cl_double(0.0)}};
+	return retVal;
+}
+inline cl_double4 toClDouble4(CVector4 v)
+{
+	cl_double4 retVal = {{cl_double(v.x), cl_double(v.y), cl_double(v.z), cl_double(v.w)}};
+	return retVal;
+}
+inline cl_double3 toClDouble3(sRGBFloat c)
+{
+	cl_double3 retVal = {{cl_double(c.R), cl_double(c.G), cl_double(c.B), cl_double(1.0)}};
+	return retVal;
+}
+inline cl_double4 toClDouble4(sRGBAFloat c)
+{
+	cl_double4 retVal = {{cl_double(c.R), cl_double(c.G), cl_double(c.B), cl_double(c.A)}};
+	return retVal;
+}
+inline cl_double2 toClDouble2(cl_float2 v)
+{
+	cl_double2 retVal = {{cl_double(v.x), cl_double(v.y)}};
+	return retVal;
+}
+inline cl_double3 toClDouble3(cl_float3 v)
+{
+	cl_double3 retVal = {{cl_double(v.x), cl_double(v.y), cl_double(v.z), cl_double(0.0)}};
+	return retVal;
+}
+inline cl_double4 toClDouble4(cl_float4 v)
+{
+	cl_double4 retVal = {{cl_double(v.x), cl_double(v.y), cl_double(v.z), cl_double(v.w)}};
+	return retVal;
+}
+inline matrix33D toClMatrix33D(CRotationMatrix source)
+{
+	CMatrix33 matrix = source.GetMatrix();
+	matrix33D m;
+	m.m1 = {{cl_double(matrix.m11), cl_double(matrix.m12), cl_double(matrix.m13), cl_double(0.0)}};
+	m.m2 = {{cl_double(matrix.m21), cl_double(matrix.m22), cl_double(matrix.m23), cl_double(0.0)}};
+	m.m3 = {{cl_double(matrix.m31), cl_double(matrix.m32), cl_double(matrix.m33), cl_double(0.0)}};
+	return m;
+}
+inline matrix33 toClFloatMatrix33(const matrix33D &source)
+{
+	matrix33 m;
+	m.m1 = {{cl_float(source.m1.x), cl_float(source.m1.y), cl_float(source.m1.z), cl_float(0.0)}};
+	m.m2 = {{cl_float(source.m2.x), cl_float(source.m2.y), cl_float(source.m2.z), cl_float(0.0)}};
+	m.m3 = {{cl_float(source.m3.x), cl_float(source.m3.y), cl_float(source.m3.z), cl_float(0.0)}};
+	return m;
+}
+inline matrix33D toClMatrix33D(const matrix33 &source)
+{
+	matrix33D m;
+	m.m1 = {{cl_double(source.m1.x), cl_double(source.m1.y), cl_double(source.m1.z), cl_double(0.0)}};
+	m.m2 = {{cl_double(source.m2.x), cl_double(source.m2.y), cl_double(source.m2.z), cl_double(0.0)}};
+	m.m3 = {{cl_double(source.m3.x), cl_double(source.m3.y), cl_double(source.m3.z), cl_double(0.0)}};
+	return m;
+}
 
 inline matrix44 toClMatrix44(const CMatrix44 &source)
 {
@@ -117,13 +228,64 @@ inline matrix44 toClMatrix44(const CMatrix44 &source)
 	return m;
 }
 
+inline matrix44 toClMatrix44(const CRotationMatrix44 &source)
+{
+	return toClMatrix44(source.GetMatrix());
+}
+
+inline matrix44D toClMatrix44D(const CMatrix44 &source)
+{
+	matrix44D m;
+	m.r1 = {{cl_double(source.m11), cl_double(source.m12), cl_double(source.m13),
+		cl_double(source.m14)}};
+	m.r2 = {{cl_double(source.m21), cl_double(source.m22), cl_double(source.m23),
+		cl_double(source.m24)}};
+	m.r3 = {{cl_double(source.m31), cl_double(source.m32), cl_double(source.m33),
+		cl_double(source.m34)}};
+	m.r4 = {{cl_double(source.m41), cl_double(source.m42), cl_double(source.m43),
+		cl_double(source.m44)}};
+	return m;
+}
+
+inline matrix44D toClMatrix44D(const CRotationMatrix44 &source)
+{
+	return toClMatrix44D(source.GetMatrix());
+}
+
+inline matrix44 toClFloatMatrix44(const matrix44D &source)
+{
+	matrix44 m;
+	m.r1 = {{cl_float(source.r1.x), cl_float(source.r1.y), cl_float(source.r1.z),
+		cl_float(source.r1.w)}};
+	m.r2 = {{cl_float(source.r2.x), cl_float(source.r2.y), cl_float(source.r2.z),
+		cl_float(source.r2.w)}};
+	m.r3 = {{cl_float(source.r3.x), cl_float(source.r3.y), cl_float(source.r3.z),
+		cl_float(source.r3.w)}};
+	m.r4 = {{cl_float(source.r4.x), cl_float(source.r4.y), cl_float(source.r4.z),
+		cl_float(source.r4.w)}};
+	return m;
+}
+inline matrix44D toClMatrix44D(const matrix44 &source)
+{
+	matrix44D m;
+	m.r1 = {{cl_double(source.r1.x), cl_double(source.r1.y), cl_double(source.r1.z),
+		cl_double(source.r1.w)}};
+	m.r2 = {{cl_double(source.r2.x), cl_double(source.r2.y), cl_double(source.r2.z),
+		cl_double(source.r2.w)}};
+	m.r3 = {{cl_double(source.r3.x), cl_double(source.r3.y), cl_double(source.r3.z),
+		cl_double(source.r3.w)}};
+	m.r4 = {{cl_double(source.r4.x), cl_double(source.r4.y), cl_double(source.r4.z),
+		cl_double(source.r4.w)}};
+	return m;
+}
+
 #endif
 
 #ifdef OPENCL_KERNEL_CODE
 
-inline float4 Matrix33MulFloat4(matrix33 matrix, float4 vect)
+inline REAL4 Matrix33MulFloat4(matrix33 matrix, REAL4 vect)
 {
-	float4 out;
+	REAL4 out;
 	out.x = dot(vect.xyz, matrix.m1);
 	out.y = dot(vect.xyz, matrix.m2);
 	out.z = dot(vect.xyz, matrix.m3);
@@ -131,21 +293,21 @@ inline float4 Matrix33MulFloat4(matrix33 matrix, float4 vect)
 	return out;
 }
 
-inline float3 Matrix33MulFloat3(matrix33 matrix, float3 vect)
+inline REAL3 Matrix33MulFloat3(matrix33 matrix, REAL3 vect)
 {
-	float3 out;
+	REAL3 out;
 	out.x = dot(vect.xyz, matrix.m1);
 	out.y = dot(vect.xyz, matrix.m2);
 	out.z = dot(vect.xyz, matrix.m3);
 	return out;
 }
 
-inline float3 Matrix44TransformPoint(matrix44 matrix, float3 point)
+inline REAL3 Matrix44TransformPoint(matrix44 matrix, REAL3 point)
 {
-	float3 out;
-	out.x = dot((float4){point.x, point.y, point.z, 1.0f}, matrix.r1);
-	out.y = dot((float4){point.x, point.y, point.z, 1.0f}, matrix.r2);
-	out.z = dot((float4){point.x, point.y, point.z, 1.0f}, matrix.r3);
+	REAL3 out;
+	out.x = dot((REAL4){point.x, point.y, point.z, 1.0}, matrix.r1);
+	out.y = dot((REAL4){point.x, point.y, point.z, 1.0}, matrix.r2);
+	out.z = dot((REAL4){point.x, point.y, point.z, 1.0}, matrix.r3);
 	return out;
 }
 
@@ -164,82 +326,82 @@ matrix33 Matrix33MulMatrix33(matrix33 m1, matrix33 m2)
 	return out;
 }
 
-matrix33 RotateX(matrix33 m, float angle)
+matrix33 RotateX(matrix33 m, REAL angle)
 {
 	matrix33 out, rot;
-	float s = sin(angle);
-	float c = cos(angle);
-	rot.m1 = (float3){1.0f, 0.0f, 0.0f};
-	rot.m2 = (float3){0.0f, c, -s};
-	rot.m3 = (float3){0.0f, s, c};
+	REAL s = sin(angle);
+	REAL c = cos(angle);
+	rot.m1 = (REAL3){1.0, 0.0, 0.0};
+	rot.m2 = (REAL3){0.0, c, -s};
+	rot.m3 = (REAL3){0.0, s, c};
 	out = Matrix33MulMatrix33(m, rot);
 	return out;
 }
 
-matrix33 RotateY(matrix33 m, float angle)
+matrix33 RotateY(matrix33 m, REAL angle)
 {
 	matrix33 out, rot;
-	float s = sin(angle);
-	float c = cos(angle);
-	rot.m1 = (float3){c, 0.0f, s};
-	rot.m2 = (float3){0.0f, 1.0f, 0.0f};
-	rot.m3 = (float3){-s, 0.0f, c};
+	REAL s = sin(angle);
+	REAL c = cos(angle);
+	rot.m1 = (REAL3){c, 0.0, s};
+	rot.m2 = (REAL3){0.0, 1.0, 0.0};
+	rot.m3 = (REAL3){-s, 0.0, c};
 	out = Matrix33MulMatrix33(m, rot);
 	return out;
 }
 
-matrix33 RotateZ(matrix33 m, float angle)
+matrix33 RotateZ(matrix33 m, REAL angle)
 {
 	matrix33 out, rot;
-	float s = sin(angle);
-	float c = cos(angle);
-	rot.m1 = (float3){c, -s, 0.0f};
-	rot.m2 = (float3){s, c, 0.0f};
-	rot.m3 = (float3){0.0f, 0.0f, 1.0f};
+	REAL s = sin(angle);
+	REAL c = cos(angle);
+	rot.m1 = (REAL3){c, -s, 0.0};
+	rot.m2 = (REAL3){s, c, 0.0};
+	rot.m3 = (REAL3){0.0, 0.0, 1.0};
 	out = Matrix33MulMatrix33(m, rot);
 	return out;
 }
 
-float3 RotateAroundVectorByAngle(float3 origin, float3 axis, float angle)
+REAL3 RotateAroundVectorByAngle(REAL3 origin, REAL3 axis, REAL angle)
 {
-	float3 vector = origin * cos(angle);
+	REAL3 vector = origin * cos(angle);
 	vector += cross(axis, origin) * sin(angle);
-	vector += axis * dot(axis, origin) * (1.0f - cos(angle));
+	vector += axis * dot(axis, origin) * (1.0 - cos(angle));
 	return vector;
 }
 
-float4 RotateAroundVectorByAngle4(float4 origin4d, float3 axis, float angle)
+REAL4 RotateAroundVectorByAngle4(REAL4 origin4d, REAL3 axis, REAL angle)
 {
-	float3 origin = origin4d.xyz;
-	float3 vector = origin * cos(angle);
+	REAL3 origin = origin4d.xyz;
+	REAL3 vector = origin * cos(angle);
 	vector += cross(axis, origin) * sin(angle);
-	vector += axis * dot(axis, origin) * (1.0f - cos(angle));
-	return (float4){vector.x, vector.y, vector.z, origin4d.w};
+	vector += axis * dot(axis, origin) * (1.0 - cos(angle));
+	return (REAL4){vector.x, vector.y, vector.z, origin4d.w};
 }
 
 inline matrix33 TransposeMatrix(matrix33 m)
 {
 	matrix33 out;
-	out.m1 = (float3){m.m1.x, m.m2.x, m.m3.x};
-	out.m2 = (float3){m.m1.y, m.m2.y, m.m3.y};
-	out.m3 = (float3){m.m1.z, m.m2.z, m.m3.z};
+	out.m1 = (REAL3){m.m1.x, m.m2.x, m.m3.x};
+	out.m2 = (REAL3){m.m1.y, m.m2.y, m.m3.y};
+	out.m3 = (REAL3){m.m1.z, m.m2.z, m.m3.z};
 	return out;
 }
 
-float SmoothConditionAGreaterB(float a, float b, float sharpness)
+REAL SmoothConditionAGreaterB(REAL a, REAL b, REAL sharpness)
 {
-	return native_recip(1.0f + native_exp(sharpness * (b - a)));
+	return native_recip(1.0 + native_exp(sharpness * (b - a)));
 }
 
-float SmoothConditionALessB(float a, float b, float sharpness)
+REAL SmoothConditionALessB(REAL a, REAL b, REAL sharpness)
 {
-	return native_recip(1.0f + native_exp(sharpness * (a - b)));
+	return native_recip(1.0 + native_exp(sharpness * (a - b)));
 }
 
-inline float3 wrap(float3 x, float3 a, float3 s)
+inline REAL3 wrap(REAL3 x, REAL3 a, REAL3 s)
 {
 	x -= s;
-	float3 out;
+	REAL3 out;
 	out.x = x.x - a.x * floor(x.x / a.x) + s.x;
 	out.y = x.y - a.y * floor(x.y / a.y) + s.y;
 	out.z = x.z - a.z * floor(x.z / a.z) + s.z;
@@ -247,10 +409,10 @@ inline float3 wrap(float3 x, float3 a, float3 s)
 }
 
 // ref https://iquilezles.org/articles/distfunctions/
-inline float opSmoothUnion(float d1, float d2, float k)
+inline REAL opSmoothUnion(REAL d1, REAL d2, REAL k)
 {
-	float h = clamp(0.5f + 0.5f * (d2 - d1) / k, 0.0f, 1.0f);
-	return mix(d2, d1, h) - k * h * (1.0f - h);
+	REAL h = clamp(0.5 + 0.5 * (d2 - d1) / k, 0.0, 1.0);
+	return mix(d2, d1, h) - k * h * (1.0 - h);
 }
 
 //********** Random ******************************
@@ -283,41 +445,41 @@ uint RandomL(uint max, ulong *randomSeed)
 	return RandomLong(randomSeed) % (max + 1);
 }
 
-inline float3 vectorMod(float3 vector1, float3 vector2)
+inline REAL3 vectorMod(REAL3 vector1, REAL3 vector2)
 {
-	return (float3){(vector2.x > 0.0f ? fmod(vector1.x, vector2.x) : vector1.x),
-		(vector2.y > 0.0f ? fmod(vector1.y, vector2.y) : vector1.y),
-		(vector2.z > 0.0f ? fmod(vector1.z, vector2.z) : vector1.z)};
+	return (REAL3){(vector2.x > 0.0 ? fmod(vector1.x, vector2.x) : vector1.x),
+		(vector2.y > 0.0 ? fmod(vector1.y, vector2.y) : vector1.y),
+		(vector2.z > 0.0 ? fmod(vector1.z, vector2.z) : vector1.z)};
 }
 
-inline float3 modRepeat(float3 vector1, float3 repeat)
+inline REAL3 modRepeat(REAL3 vector1, REAL3 repeat)
 {
-	if (length(repeat) == 0.0f) return vector1;
-	return vectorMod((vectorMod((vector1 - repeat * 0.5f), repeat) + repeat), repeat) - repeat * 0.5f;
+	if (length(repeat) == 0.0) return vector1;
+	return vectorMod((vectorMod((vector1 - repeat * 0.5), repeat) + repeat), repeat) - repeat * 0.5;
 }
 
 #ifdef ITERATION_WEIGHT
-float4 SmoothCVector(const float4 v1, const float4 v2, float k)
+REAL4 SmoothCVector(const REAL4 v1, const REAL4 v2, REAL k)
 {
-	float4 result;
-	float nk = 1.0f - k;
+	REAL4 result;
+	REAL nk = 1.0 - k;
 
-	if (k <= 0.0f)
+	if (k <= 0.0)
 	{
 		result = v1;
 	}
-	else if (k >= 1.0f)
+	else if (k >= 1.0)
 	{
 		result = v2;
 	}
 	else
 	{
-		float length1 = length(v1);
-		float length2 = length(v2);
-		float lenInterp = length1 * nk + length2 * k;
-		float4 vTemp = v1 * nk + v2 * k;
-		float lengthTemp = length(vTemp);
-		if (lengthTemp > 0.0f)
+		REAL length1 = length(v1);
+		REAL length2 = length(v2);
+		REAL lenInterp = length1 * nk + length2 * k;
+		REAL4 vTemp = v1 * nk + v2 * k;
+		REAL lengthTemp = length(vTemp);
+		if (lengthTemp > 0.0)
 		{
 			result = (vTemp / lengthTemp) * lenInterp;
 		}
@@ -330,17 +492,17 @@ float4 SmoothCVector(const float4 v1, const float4 v2, float k)
 }
 #endif
 
-inline float LengthPow(float2 vect, float p)
+inline REAL LengthPow(REAL2 vect, REAL p)
 {
-	return pow(pow(vect.x, p) + pow(vect.y, p), 1.0f / p);
+	return pow(pow(vect.x, p) + pow(vect.y, p), 1.0 / p);
 }
 
-inline float GetAlpha(float3 vect)
+inline REAL GetAlpha(REAL3 vect)
 {
 	return atan2(vect.y, vect.x);
 }
 
-inline float GetBeta(float3 vect)
+inline REAL GetBeta(REAL3 vect)
 {
 	return atan2(vect.z, length(vect.xy));
 }

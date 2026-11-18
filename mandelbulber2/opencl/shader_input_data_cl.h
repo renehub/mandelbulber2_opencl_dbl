@@ -34,11 +34,11 @@
 
 typedef struct
 {
-	float3 point;
-	float3 transformedPoint;
-	float3 viewVector;
-	float3 viewVectorNotRotated;
-	float3 normal;
+	REAL3 point;
+	REAL3 transformedPoint;
+	REAL3 viewVector;
+	REAL3 viewVectorNotRotated;
+	REAL3 normal;
 
 #ifdef USE_TEXTURES
 	float3 texColor;
@@ -48,12 +48,12 @@ typedef struct
 	float3 texTransparency;
 	float3 texTransparencyAlpha;
 #endif
-	float distThresh; // distance threshold depend on 'detailLevel'
-	float lastDist;
-	float delta; // initial step distance for shaders based on distance form camera
-	float depth;
+	REAL distThresh; // distance threshold depend on 'detailLevel'
+	REAL lastDist;
+	REAL delta; // initial step distance for shaders based on distance form camera
+	REAL depth;
 #ifdef USE_PERLIN_NOISE
-	float perlinNoise;
+	REAL perlinNoise;
 #endif
 
 	int stepCount;
@@ -95,7 +95,7 @@ typedef struct
 #endif
 } sShaderInputDataCl;
 
-static __inline__ float3 GetFractalPoint(sShaderInputDataCl *input)
+static __inline__ REAL3 GetFractalPoint(sShaderInputDataCl *input)
 {
 	return input->hasTransformedPoint ? input->transformedPoint : input->point;
 }
@@ -103,24 +103,24 @@ static __inline__ float3 GetFractalPoint(sShaderInputDataCl *input)
 typedef struct
 {
 #ifdef USE_SURFACE_GRADIENT
-	float3 surface;
+	REAL3 surface;
 #endif
 #ifdef USE_SPECULAR_GRADIENT
-	float3 specular;
+	REAL3 specular;
 #endif
 #ifdef USE_DIFFUSE_GRADIENT
-	float3 diffuse;
+	REAL3 diffuse;
 #endif
 #ifdef USE_LUMINOSITY_GRADIENT
-	float3 luminosity;
+	REAL3 luminosity;
 #endif
 #ifdef USE_ROUGHNESS_GRADIENT
-	float3 roughness;
+	REAL3 roughness;
 #endif
 #ifdef USE_REFLECTANCE_GRADIENT
-	float3 reflectance;
+	REAL3 reflectance;
 #endif
 #ifdef USE_TRANSPARENCY_GRADIENT
-	float3 transparency;
+	REAL3 transparency;
 #endif
 } sClGradientsCollection;

@@ -35,11 +35,11 @@
 #ifndef MANDELBULBER2_OPENCL_MESH_EXPORT_DATA_CL_H_
 #define MANDELBULBER2_OPENCL_MESH_EXPORT_DATA_CL_H_
 
-typedef struct
+typedef struct ALIGN_REAL
 {
-	cl_float3 limitMin;
-	cl_float3 limitMax;
-	cl_float distThresh;
+	REAL3 limitMin;
+	REAL3 limitMax;
+	REAL distThresh;
 	cl_int3 size;
 	cl_int maxiter;
 	cl_int sliceWidth;	// must be size.x + 1
@@ -48,5 +48,37 @@ typedef struct
 	cl_int coloredMesh;
 
 } sClMeshExport;
+
+#ifndef OPENCL_KERNEL_CODE
+// BEGIN OPENCL_D_STRUCTS
+typedef struct ALIGN_DOUBLE
+{
+	cl_double3 limitMin;
+	cl_double3 limitMax;
+	cl_double distThresh;
+	cl_int3 size;
+	cl_int maxiter;
+	cl_int sliceWidth;	// must be size.x + 1
+	cl_int sliceHeight; // must be size.y + 1
+	cl_int sliceIndex;
+	cl_int coloredMesh;
+} sClMeshExportD;
+
+inline sClMeshExportD clPromoteSClMeshExportD(const sClMeshExport &source)
+{
+	sClMeshExportD target;
+	target.limitMin = toClDouble3(source.limitMin);
+	target.limitMax = toClDouble3(source.limitMax);
+	target.distThresh = source.distThresh;
+	target.size = source.size;
+	target.maxiter = source.maxiter;
+	target.sliceWidth = source.sliceWidth;
+	target.sliceHeight = source.sliceHeight;
+	target.sliceIndex = source.sliceIndex;
+	target.coloredMesh = source.coloredMesh;
+	return target;
+}
+// END OPENCL_D_STRUCTS
+#endif /* OPENCL_KERNEL_CODE */
 
 #endif /* MANDELBULBER2_OPENCL_MESH_EXPORT_DATA_CL_H_ */
