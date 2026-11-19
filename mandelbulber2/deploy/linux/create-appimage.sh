@@ -92,7 +92,12 @@ while [ $# -gt 0 ]; do
 done
 
 [ -n "$BUILD_DIR" ] || BUILD_DIR="$PROJECT_ROOT/$PRO_DIR"
+BUILD_DIR="$(cd "$BUILD_DIR" 2>/dev/null && pwd)" || die "build directory does not exist"
 [ -n "$APPDIR" ] || APPDIR="$BUILD_DIR/appdir"
+case "$APPDIR" in
+	/*) : ;;
+	*) APPDIR="$(pwd)/$APPDIR" ;;
+esac
 OUT_DIR="$(cd "$OUT_DIR" 2>/dev/null && pwd)" || die "output directory does not exist"
 mkdir -p "$TOOLS_DIR" || die "cannot create tools directory '$TOOLS_DIR'"
 
