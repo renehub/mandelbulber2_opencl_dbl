@@ -81,7 +81,12 @@ REAL CalcDistThresh(REAL3 point, __constant sClInConstants *consts)
 #ifdef ADVANCED_QUALITY
 	distThresh = clamp(distThresh, consts->params.detailSizeMin, consts->params.detailSizeMax);
 #else
-	distThresh = max(distThresh, 1e-6);
+	// The 1e-6 floor exists to protect single-precision distance estimation.
+	// The CPU renderer has no such floor, so applying it in double precision
+	// makes the OpenCL ray-marcher stop far earlier than the CPU in deep zooms.
+#ifndef DOUBLE_PRECISION
+	distThresh = max(distThresh, 1e-6f);
+#endif
 #endif
 
 	return distThresh;
@@ -97,7 +102,9 @@ REAL CalcDelta(REAL3 point, __constant sClInConstants *consts)
 	delta *= 0.5;
 #endif
 
-	delta = max(delta, 1e-6);
+#ifndef DOUBLE_PRECISION
+	delta = max(delta, 1e-6f);
+#endif
 	return delta;
 }
 

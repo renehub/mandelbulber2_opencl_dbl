@@ -97,6 +97,27 @@ promoted with `TO_REAL3` at the boundary. Texture and palette colors stay
 The Nebula renderer always compiles without `DOUBLE_PRECISION`, even when the
 fractal renderer is in double mode.
 
+## Distance threshold floor
+
+The original single-precision engine stops ray marching at a small distance
+floor in `calculate_distance.cl`:
+
+```c
+distThresh = max(distThresh, 1e-6f);   // CalcDistThresh
+delta = max(delta, 1e-6f);             // CalcDelta
+```
+
+That floor is a single-precision safeguard: below roughly float resolution the
+distance estimator can stall and produce unstable hit points. It must not apply
+to double mode. In deep zooms the CPU threshold is often far below `1e-6`, so
+keeping the floor made the OpenCL ray marcher stop much earlier than the CPU and
+produce different hit points, palette color indices and surface detail.
+
+Both floors are now compiled only when `DOUBLE_PRECISION` is not defined. The
+single-precision path keeps the original clamp and behavior unchanged; double
+mode uses the per-point threshold computed from the camera distance, resolution
+and field of view, matching the CPU ray marcher.
+
 ## Host and kernel data layouts
 
 Generated headers contain two layouts:
@@ -223,37 +244,46 @@ result than single precision.
 
 ## Validation evidence
 
-Deep-zoom scene `msltoe_donut_001`, 320x180, full shading path with AO,
-reflections and fog:
+Deep-zoom scene `msltoe_donut_001` (camera-to-target distance `0.000377`),
+320x180, full shading path with AO, reflections and fog, refreshed after the
+threshold-floor fix:
 
 | Comparison        | RMSE    |
 |-------------------|---------|
-| CPU to double     | 0.04322 |
-| CPU to single     | 0.06419 |
-| double to single  | 0.06310 |
+| CPU to double     | 0.04206 |
+| CPU to single     | 0.06298 |
+| double to single  | 0.06169 |
 
-The full path includes random sampling, so the RMSE varies slightly between
-runs. Geometry-only variant, which removes AO, reflections and fog:
+The `gputest` mandelbox scene (`mandelbox_scale -1.1`,
+`mandelbox_main_rotation_enabled true`) at 180x120 is a deeper zoom where the
+ray-march threshold falls well below `1e-6`. It shows the effect of the floor
+fix directly:
 
-| Comparison        | RMSE    |
-|-------------------|---------|
-| CPU to double     | 0.03099 |
-| CPU to single     | 0.03352 |
-| double to single  | 0.03187 |
+| Comparison        | Before fix | After fix |
+|-------------------|------------|-----------|
+| CPU to double     | 0.261815   | 0.06797   |
+| CPU to single     | 0.261571   | 0.26150   |
+| single to double  | 0.118661   | 0.25605   |
 
-Deeper camera distance (`1e-5`, 160x90):
+CPU and double now render the same green palette colors and surface detail;
+before the fix the double image retained the clamped single-precision look
+(magenta/brown) while the CPU used the unclamped threshold and stayed green.
+CPU to single is unchanged, confirming single-precision behavior is preserved.
+The single-to-double increase is expected: double moved to match the CPU, so it
+is now farther from the clamped single image.
 
-| Comparison        | RMSE    |
-|-------------------|---------|
-| CPU to double     | 0.02710 |
-| CPU to single     | 0.02899 |
-| double to single  | 0.02602 |
+Earlier variants measured before the floor fix showed the same ordering, with
+double closer to CPU than single: geometry-only (AO, reflections and fog off)
+scored 0.03099/0.03352/0.03187 and a deeper camera (`1e-5`, 160x90) scored
+0.02710/0.02899/0.02602 for CPU-to-double/CPU-to-single/double-to-single. Those
+numbers predate the threshold fix and are useful mainly as relative comparisons.
 
-These tests show double is consistently closer to CPU than single. They also
-expose a remaining limitation: CPU and GPU renders are not pixel-identical even
-in double mode because the CPU and OpenCL renderers still differ in shading,
-sampling and Monte Carlo details. Deep-zoom precision alone does not eliminate
-those differences.
+The CPU renderer seeds random marching and sampling differently from run to run,
+so repeated CPU renders of the same scene differ by roughly 0.03-0.04 RMSE, and
+CPU-to-GPU RMSE has comparable run-to-run spread. GPU renders are deterministic.
+Even in double mode, CPU and GPU renders are not pixel-identical because the
+renderers still differ in random step jitter, shading and Monte Carlo details.
+Deep-zoom precision alone does not eliminate those differences.
 
 Additional smoke coverage:
 
@@ -289,7 +319,10 @@ Additional smoke coverage:
   large full-engine scenes.
 - Display, texture, palette, DOF/SSAO/post-filter and Nebula pipelines stay
   single precision by design; these values do not affect fractal geometry.
-- CPU and GPU renders can still differ in deep zooms due to shading and
-  sampling differences unrelated to float/double precision.
+- CPU and GPU renders can still differ in deep zooms due to random step jitter,
+  shading and sampling differences unrelated to float/double precision; exact
+  pixel identity is not attainable.
+- The `1e-6` distance floor is intentionally single-precision only. Removing it
+  from double mode is what aligns deep-zoom hit points with the CPU.
 - There is no PHP or `clang-format` in this environment; the Python generators
   replace the PHP generator for reproducibility.
