@@ -325,8 +325,8 @@ void cSettings::Compatibility(QString &name, QString &value) const
  * Handles DE function normalization, primitive-to-material migration, gradient renames,
  * FOV conversion, light parameter migrations, and objects tree migration (v2.35+).
  */
-void cSettings::Compatibility2(
-	std::shared_ptr<cParameterContainer> par, std::shared_ptr<cFractalContainer> fract)
+void cSettings::Compatibility2(std::shared_ptr<cParameterContainer> par,
+	std::shared_ptr<cFractalContainer> fract, bool migrateObjectsTree)
 {
 	// === v2.06: normalize DE function, enable IFS rotation ===
 	if (fileVersion <= 2.06)
@@ -575,7 +575,11 @@ void cSettings::Compatibility2(
 	}
 
 	// === v2.35: migrate to objects tree (node-based hierarchy) ===
-	if (fileVersion < 2.35)
+	// Run once per load, after the main parameters have been decoded. Animation
+	// frames pass migrateObjectsTree=false: the migrator is independent of the
+	// per-frame values, and rerunning it per frame made loading long flights
+	// take tens of seconds.
+	if (fileVersion < 2.35 && migrateObjectsTree && !legacyObjectsTreeMigrated)
 	{
 		if (fract)
 		{
@@ -588,6 +592,7 @@ void cSettings::Compatibility2(
 		}
 		cObjectsTreeMigrator::DeleteTemporaryLegacyPrimitiveTransformParams(par);
 		cObjectsTreeMigrator::DeleteTemporaryLegacyPrimitiveNodeParams(par);
+		legacyObjectsTreeMigrated = true;
 	}
 }
 

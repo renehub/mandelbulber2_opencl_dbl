@@ -200,7 +200,7 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, REAL3 poin
 		out = Fractal(consts, point, calcParam, calcModeDeltaDE1, NULL, internalObjectId, renderData,
 			hybridSequenceIndex, point, false);
 		calcParam->deltaDEMaxN = out.iters - 1;
-		REAL r = length(out.z);
+		REAL r = CalcRadius(out.z);
 		REAL4 zFromIters = out.z;
 
 		bool maxiter = out.maxiter;

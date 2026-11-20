@@ -97,8 +97,8 @@ private:
 	bool DecodeOneLine(std::shared_ptr<cParameterContainer> par, QString line);
 	static bool CheckSection(QString text, QString &section);
 	void Compatibility(QString &name, QString &value) const;
-	void Compatibility2(
-		std::shared_ptr<cParameterContainer> par, std::shared_ptr<cFractalContainer> fract);
+	void Compatibility2(std::shared_ptr<cParameterContainer> par,
+		std::shared_ptr<cFractalContainer> fract, bool migrateObjectsTree = true);
 	void Compatibility3(const std::shared_ptr<cKeyframes> &keyframes,
 		const std::shared_ptr<cParameterContainer> &par,
 		const std::shared_ptr<cFractalContainer> &fractPar);
@@ -140,6 +140,11 @@ private:
 
 	QList<QString> linesWithSoundParameters;
 	bool foundAnimSoundParameters;
+	// The legacy flat-file migration to the objects tree must run once per load.
+	// Compatibility2() is also called for every animation frame (thousands of
+	// times for long flights), and rerunning the migrator there made opening
+	// such files take tens of seconds.
+	bool legacyObjectsTreeMigrated;
 };
 
 #endif /* MANDELBULBER2_SRC_SETTINGS_HPP_ */

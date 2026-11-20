@@ -156,6 +156,16 @@ void cRenderWorker::doWork()
 			CVector2<int> screenPoint(xs, ys);
 			// Map screen pixel coordinates to normalized image space.
 			CVector2<double> imagePoint = data->screenRegion.transpose(data->imageRegion, screenPoint);
+
+			// Seed the per-pixel random generator exactly like the OpenCL kernels:
+			// seed = imageX + imageY * imageWidth + frameNo, followed by 10 warm-up
+			// steps. Stochastic shading then starts from the same sequence on CPU
+			// and OpenCL, and repeated CPU renders are deterministic.
+			const unsigned int pixelX = static_cast<unsigned int>(imagePoint.x);
+			const unsigned int pixelY = static_cast<unsigned int>(imagePoint.y);
+			SeedRenderRandom(pixelX + pixelY * static_cast<unsigned int>(width)
+										 + static_cast<unsigned int>(params->frameNo));
+
 			cStereo::enumEye stereoEye = data->stereo.WhichEye(imagePoint);
 			if (data->stereo.isEnabled())
 			{
@@ -708,7 +718,8 @@ double cRenderWorker::CalcDelta(CVector3 point) const
 // Algorithm:
 // 1. Coarse march: step size = (dist - 0.5 * distThresh) * DEFactor
 //    The 0.5 * distThresh safety margin prevents overshooting the surface.
-//    Random jitter (1.0 - rand/10000) adds anti-aliasing to the step positions.
+//    The step is deterministic (no random jitter) so CPU and OpenCL follow the
+//    same hit points.
 // 2. Binary search refinement: once the surface is approached (dist < distThresh),
 //    halve the step size and search backward to find the precise surface intersection.
 // 3. iterThreshMode correction: back off by distThresh to avoid noise from the
@@ -726,6 +737,9 @@ void cRenderWorker::RayMarching(
 																		// and camera at (0,0,0)
 	bool found = false;
 	double scan = in.minScan;
+	// The direction length is constant for the whole ray; avoid recomputing it
+	// (and dividing by it) at every step.
+	const double invDirectionLength = 1.0 / in.direction.Length();
 	double dist = 0;
 	// search_accuracy and search_limit define the convergence criterion for binary search.
 	// The surface is considered found when dist is within search_limit of distThresh.
@@ -816,14 +830,17 @@ void cRenderWorker::RayMarching(
 		// Compute the next step size. The base formula uses the SDF distance minus
 		// a safety margin (0.5 * distThresh for exterior, 0.8 * distThresh for interior).
 		// DEFactor scales the step (typically < 1.0 for safety).
-		// Random jitter prevents regular patterns in the step sizes.
+		// No random step jitter: it made CPU and OpenCL ray marching follow
+		// different hit points. The CPU and GPU distance estimators differ by a
+		// few ulps, and random jitter turned those tiny differences into visibly
+		// different surfaces. A deterministic step keeps the renderers aligned.
 		if (params->interiorMode)
 		{
-			step = (dist - 0.8 * distThresh) * params->DEFactor * (1.0 - Random(1000) / 10000.0);
+			step = (dist - 0.8 * distThresh) * params->DEFactor;
 		}
 		else
 		{
-			step = (dist - 0.5 * distThresh) * params->DEFactor * (1.0 - Random(1000) / 10000.0);
+			step = (dist - 0.5 * distThresh) * params->DEFactor;
 		}
 
 		// Apply advanced quality clamps to the step size.
@@ -848,7 +865,7 @@ void cRenderWorker::RayMarching(
 
 		(*inOut->buffCount) = i + 1;
 		// divided by length of view Vector to eliminate overstepping when fov is big
-		scan += step / in.direction.Length();
+		scan += step * invDirectionLength;
 		if (scan > in.maxScan)
 		{
 			break;

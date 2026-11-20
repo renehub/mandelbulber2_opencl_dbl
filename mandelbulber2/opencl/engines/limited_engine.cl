@@ -443,7 +443,7 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 		step = (distance - 0.5 * distThresh) * consts->params.DEFactor;
 #endif
 
-				step *= (1.0 - Random(1000, &randomSeed) / 10000.0);
+				// No random step jitter; see the comment in ray_recursion.cl.
 
 #ifdef ADVANCED_QUALITY
 				step = clamp(step, consts->params.absMinMarchingStep, consts->params.absMaxMarchingStep);

@@ -47,11 +47,19 @@
 
 #include "algebra.hpp"
 
-extern unsigned int gRandomSeed;
+// Per-thread render random state. Rendering runs in parallel worker threads,
+// so the generator must not be shared between them.
+extern thread_local unsigned int gRandomSeed;
 
 // int abs(int v);
 int RandomInt();
 int Random(int max);
+
+// Seeds the per-pixel random generator used by the CPU renderer. The seed and
+// the warm-up iterations match the OpenCL kernels (full_engine.cl), so the CPU
+// and OpenCL renderers start stochastic shading from the same sequence and the
+// CPU render is deterministic.
+void SeedRenderRandom(unsigned int seed);
 
 // ---------------------------------------------------------------------------
 // Reflection / refraction — declared here, defined in common_math.cpp

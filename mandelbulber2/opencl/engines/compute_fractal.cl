@@ -134,7 +134,7 @@ formulaOut Fractal(__constant sClInConstants *consts, REAL3 point, sClCalcParams
 	aux.const_c = c;
 	aux.old_z = z;
 	aux.pos_neg = 1.0;
-	aux.r = length(z);
+	aux.r = CalcRadius(z);
 	aux.DE = 1.0;
 	aux.DE0 = 0.0;
 	aux.dist = 1000.0;
@@ -214,12 +214,12 @@ formulaOut Fractal(__constant sClInConstants *consts, REAL3 point, sClCalcParams
 
 #ifdef BOX_FOLDING
 		z = BoxFolding(z, &consts->params.common.foldings, &aux);
-		aux.r = length(z);
+		aux.r = CalcRadius(z);
 #endif
 
 #ifdef SPHERICAL_FOLDING
 		z = SphericalFolding(z, &consts->params.common.foldings, &aux);
-		aux.r = length(z);
+		aux.r = CalcRadius(z);
 #endif
 
 		// temporary vector for weight function
@@ -242,7 +242,7 @@ formulaOut Fractal(__constant sClInConstants *consts, REAL3 point, sClCalcParams
 		{
 			REAL high = fractDataArray[sequence].bailout * 10.0;
 			z = high;
-			aux.r = length(z);
+			aux.r = CalcRadius(z);
 			out.distance = 10.0;
 			out.iters = 1;
 			out.z = z;
@@ -308,7 +308,7 @@ formulaOut Fractal(__constant sClInConstants *consts, REAL3 point, sClCalcParams
 
 		// calculate r
 
-		aux.r = length(z);
+		aux.r = CalcRadius(z);
 
 		// escape conditions
 		if (fractDataArray[sequence].checkForBailout)

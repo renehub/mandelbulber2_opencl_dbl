@@ -40,30 +40,35 @@
 #endif
 
 //********** Random ******************************
-// reference:
-// http://csg.sph.umich.edu/abecasis/class/2006/615.14.pdf
-// Park-Miller Generator Without any Divisions
-// by D. Carta (1990)
-unsigned int gRandomSeed = 1;
+// The renderer uses the same 48-bit linear congruential generator as the
+// OpenCL kernels (see opencl/opencl_algebra.h, RandomInt). Keeping the
+// generator and the per-pixel seed in sync makes the stochastic shading
+// (ambient occlusion sampling, rough normals, etc.) start from the same
+// sequence on CPU and OpenCL. The state is thread_local because CPU workers
+// render different pixels in parallel; seeding it per pixel also makes the
+// CPU renderer deterministic from run to run.
+thread_local unsigned int gRandomSeed = 1;
 int RandomInt()
 {
-	// After calculation below, (hi << 16) + lo = seed * 16807
-	unsigned int lo = 16807 * (gRandomSeed & 0xFFFF); // Multiply lower 16 bits by 16807
-	unsigned int hi = 16807 * (gRandomSeed >> 16);		// Multiply higher 16 bits by 16807
+	int s = static_cast<int>(gRandomSeed);
+	unsigned long long value =
+		static_cast<unsigned long long>(static_cast<unsigned int>(s)) * 0x5DEECE66DULL + 0xBULL;
+	s = static_cast<int>(static_cast<unsigned int>(value & 0xFFFFFFFFULL));
+	if (s < 0) s = -s;
+	gRandomSeed = static_cast<unsigned int>(s);
+	return s;
+}
 
-	// After these lines, lo has the bottom 31 bits of result, hi has bits 32 and up
-	lo += (hi & 0x7FFF) << 16; // Combine lower 15 bits of hi with lo's upper bits
-	hi >>= 15;								 // Discard the lower 15 bits of hi
-
-	// value % (231 - 1)) 	= ((231) * hi + lo) % (231 - 1)
-	// 			= ((231 - 1) * hi + hi + lo) % (231-1)
-	// 			= (hi + lo) % (231 - 1)
-	lo += hi;
-
-	// No division required, since hi + lo is always < 232 - 2
-	if (lo > 2147483647) lo -= 2147483647;
-
-	return (int(gRandomSeed = lo));
+void SeedRenderRandom(unsigned int seed)
+{
+	gRandomSeed = seed;
+	// The OpenCL full engine warms up the random seed with 10 LCG steps before
+	// the first Random() call of the pixel. Do the same so both renderers start
+	// from the same point in the sequence.
+	for (int i = 0; i < 10; i++)
+	{
+		RandomInt();
+	}
 }
 
 int Random(int max)

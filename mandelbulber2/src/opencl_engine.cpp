@@ -96,6 +96,15 @@ bool cOpenClEngine::Build(const QByteArray &programString, QString *errorText, b
 {
 	if (hardware->getClDevices().size() > 0 && hardware->getEnabledDevices().size() > 0)
 	{
+		// Compiler flags affect the generated binary, so they must be part of the
+		// kernel cache key. Changing -cl-fast-relaxed-math or a register cap used
+		// to reuse an incompatible cached binary.
+		std::string buildFlags = "-w -cl-denorms-are-zero -cl-mad-enable";
+		// -cl-single-precision-constant would silently truncate every double
+		// literal to float, so it must never be used in double precision mode.
+		if (!doublePrecision) buildFlags += " -cl-single-precision-constant";
+		if (useFastRelaxedMath) buildFlags += " -cl-fast-relaxed-math";
+
 		// calculating hash code of the program
 		QCryptographicHash hashCryptProgram(QCryptographicHash::Md4);
 		hashCryptProgram.addData(programString);
@@ -110,11 +119,13 @@ bool cOpenClEngine::Build(const QByteArray &programString, QString *errorText, b
 		// this hash guarantees that a cached binary can never be reused across
 		// precisions, even if the source text is identical.
 		hashCryptProgram.addData(doublePrecision ? "-DDOUBLE_PRECISION" : "-DOPENCL_SINGLE");
+		hashCryptProgram.addData(buildFlags.c_str());
 		QByteArray hashProgram = hashCryptProgram.result();
 
 		// calculating hash code of build parameters
 		QCryptographicHash hashCryptBuildParams(QCryptographicHash::Md4);
 		hashCryptBuildParams.addData(definesCollector.toLocal8Bit());
+		hashCryptBuildParams.addData(buildFlags.c_str());
 		// Kernel cache must be keyed by precision: the generated source and the
 		// host-side constant/dynamic layouts both depend on it.
 		hashCryptBuildParams.addData(doublePrecision ? "-DDOUBLE_PRECISION" : "-DOPENCL_SINGLE");
@@ -156,15 +167,8 @@ bool cOpenClEngine::Build(const QByteArray &programString, QString *errorText, b
 
 			if (checkErr(err, "cl::Program()"))
 			{
-				std::string buildParams = "-w -cl-denorms-are-zero -cl-mad-enable";
-				// -cl-single-precision-constant would silently truncate every double
-				// literal to float, so it must never be used in double precision mode.
-				if (!doublePrecision) buildParams += " -cl-single-precision-constant";
-
-				if (useFastRelaxedMath) buildParams += " -cl-fast-relaxed-math";
-
+				std::string buildParams = buildFlags;
 				buildParams.append(" -DOPENCL_KERNEL_CODE");
-
 				buildParams += definesCollector.toUtf8().constData();
 
 				WriteLogString("Build parameters", buildParams.c_str(), 2);

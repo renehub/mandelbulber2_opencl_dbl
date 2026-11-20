@@ -148,6 +148,7 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 	REAL scan, distance;
 
 	scan = in.minScan;
+	const REAL invDirectionLength = 1.0 / length(in.direction);
 
 	sClCalcParams calcParam;
 	calcParam.N = consts->params.N;
@@ -216,11 +217,10 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 		step = (distance - 0.5 * distThresh) * consts->params.DEFactor;
 #endif
 
-#ifdef MONTE_CARLO
-		step *= (1.0 - Random(1000, randomSeed) / 5000.0);
-#else
-		step *= (1.0 - Random(1000, randomSeed) / 10000.0);
-#endif
+		// No random step jitter. See the matching comment in
+		// src/render_worker.cpp: random jitter amplified the small numerical
+		// differences between the CPU and OpenCL distance estimators and made
+		// the two renderers produce visibly different surfaces.
 
 #ifdef ADVANCED_QUALITY
 		step = clamp(step, consts->params.absMinMarchingStep, consts->params.absMaxMarchingStep);
@@ -230,7 +230,7 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 				consts->params.relMaxMarchingStep * distThresh);
 #endif
 
-		scan += step / length(in.direction);
+		scan += step * invDirectionLength;
 	}
 
 	point = in.start + in.direction * scan;

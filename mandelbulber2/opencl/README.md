@@ -8,6 +8,27 @@ renders and accurate double renders.
 The default remains `single`. Existing scenes and GPU drivers keep their
 previous behavior.
 
+## Running from a build tree
+
+Mandelbulber resolves its program data relative to the executable
+(`../share/mandelbulber2`). A raw qmake build has no `share` directory there, so
+the program falls back to `/usr/share/mandelbulber2`. If that directory contains
+a different Mandelbulber version, the OpenCL headers and kernels do not match
+the binary and renders can be badly wrong even though the build succeeded.
+
+Either install the build, or stage the source tree's data next to the binary:
+
+```sh
+cd mandelbulber2
+ln -s deploy/share share
+ln -s ../../../opencl deploy/share/mandelbulber2/opencl
+ln -s ../../../formula deploy/share/mandelbulber2/formula
+ln -s ../../../language deploy/share/mandelbulber2/language
+```
+
+Keep this staging in mind when comparing CPU and OpenCL renders: the fallback
+system data can silently replace the kernels this document describes.
+
 ## Runtime selection
 
 `opencl_precision` is an enumeration with two values:
@@ -158,6 +179,38 @@ readback types based on the effective precision:
 - `CalculateDistance()` returns `double`,
 - mesh/distance readback uses the matching array element type.
 
+## Deterministic seeding and step jitter
+
+The OpenCL kernels used to receive their per-pixel random seed from
+`std::rand()`. That value depended on unrelated `rand()` calls made earlier in
+the process (for example during kernel compilation), so repeated renders and
+the single/double kernels could start from different seeds. The seed is now
+derived from the frame number, and the kernel mixes in the pixel coordinates:
+
+```c
+int randomSeed = imageX + imageY * imageWidth + frameNo;
+```
+
+The CPU renderer uses the same formula, the same 48-bit LCG
+(`opencl/opencl_algebra.h`) and the same ten-step warm-up, seeded once per
+pixel. The generator state is `thread_local`, so parallel CPU workers do not
+share it. As a result OpenCL renders are deterministic for a given scene and
+frame, and the CPU render is deterministic too.
+
+Random step-size jitter was removed from both ray marchers. The CPU and OpenCL
+distance estimators differ by a few ulps; random jitter amplified those tiny
+differences into visibly different hit points and speckled edges. Removing it
+was the largest single improvement in CPU/OpenCL parity:
+
+| Scene (`mandelbulb_power_2`, 400x225, default shading) | Before | After |
+|--------------------------------------------------------|--------|-------|
+| CPU to single                                          | 0.0254 | 0.0127 |
+| CPU to double                                          | 0.0263 | 0.0125 |
+| single to double                                       | 0.0272 | 0.00235 |
+
+The remaining CPU/OpenCL difference comes from shading and Monte Carlo sampling
+paths, not from the step jitter.
+
 ## Kernel cache and build flags
 
 The precision is part of both cache keys:
@@ -168,12 +221,18 @@ The precision is part of both cache keys:
   added to the program/cache filename hash and to the build-parameter hash.
 
 A cache entry from a single-precision build can therefore never be reused for a
-double-precision build, and vice versa.
+double-precision build, and vice versa. The compiler flags themselves are also
+part of the hash now, so toggling `-cl-fast-relaxed-math` (or any future flag)
+cannot reuse a binary built with different options.
 
 In single mode the build still uses `-cl-single-precision-constant`. In double
 mode that flag is **not** added, because it would silently truncate every double
 literal to float. `-cl-mad-enable`, `-cl-denorms-are-zero` and the optional
-`-cl-fast-relaxed-math` setting are unchanged.
+`-cl-fast-relaxed-math` setting are otherwise unchanged.
+
+Double mode with fast-relaxed-math enabled also defines `DOUBLE_FAST_RADIUS`,
+which selects the float-sqrt radius path described above. It is part of the
+define hash, so changing fast math cannot mix kernel variants.
 
 ## Generated headers
 
@@ -242,6 +301,33 @@ In the geometry-only deep-zoom variant (320x180), double rendered in 1.0 s
 against 0.2 s for single; the CPU took 1.3 s. Double was closer to the CPU
 result than single precision.
 
+### Double-precision hot loop
+
+The inner fractal iteration used `length(z)` to update the iteration radius.
+In the double kernels the OpenCL built-in generated much slower code than an
+explicit `sqrt(dot(z, z))`. The radius is needed once per iteration by every
+formula, so this was the dominant cost of double rendering. `CalcRadius()` in
+`opencl/opencl_algebra.h` now uses the explicit form. Under the default
+fast-relaxed-math setting the sqrt is evaluated in float and promoted; the
+radius only scales the distance estimate, so this changes the image by about
+1e-7 relative while the iteration itself remains double. Disable
+`opencl_use_fast_relaxed_math` to get the exact double sqrt.
+
+Measured on the user's deep-zoom Mandelbox scene (`pt1.fract`, 360x240,
+full engine, GTX 1050 Ti):
+
+| Renderer | Before | After |
+|----------|--------|-------|
+| CPU      | 12.3 s | 12.3 s |
+| single   |  3.4 s |  3.3 s |
+| double   | 10.6 s |  6.0 s |
+
+The double render is now about twice as fast as the CPU render instead of
+barely faster. Absolute times vary with GPU clock throttling; the relative
+improvement is stable across repeated runs. The double image changes by only
+RMSE 0.00022 versus the pre-optimization render, and CPU-to-double RMSE is
+unchanged (0.02738).
+
 ## Validation evidence
 
 Deep-zoom scene `msltoe_donut_001` (camera-to-target distance `0.000377`),
@@ -250,9 +336,9 @@ threshold-floor fix:
 
 | Comparison        | RMSE    |
 |-------------------|---------|
-| CPU to double     | 0.04206 |
-| CPU to single     | 0.06298 |
-| double to single  | 0.06169 |
+| CPU to double     | 0.02982 |
+| CPU to single     | 0.06091 |
+| double to single  | 0.05938 |
 
 The `gputest` mandelbox scene (`mandelbox_scale -1.1`,
 `mandelbox_main_rotation_enabled true`) at 180x120 is a deeper zoom where the
@@ -278,12 +364,10 @@ scored 0.03099/0.03352/0.03187 and a deeper camera (`1e-5`, 160x90) scored
 0.02710/0.02899/0.02602 for CPU-to-double/CPU-to-single/double-to-single. Those
 numbers predate the threshold fix and are useful mainly as relative comparisons.
 
-The CPU renderer seeds random marching and sampling differently from run to run,
-so repeated CPU renders of the same scene differ by roughly 0.03-0.04 RMSE, and
-CPU-to-GPU RMSE has comparable run-to-run spread. GPU renders are deterministic.
-Even in double mode, CPU and GPU renders are not pixel-identical because the
-renderers still differ in random step jitter, shading and Monte Carlo details.
-Deep-zoom precision alone does not eliminate those differences.
+CPU and GPU renders are now deterministic for a given scene and frame. Even in
+double mode they are not pixel-identical because the renderers still differ in
+shading and Monte Carlo sampling details. Deep-zoom precision alone does not
+eliminate those differences.
 
 Additional smoke coverage:
 
@@ -319,9 +403,9 @@ Additional smoke coverage:
   large full-engine scenes.
 - Display, texture, palette, DOF/SSAO/post-filter and Nebula pipelines stay
   single precision by design; these values do not affect fractal geometry.
-- CPU and GPU renders can still differ in deep zooms due to random step jitter,
-  shading and sampling differences unrelated to float/double precision; exact
-  pixel identity is not attainable.
+- CPU and GPU renders can still differ in deep zooms due to shading and
+  sampling differences unrelated to float/double precision; exact pixel
+  identity is not attainable.
 - The `1e-6` distance floor is intentionally single-precision only. Removing it
   from double mode is what aligns deep-zoom hit points with the CPU.
 - There is no PHP or `clang-format` in this environment; the Python generators

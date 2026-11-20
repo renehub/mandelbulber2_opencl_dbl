@@ -465,6 +465,17 @@ bool cOpenClEngineRenderFractal::LoadSourcesAndCompile(
 	SetUseBuildCache(!params->Get<bool>("opencl_disable_build_cache"));
 	SetUseFastRelaxedMath(params->Get<bool>("opencl_use_fast_relaxed_math"));
 
+	// The exact double sqrt dominates the fractal iteration on GPUs with weak
+	// FP64 throughput. Under the existing fast-relaxed-math setting, use a
+	// float sqrt for the iteration radius and promote the result; the double
+	// iteration itself is unchanged. Users who need the last 1e-7 of radius
+	// accuracy can disable fast relaxed math.
+	if (GetDoublePrecision() && params->Get<bool>("opencl_use_fast_relaxed_math")
+			&& !definesCollector.contains("DOUBLE_FAST_RADIUS"))
+	{
+		definesCollector += " -DDOUBLE_FAST_RADIUS";
+	}
+
 	// building OpenCl kernel
 	QString errorString;
 	bool quiet = (compilerErrorOutput) ? true : false;
@@ -2696,7 +2707,14 @@ bool cOpenClEngineRenderFractal::AssignParametersToKernelAdditional(
 
 	if (!meshExportMode && !distanceMode)
 	{
-		err = clKernels.at(deviceIndex)->setArg(argIterator++, std::rand()); // random seed
+		// Use the frame number as the jitter seed instead of std::rand(). The
+		// kernel mixes in the pixel coordinates, so this is deterministic per
+		// frame and identical for the single and double precision kernels, while
+		// still changing between animation frames. std::rand() made the seed
+		// depend on unrelated earlier rand() calls (e.g. kernel compilation),
+		// which is why repeated renders and precision modes did not match.
+		const int initRandomSeed = constantInBuffer->params.frameNo;
+		err = clKernels.at(deviceIndex)->setArg(argIterator++, initRandomSeed); // random seed
 		if (!checkErr(err, "kernel->setArg(4, initRandomSeed)"))
 		{
 			emit EmitErrorMessage(

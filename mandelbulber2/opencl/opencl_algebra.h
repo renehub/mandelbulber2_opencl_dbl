@@ -415,6 +415,29 @@ inline REAL opSmoothUnion(REAL d1, REAL d2, REAL k)
 	return mix(d2, d1, h) - k * h * (1.0 - h);
 }
 
+// Radius used by the fractal iteration. This is called once per fractal
+// iteration and used to be written as length(z), which generates significantly
+// slower code than an explicit sqrt(dot(z, z)) in the double kernels. Under
+// fast-relaxed-math the sqrt itself is evaluated in float and promoted; the
+// radius only scales the DE, so this changes the image at roughly the 1e-7
+// relative level while the iteration itself stays double. Disable fast math to
+// get the exact double sqrt.
+inline REAL CalcRadius(REAL4 z)
+{
+	const REAL r2 = dot(z, z);
+#ifdef DOUBLE_PRECISION
+#ifdef DOUBLE_FAST_RADIUS
+	// Fall back to the double path for values that would overflow float.
+	if (r2 < 1.0e37) return convert_double(sqrt(convert_float(r2)));
+	return sqrt(r2);
+#else
+	return sqrt(r2);
+#endif
+#else
+	return sqrt(r2);
+#endif
+}
+
 //********** Random ******************************
 int RandomInt(int *randomSeed)
 {

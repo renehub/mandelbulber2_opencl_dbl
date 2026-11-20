@@ -1064,6 +1064,26 @@ void cCommandLineInterface::handleOverrideParameters() const
 	QStringList overrideParameters = cliData.overrideParametersText.split("#", Qt::SkipEmptyParts);
 #endif
 
+	// Store an override with the parameter's real type. Plain Set(QString)
+	// would turn enum names ("double") and booleans ("true") into 0, silently
+	// keeping the default value and making command-line comparisons useless.
+	auto applyOverride = [](cParameterContainer *container, const QString &name,
+												 const QString &value) {
+		cOneParameter parameter = container->GetAsOneParameter(name);
+		if (parameter.IsEnumeration())
+		{
+			container->Set(name, parameter.GetIndexByEnumeration(value));
+		}
+		else if (parameter.GetValueType() == typeBool)
+		{
+			container->Set(name, value == "true" || value == "1");
+		}
+		else
+		{
+			container->Set(name, value);
+		}
+	};
+
 	for (int i = 0; i < overrideParameters.size(); i++)
 	{
 		int fractalIndex = -1;
@@ -1079,12 +1099,12 @@ void cCommandLineInterface::handleOverrideParameters() const
 		{
 			if (fractalIndex >= 0 && fractalIndex < gParFractal->size())
 			{
-				gParFractal->at(fractalIndex)
-					->Set(overrideParameter[0].trimmed(), overrideParameter[1].trimmed());
+				applyOverride(gParFractal->at(fractalIndex).get(), overrideParameter[0].trimmed(),
+					overrideParameter[1].trimmed());
 			}
 			else
 			{
-				gPar->Set(overrideParameter[0].trimmed(), overrideParameter[1].trimmed());
+				applyOverride(gPar.get(), overrideParameter[0].trimmed(), overrideParameter[1].trimmed());
 			}
 		}
 	}

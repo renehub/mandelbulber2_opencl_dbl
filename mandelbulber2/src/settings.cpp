@@ -77,6 +77,7 @@ cSettings::cSettings(enumFormat _format)
 	csvNoOfColumns = 0;
 	foundAnimSoundParameters = false;
 	forcedFractalFormulaIndex = -1;
+	legacyObjectsTreeMigrated = false;
 }
 
 /**
@@ -479,6 +480,7 @@ bool cSettings::LoadFromFile(QString filename)
 {
 	settingsText.clear();
 	textPrepared = false;
+	legacyObjectsTreeMigrated = false;
 	WriteLogString("Loading settings started", filename, 2);
 	QFile qFile(filename);
 	if (qFile.open(QIODevice::ReadOnly))
@@ -517,6 +519,7 @@ bool cSettings::LoadFromString(const QString &_settingsText)
 {
 	settingsText = _settingsText;
 	textPrepared = true;
+	legacyObjectsTreeMigrated = false;
 
 	QCryptographicHash hashCrypt(QCryptographicHash::Md4);
 	hashCrypt.addData(settingsText.toLocal8Bit());
@@ -1539,7 +1542,7 @@ bool cSettings::DecodeFramesLine(QString line, std::shared_ptr<cParameterContain
 		return false;
 	}
 
-	Compatibility2(par, fractPar);
+	Compatibility2(par, fractPar, false);
 	frames->AddFrame(par, fractPar, numberOfSubFrames);
 
 	return true;
