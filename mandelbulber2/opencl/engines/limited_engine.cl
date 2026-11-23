@@ -548,7 +548,8 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 				REAL3 shadowOutDummy;
 				REAL3 outLuminosityEmissive;
 				color = ObjectShader(consts, &renderData, &shaderInputData, &calcParam, &surfaceColor,
-					&specular, &iridescence, &shadowOutDummy, &outLuminosityEmissive, &alpha, &gradients);
+					&specular, &iridescence, &shadowOutDummy, &outLuminosityEmissive, &alpha, &gradients,
+					indirectShadingFull);
 			}
 			else
 			{

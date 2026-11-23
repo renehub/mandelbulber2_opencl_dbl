@@ -44,14 +44,19 @@ REAL3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 
 	bool cloudMode = consts->params.cloudsEnable;
 
+	// Optional cap for directional lights, which would otherwise march to
+	// viewDistanceMax. 0 means unchanged (unlimited to viewDistanceMax).
+	if (light->type == lightDirectional && consts->params.shadowRayMaxDistance > 0.0)
+	{
+		distance = min(distance, consts->params.shadowRayMaxDistance);
+	}
+
 	REAL DEFactor = consts->params.DEFactor;
 	if (consts->params.iterFogEnabled || consts->params.distanceFogShadows || light->volumetric)
 		DEFactor = 1.0;
 #ifdef CLOUDS
 	DEFactor = consts->params.DEFactor * consts->params.volumetricLightDEFactor;
 #endif
-
-	REAL start = input->distThresh;
 
 #ifdef MC_SOFT_SHADOWS
 	REAL softRange;
@@ -78,11 +83,18 @@ REAL3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 
 	REAL maxSoft = 0.0;
 
-	const bool bSoft = !goThrough && !cloudMode && !consts->params.iterFogEnabled
-										 && !consts->params.distanceFogShadows && !consts->params.fogCastShadows
-										 && !consts->params.common.iterThreshMode && !consts->params.interiorMode
-										 && softRange > 0.0
-										 && !(consts->params.monteCarloSoftShadows && consts->params.DOFMonteCarlo);
+	const bool simpleShadowCase = !goThrough && !cloudMode && !consts->params.iterFogEnabled
+																&& !consts->params.distanceFogShadows && !consts->params.fogCastShadows
+																&& !consts->params.common.iterThreshMode && !consts->params.interiorMode
+																&& !(consts->params.monteCarloSoftShadows && consts->params.DOFMonteCarlo);
+	const bool bSoft = simpleShadowCase && softRange > 0.0;
+	const bool hardShadow = simpleShadowCase && softRange <= 0.0;
+
+	// Hard shadows do not need the scene's safety factor; full SDF steps are
+	// safe. Soft shadows keep the smaller DEFactor for penumbra density.
+	if (hardShadow) DEFactor = 1.0;
+
+	REAL start = input->distThresh;
 
 #ifdef MC_SOFT_SHADOWS
 	REAL3 randomVector;
@@ -108,6 +120,9 @@ REAL3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 
 	for (REAL i = start; i < distance; i += step)
 	{
+		// Dedicated hard budget for shadow rays (MAX_RAYMARCHING can be 10000).
+		if (count >= MAX_SHADOW_STEPS || count >= MAX_RAYMARCHING) break;
+
 		// REAL3 point2 = input->point + lightVector * i;
 		point2 += lightVector * step;
 
@@ -358,7 +373,7 @@ REAL3 AuxShadow(constant sClInConstants *consts, sRenderData *renderData,
 
 		shadowTemp = 1.0 - totalOpacity;
 
-		if ((!goThrough && (dist < dist_thresh || shadowTemp < 0.0))
+		if ((!goThrough && (dist < dist_thresh || shadowTemp < SHADOW_MIN))
 				|| (goThrough && shadowTemp < 0.0001))
 		{
 			if (light->penetrating)

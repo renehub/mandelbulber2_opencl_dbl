@@ -58,6 +58,8 @@ sParamRender::sParamRender(const std::shared_ptr<cParameterContainer> container,
 	ambientOcclusionColor = toRGBFloat(container->Get<sRGB>("ambient_occlusion_color"));
 	ambientOcclusionFastTune = container->Get<double>("ambient_occlusion_fast_tune");
 	ambientOcclusionMode = params::enumAOMode(container->Get<int>("ambient_occlusion_mode"));
+	indirectShadingQuality =
+		params::enumIndirectShadingQuality(container->Get<int>("indirect_shading_quality"));
 	ambientOcclusionQuality = container->Get<int>("ambient_occlusion_quality");
 	ambientOcclusionLightMapRotation =
 		container->Get<CVector3>("ao_light_map_rotation") / 180.0 * M_PI;
@@ -216,6 +218,7 @@ sParamRender::sParamRender(const std::shared_ptr<cParameterContainer> container,
 	resolution = 0.0;
 	slowShading = container->Get<bool>("slow_shading");
 	smoothness = container->Get<double>("smoothness");
+	shadowRayMaxDistance = container->Get<double>("shadow_ray_max_distance");
 	SSAO_random_mode = container->Get<bool>("SSAO_random_mode");
 	stereoEyeDistance = container->Get<double>("stereo_eye_distance");
 	stereoInfiniteCorrection = container->Get<double>("stereo_infinite_correction");

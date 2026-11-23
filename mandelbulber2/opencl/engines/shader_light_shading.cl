@@ -165,7 +165,7 @@ REAL CalculateLightCone(__global sLightCl *light, sRenderData *renderData, REAL3
 REAL3 LightShading(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParam, REAL3 surfaceColor,
 	__global sLightCl *light, sClGradientsCollection *gradients, REAL3 *outSpecular,
-	REAL3 *outShadow)
+	REAL3 *outShadow, bool allowShadows)
 {
 	REAL3 shading = 0.0;
 
@@ -215,9 +215,9 @@ REAL3 LightShading(__constant sClInConstants *consts, sRenderData *renderData,
 
 	REAL3 auxShadow = 1.0;
 #ifdef SHADOWS
-	if (light->castShadows)
+	if (allowShadows && light->castShadows)
 	{
-		if (shade > 0.001 || specularMax > 0.001)
+		if (shade > SHADOW_CONTRIBUTION_MIN || specularMax > SHADOW_CONTRIBUTION_MIN)
 		{
 			auxShadow =
 				AuxShadow(consts, renderData, input, light, dist, lightVector, calcParam, light->intensity);

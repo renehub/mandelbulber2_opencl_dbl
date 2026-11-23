@@ -68,6 +68,7 @@
 #include "rectangle.hpp"
 #include "render_data.hpp"
 #include "render_worker.hpp"
+#include "secondary_ray_budgets.h"
 #include "system_data.hpp"
 #include "system_directories.hpp"
 #include "texture.hpp"
@@ -750,6 +751,18 @@ void cOpenClEngineRenderFractal::SetParametersForShaders(
 	bool anyVolumetricShaderUsed = false;
 
 	definesCollector += " -DMAX_RAYMARCHING=" + QString::number(paramRender->maxRaymarchingSteps);
+	// Secondary-ray budgets. Keep the GPU defines in sync with the CPU header.
+	definesCollector += " -DMAX_GI_STEPS=" + QString::number(MAX_GI_STEPS);
+	definesCollector += " -DGI_MAX_DEPTH=" + QString::number(GI_MAX_DEPTH);
+	definesCollector += " -DMAX_AO_STEPS=" + QString::number(MAX_AO_STEPS);
+	definesCollector += " -DMAX_SHADOW_STEPS=" + QString::number(MAX_SHADOW_STEPS);
+	definesCollector +=
+		" -DGI_NO_PROGRESS_EPSILON=" + QString::number(GI_NO_PROGRESS_EPSILON, 'g', 6);
+	definesCollector += " -DAO_MIN_SHADOW=" + QString::number(AO_MIN_SHADOW, 'g', 6);
+	definesCollector += " -DAO_MIN_REMAINING=" + QString::number(AO_MIN_REMAINING, 'g', 6);
+	definesCollector += " -DSHADOW_MIN=" + QString::number(SHADOW_MIN, 'g', 6);
+	definesCollector +=
+		" -DSHADOW_CONTRIBUTION_MIN=" + QString::number(SHADOW_CONTRIBUTION_MIN, 'g', 6);
 
 	if (paramRender->ambientOcclusionEnabled)
 	{

@@ -45,21 +45,20 @@ REAL3 NormalVector(__constant sClInConstants *consts, sRenderData *renderData, R
 	calcParam->detailSize = distThresh;
 	calcParam->normalCalculationMode = true;
 
-	REAL3 deltas[6];
-	deltas[0] = (REAL3){delta, 0.0, 0.0};
-	deltas[1] = (REAL3){-delta, 0.0, 0.0};
-	deltas[2] = (REAL3){0.0, delta, 0.0};
-	deltas[3] = (REAL3){0.0, -delta, 0.0};
-	deltas[4] = (REAL3){0.0, 0.0, delta};
-	deltas[5] = (REAL3){0.0, 0.0, -delta};
+	// Tetrahedral normal estimator: four diagonal distance samples instead of
+	// six axis-aligned central differences. Same O(h^2) gradient accuracy with
+	// two fewer DE calls per normal.
+	const REAL3 k = (REAL3){1.0, -1.0, -1.0};
+	const REAL s0 =
+		CalculateDistance(consts, point + k.xyy * delta, calcParam, renderData).distance;
+	const REAL s1 =
+		CalculateDistance(consts, point + k.yyx * delta, calcParam, renderData).distance;
+	const REAL s2 =
+		CalculateDistance(consts, point + k.yxy * delta, calcParam, renderData).distance;
+	const REAL s3 =
+		CalculateDistance(consts, point + k.xxx * delta, calcParam, renderData).distance;
 
-	REAL s[6];
-	for (int i = 0; i < 6; i++)
-	{
-		s[i] = CalculateDistance(consts, point + deltas[i], calcParam, renderData).distance;
-	}
-
-	REAL3 normal = (REAL3){s[0] - s[1], s[2] - s[3], s[4] - s[5]};
+	REAL3 normal = k.xyy * s0 + k.yyx * s1 + k.yxy * s2 + k.xxx * s3;
 	normal = normalize(normal);
 	calcParam->normalCalculationMode = false;
 

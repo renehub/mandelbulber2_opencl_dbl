@@ -54,9 +54,16 @@ REAL3 AmbientOcclusion(__constant sClInConstants *consts, sRenderData *renderDat
 
 		REAL opacity = 0.0;
 		REAL shadowTemp = 1.0;
+		int aoSteps = 0;
 
 		for (REAL r = start_dist; r < end_dist; r += dist * 2.0)
 		{
+			// Hard budget and negligible-contribution stop for deep AO rays.
+			if (aoSteps >= MAX_AO_STEPS) break;
+			const REAL remaining = (end_dist > 0.0) ? (end_dist - r) / end_dist : 0.0;
+			if (shadowTemp < AO_MIN_SHADOW || remaining < AO_MIN_REMAINING) break;
+			aoSteps++;
+
 			REAL3 point2 = input->point + v.v * r;
 
 			calcParam->distThresh = input->distThresh;

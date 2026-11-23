@@ -36,7 +36,7 @@
 
 REAL3 AuxLightsShader(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParam, REAL3 surfaceColor,
-	sClGradientsCollection *gradients, REAL3 *specularOut, REAL3 *outShadow)
+	sClGradientsCollection *gradients, REAL3 *specularOut, REAL3 *outShadow, bool allowShadows)
 {
 
 	int numberOfLights = renderData->numberOfLights;
@@ -51,7 +51,7 @@ REAL3 AuxLightsShader(__constant sClInConstants *consts, sRenderData *renderData
 		{
 			REAL3 specularAuxOutTemp;
 			REAL3 shadeAux = LightShading(consts, renderData, input, calcParam, surfaceColor, light,
-				gradients, &specularAuxOutTemp, outShadow);
+				gradients, &specularAuxOutTemp, outShadow, allowShadows);
 			shadeAuxSum += shadeAux;
 			specularAuxSum += specularAuxOutTemp;
 		}

@@ -37,7 +37,8 @@
 #include "render_worker.hpp"
 
 sRGBAFloat cRenderWorker::AuxLightsShader(sShaderInputData &input, sRGBAFloat surfaceColor,
-	sGradientsCollection *gradients, sRGBAFloat *specularOut, sRGBAFloat *outShadow) const
+	sGradientsCollection *gradients, sRGBAFloat *specularOut, sRGBAFloat *outShadow,
+	bool allowShadows) const
 {
 
 	int numberOfLights = data->lights.GetNumberOfLights();
@@ -49,8 +50,8 @@ sRGBAFloat cRenderWorker::AuxLightsShader(sShaderInputData &input, sRGBAFloat su
 		if (light->enabled)
 		{
 			sRGBAFloat specularAuxOutTemp;
-			sRGBAFloat shadeAux =
-				LightShading(input, surfaceColor, light, gradients, &specularAuxOutTemp, outShadow);
+			sRGBAFloat shadeAux = LightShading(
+				input, surfaceColor, light, gradients, &specularAuxOutTemp, outShadow, allowShadows);
 			shadeAuxSum.R += shadeAux.R;
 			shadeAuxSum.G += shadeAux.G;
 			shadeAuxSum.B += shadeAux.B;

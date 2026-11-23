@@ -61,6 +61,13 @@ enum enumTextureMapType
 	mapFlat = 2
 };
 
+enum enumIndirectShadingQuality
+{
+	indirectShadingFull = 0,
+	indirectShadingFast = 1,
+	indirectShadingOff = 2
+};
+
 } // namespace params
 
 struct sParamRender
@@ -178,6 +185,7 @@ struct sParamRender
 	double relMaxMarchingStep;
 	double relMinMarchingStep;
 	double resolution; // resolution of image in fractal coordinates
+	double shadowRayMaxDistance; // 0 = use viewDistanceMax for directional lights
 	double smoothness;
 	double stereoEyeDistance;
 	double stereoInfiniteCorrection;
@@ -216,6 +224,7 @@ struct sParamRender
 	// Enums (as in OpenCL)
 	params::enumPerspectiveType perspectiveType;
 	params::enumAOMode ambientOcclusionMode;
+	params::enumIndirectShadingQuality indirectShadingQuality;
 	params::enumTextureMapType texturedBackgroundMapType;
 	fractal::enumDEMethod delta_DE_method;
 	fractal::enumDEFunctionType delta_DE_function;

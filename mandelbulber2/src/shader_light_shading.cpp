@@ -36,10 +36,11 @@
 #include "lights.hpp"
 #include "material.h"
 #include "render_worker.hpp"
+#include "secondary_ray_budgets.h"
 
 sRGBAFloat cRenderWorker::LightShading(sShaderInputData &input, sRGBAFloat surfaceColor,
 	const cLight *light, sGradientsCollection *gradients, sRGBAFloat *outSpecular,
-	sRGBAFloat *outShadow) const
+	sRGBAFloat *outShadow, bool allowShadows) const
 {
 	sRGBAFloat shading;
 
@@ -92,9 +93,9 @@ sRGBAFloat cRenderWorker::LightShading(sShaderInputData &input, sRGBAFloat surfa
 
 	// calculate shadow
 	sRGBAFloat auxShadow(1.0, 1.0, 1.0, 1.0);
-	if (light->castShadows)
+	if (allowShadows && light->castShadows)
 	{
-		if (shade > 0.001f || specularMax > 0.001f)
+		if (shade > SHADOW_CONTRIBUTION_MIN || specularMax > SHADOW_CONTRIBUTION_MIN)
 		{
 			auxShadow = AuxShadow(input, light, distance, lightVector);
 			specular.R *= auxShadow.R;

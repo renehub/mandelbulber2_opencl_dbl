@@ -39,8 +39,12 @@
 
 sRGBAFloat cRenderWorker::ObjectShader(const sShaderInputData &_input, sRGBAFloat *surfaceColour,
 	sRGBAFloat *specularOut, sRGBFloat *iridescenceOut, sRGBAFloat *outShadow,
-	sRGBFloat *luminosityEmissiveOut, sGradientsCollection *gradients) const
+	sRGBFloat *luminosityEmissiveOut, sGradientsCollection *gradients, int shadingQuality) const
 {
+	const bool allowAO = (shadingQuality == int(params::indirectShadingFull));
+	const bool allowShadows = allowAO;
+	const bool allowExtraShading = (shadingQuality != int(params::indirectShadingOff));
+
 	sRGBAFloat output;
 	float alpha = 1.0f;
 
@@ -107,7 +111,7 @@ sRGBAFloat cRenderWorker::ObjectShader(const sShaderInputData &_input, sRGBAFloa
 
 	// ambient occlusion
 	sRGBAFloat ambient(0.0, 0.0, 0.0, 0.0);
-	if (params->ambientOcclusionEnabled)
+	if (allowAO && params->ambientOcclusionEnabled)
 	{
 		// fast mode
 		if (params->ambientOcclusionMode == params::AOModeFast)
@@ -126,23 +130,24 @@ sRGBAFloat cRenderWorker::ObjectShader(const sShaderInputData &_input, sRGBAFloa
 
 	// environment mapping
 	sRGBAFloat envMapping(0.0, 0.0, 0.0, 0.0);
-	if (params->envMappingEnable)
+	if (allowExtraShading && params->envMappingEnable)
 	{
 		envMapping = EnvMapping(input);
+		envMapping.R *= mat->reflectance * input.texDiffuse.R;
+		envMapping.G *= mat->reflectance * input.texDiffuse.G;
+		envMapping.B *= mat->reflectance * input.texDiffuse.B;
 	}
-	envMapping.R *= mat->reflectance * input.texDiffuse.R;
-	envMapping.G *= mat->reflectance * input.texDiffuse.G;
-	envMapping.B *= mat->reflectance * input.texDiffuse.B;
 
 	// additional lights
 	sRGBAFloat auxLights;
 	sRGBAFloat auxLightsSpecular;
-	auxLights = AuxLightsShader(input, colour, gradients, &auxLightsSpecular, outShadow);
+	auxLights = AuxLightsShader(
+		input, colour, gradients, &auxLightsSpecular, outShadow, allowShadows);
 
 	// fake orbit trap lights
 	sRGBAFloat fakeLights(0.0, 0.0, 0.0, 0.0);
 	sRGBAFloat fakeLightsSpecular(0.0, 0.0, 0.0, 0.0);
-	if (params->fakeLightsEnabled)
+	if (allowExtraShading && params->fakeLightsEnabled)
 	{
 		fakeLights = FakeLights(input, colour, &fakeLightsSpecular);
 	}
@@ -199,7 +204,7 @@ sRGBAFloat cRenderWorker::ObjectShader(const sShaderInputData &_input, sRGBAFloa
 	luminosityEmissiveOut->B = luminosity.B * mat->luminosityEmissive;
 
 	sRGBFloat iridescence(1.0, 1.0, 1.0);
-	if (input.material->iridescenceEnabled)
+	if (allowExtraShading && input.material->iridescenceEnabled)
 	{
 		iridescence = IridescenceShader(input);
 	}

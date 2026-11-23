@@ -743,10 +743,18 @@ void cRenderWorker::RayMarching(
 	double dist = 0;
 	// search_accuracy and search_limit define the convergence criterion for binary search.
 	// The surface is considered found when dist is within search_limit of distThresh.
-	double search_accuracy = 0.001 * params->detailLevel;
+	// 0.01 allows a final error of ~1% of a pixel; the former 0.001 refined far
+	// below display precision.
+	double search_accuracy = 0.01 * params->detailLevel;
 	double search_limit = 1.0 - search_accuracy;
 	int counter = 0;
 	double step = 0.0;
+	// Last coarse-march point before the current one. When the current point is
+	// a hit, this is the outside end of the root-finding bracket.
+	double previousScan = scan;
+	double previousDist = 0.0;
+	double previousDistThresh = 0.0;
+	bool havePrevious = false;
 	(*inOut->buffCount) = 0;
 	double distThresh = 0;
 	out->objectId = 0;
@@ -826,6 +834,13 @@ void cRenderWorker::RayMarching(
 			break;
 		}
 
+		// This point is outside the surface and becomes the outside end of the
+		// bracket if the next coarse step hits.
+		previousScan = scan;
+		previousDist = dist;
+		previousDistThresh = distThresh;
+		havePrevious = true;
+
 		inOut->stepBuff[i].step = step;
 		// Compute the next step size. The base formula uses the SDF distance minus
 		// a safety margin (0.5 * distThresh for exterior, 0.8 * distThresh for interior).
@@ -875,67 +890,133 @@ void cRenderWorker::RayMarching(
 
 	point = in.start + in.direction * scan;
 
-	// Binary search refinement: once the surface is approached, halve the step size
-	// and search backward to find the precise intersection point. This reduces the
-	// visual error from the coarse SDF step approximation.
+	// Binary search refinement (bracketed false position / Illinois): the last
+	// coarse point outside the surface and the hit point inside the surface form
+	// a bracket. Interpolate the root of f(scan) = distance(scan) - distThresh,
+	// with bisection as the safeguard. At most 8 new distance estimations.
 	// qDebug() << "------------ binary search";
-	if (found && in.binaryEnable && !deadComputationFound)
+	if (found && in.binaryEnable && !deadComputationFound && havePrevious)
 	{
-		step *= 0.5;
-		for (int i = 0; i < 30; i++)
+		double scanOutside = previousScan;
+		double scanInside = scan;
+		double fOutside = previousDist - previousDistThresh;
+		double fInside = dist - distThresh;
+
+		if (fOutside > 0.0 && fInside < 0.0 && scanInside > scanOutside)
 		{
-			counter++;
-			// Convergence: if dist is within search_limit of distThresh, we're close enough.
-			if (dist < distThresh && dist > distThresh * search_limit)
+			// Illinois weights: halved when the same endpoint is replaced twice.
+			double wOutside = fOutside;
+			double wInside = fInside;
+			int lastReplaced = 0; // 0 = none, 1 = inside, 2 = outside
+			bool forceBisection = false;
+
+			for (int i = 0; i < 8; i++)
 			{
-				break;
-			}
-			else
-			{
-				if (dist > distThresh)
+				const double tolerance = distThresh * search_accuracy * invDirectionLength;
+				if ((dist < distThresh && dist > distThresh * search_limit)
+						|| (scanInside - scanOutside) <= tolerance)
 				{
-					// Still outside: move forward by half step.
-					scan += step;
-					point = in.start + in.direction * scan;
+					break;
 				}
-				else if (dist < distThresh * search_limit)
+
+				double t;
+				if (forceBisection)
 				{
-					// Too far inside: move backward by half step.
-					scan -= step;
-					point = in.start + in.direction * scan;
+					t = 0.5;
 				}
+				else
+				{
+					t = wOutside / (wOutside - wInside);
+					if (!(t > 0.0 && t < 1.0)) t = 0.5;
+					t = clamp(t, 0.05, 0.95);
+				}
+
+				double scanNew = scanOutside + t * (scanInside - scanOutside);
+				if (!(scanNew > scanOutside && scanNew < scanInside))
+				{
+					scanNew = 0.5 * (scanOutside + scanInside);
+					forceBisection = true;
+				}
+				const double oldWidth = scanInside - scanOutside;
+
+				point = in.start + in.direction * scanNew;
+				double candidateThresh = CalcDistThresh(point);
+
+				sDistanceIn distanceIn(point, candidateThresh, false);
+				sDistanceOut distanceOut;
+				double candidateDist =
+					CalculateDistance(*params, *fractal, distanceIn, &distanceOut, data, &objectStack);
+
+				// Apply per-object detailLevelMultiplier to distThresh dynamically
+				if (distanceOut.detailLevelMultiplier > 0.0)
+				{
+					candidateThresh *= distanceOut.detailLevelMultiplier;
+				}
+
+				if (in.invertMode)
+				{
+					candidateDist = candidateThresh * 1.99 - candidateDist;
+					if (candidateDist < 0.0) candidateDist = 0.0;
+				}
+
+				const double fNew = candidateDist - candidateThresh;
+				data->statistics.histogramIterations.Add(distanceOut.iters);
+				data->statistics.totalNumberOfIterations += distanceOut.totalIters;
+				counter++;
+
+				if (!std::isfinite(fNew))
+				{
+					forceBisection = true;
+					continue;
+				}
+
+				bool inconsistent = false;
+				if (fNew < 0.0)
+				{
+					inconsistent = (-fNew) > (-fInside);
+					if (lastReplaced == 1) wOutside *= 0.5;
+					lastReplaced = 1;
+					scanInside = scanNew;
+					fInside = fNew;
+					wInside = fNew;
+					dist = candidateDist;
+					distThresh = candidateThresh;
+					out->objectId = distanceOut.objectId;
+					out->seqIndex = distanceOut.seqIndex;
+					out->transformedPoint = distanceOut.transformedPoint;
+					out->hasTransformedPoint = distanceOut.hasTransformedPoint;
+				}
+				else if (fNew > 0.0)
+				{
+					inconsistent = fNew > fOutside;
+					if (lastReplaced == 2) wInside *= 0.5;
+					lastReplaced = 2;
+					scanOutside = scanNew;
+					fOutside = fNew;
+					wOutside = fNew;
+				}
+				else
+				{
+					// Exact root.
+					scanInside = scanNew;
+					fInside = 0.0;
+					dist = candidateDist;
+					distThresh = candidateThresh;
+					out->objectId = distanceOut.objectId;
+					out->seqIndex = distanceOut.seqIndex;
+					out->transformedPoint = distanceOut.transformedPoint;
+					out->hasTransformedPoint = distanceOut.hasTransformedPoint;
+					break;
+				}
+
+				const double newWidth = scanInside - scanOutside;
+				forceBisection = inconsistent || (newWidth >= oldWidth * 0.99);
 			}
 
-			distThresh = CalcDistThresh(point);
-
-			sDistanceIn distanceIn(point, distThresh, false);
-			sDistanceOut distanceOut;
-			dist = CalculateDistance(*params, *fractal, distanceIn, &distanceOut, data, &objectStack);
-
-			// Apply per-object detailLevelMultiplier to distThresh dynamically (binary search phase)
-			if (distanceOut.detailLevelMultiplier > 0.0)
-			{
-				distThresh *= distanceOut.detailLevelMultiplier;
-			}
-
-			// qDebug() << "i" << i <<"thresh" <<  distThresh << "dist" << dist << "scan" << scan <<
-			// "step" << step;
-
-			if (in.invertMode)
-			{
-				dist = distThresh * 1.99 - dist;
-				if (dist < 0.0) dist = 0.0;
-			}
-
-			out->objectId = distanceOut.objectId;
-			out->seqIndex = distanceOut.seqIndex;
-			out->transformedPoint = distanceOut.transformedPoint;
-			out->hasTransformedPoint = distanceOut.hasTransformedPoint;
-
-			data->statistics.histogramIterations.Add(distanceOut.iters);
-			data->statistics.totalNumberOfIterations += distanceOut.totalIters;
-
-			step *= 0.5;
+			// Return the latest inside sample, which is guaranteed to be no
+			// farther than the bracket tolerance from the surface.
+			scan = scanInside;
+			point = in.start + in.direction * scan;
 		}
 	}
 	// iterThreshMode correction: back off by distThresh to avoid noise from the
@@ -1435,8 +1516,12 @@ cRenderWorker::sRayRecursionOut cRenderWorker::RayRecursion(
 				// calculate effects for object surface: lighting, AO, shadows, emissive, iridescence.
 				sGradientsCollection gradients;
 
+				// Deeper reflection/refraction bounces may use the reduced indirect shading.
+				const int shadingQuality =
+					(rayIndex > 1) ? int(params->indirectShadingQuality) : int(params::indirectShadingFull);
 				objectShader = ObjectShader(shaderInputData, &objectColour, &recursionOut.specular,
-					&iridescence, &recursionOut.outShadow, &luminosityEmissiveOut, &gradients);
+					&iridescence, &recursionOut.outShadow, &luminosityEmissiveOut, &gradients,
+					shadingQuality);
 
 				if (params->DOFMonteCarlo && params->DOFMonteCarloGlobalIllumination)
 				{

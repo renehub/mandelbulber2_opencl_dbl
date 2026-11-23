@@ -74,6 +74,13 @@ booleanOperatorAND = 0,
 
 
 
+typedef enum
+{
+	indirectShadingFull = 0,
+	indirectShadingFast = 1,
+	indirectShadingOff = 2
+} enumIndirectShadingQualityCl;
+
 // namespace params
 
 typedef struct ALIGN_REAL
@@ -186,6 +193,7 @@ typedef struct ALIGN_REAL
 	REAL relMaxMarchingStep;
 	REAL relMinMarchingStep;
 	REAL resolution; // resolution of image in fractal coordinates
+	REAL shadowRayMaxDistance; // 0 = use viewDistanceMax for directional lights
 	REAL smoothness;
 	REAL stereoEyeDistance;
 	REAL stereoInfiniteCorrection;
@@ -224,6 +232,7 @@ typedef struct ALIGN_REAL
 	// Enums (as in OpenCL)
 	cl_int perspectiveType;
 	cl_int ambientOcclusionMode;
+	cl_int indirectShadingQuality;
 	cl_int texturedBackgroundMapType;
 	cl_int delta_DE_method;
 	cl_int delta_DE_function;
@@ -402,6 +411,7 @@ typedef struct ALIGN_DOUBLE
 	cl_double relMaxMarchingStep;
 	cl_double relMinMarchingStep;
 	cl_double resolution; // resolution of image in fractal coordinates
+	cl_double shadowRayMaxDistance; // 0 = use viewDistanceMax for directional lights
 	cl_double smoothness;
 	cl_double stereoEyeDistance;
 	cl_double stereoInfiniteCorrection;
@@ -440,6 +450,7 @@ typedef struct ALIGN_DOUBLE
 	// Enums (as in OpenCL)
 	cl_int perspectiveType;
 	cl_int ambientOcclusionMode;
+	cl_int indirectShadingQuality;
 	cl_int texturedBackgroundMapType;
 	cl_int delta_DE_method;
 	cl_int delta_DE_function;
@@ -607,6 +618,7 @@ inline sParamRenderClD clCopySParamRenderClD(const sParamRender &source)
 	target.relMaxMarchingStep = source.relMaxMarchingStep;
 	target.relMinMarchingStep = source.relMinMarchingStep;
 	target.resolution = source.resolution;
+	target.shadowRayMaxDistance = source.shadowRayMaxDistance;
 	target.smoothness = source.smoothness;
 	target.stereoEyeDistance = source.stereoEyeDistance;
 	target.stereoInfiniteCorrection = source.stereoInfiniteCorrection;
@@ -641,6 +653,7 @@ inline sParamRenderClD clCopySParamRenderClD(const sParamRender &source)
 	target.maxRaymarchingSteps = source.maxRaymarchingSteps;
 	target.perspectiveType = source.perspectiveType;
 	target.ambientOcclusionMode = source.ambientOcclusionMode;
+	target.indirectShadingQuality = source.indirectShadingQuality;
 	target.texturedBackgroundMapType = source.texturedBackgroundMapType;
 	target.delta_DE_method = source.delta_DE_method;
 	target.delta_DE_function = source.delta_DE_function;
@@ -805,6 +818,7 @@ inline sParamRenderClD clPromoteSParamRenderClD(const sParamRenderCl &source)
 	target.relMaxMarchingStep = source.relMaxMarchingStep;
 	target.relMinMarchingStep = source.relMinMarchingStep;
 	target.resolution = source.resolution;
+	target.shadowRayMaxDistance = source.shadowRayMaxDistance;
 	target.smoothness = source.smoothness;
 	target.stereoEyeDistance = source.stereoEyeDistance;
 	target.stereoInfiniteCorrection = source.stereoInfiniteCorrection;
@@ -839,6 +853,7 @@ inline sParamRenderClD clPromoteSParamRenderClD(const sParamRenderCl &source)
 	target.maxRaymarchingSteps = source.maxRaymarchingSteps;
 	target.perspectiveType = source.perspectiveType;
 	target.ambientOcclusionMode = source.ambientOcclusionMode;
+	target.indirectShadingQuality = source.indirectShadingQuality;
 	target.texturedBackgroundMapType = source.texturedBackgroundMapType;
 	target.delta_DE_method = source.delta_DE_method;
 	target.delta_DE_function = source.delta_DE_function;
@@ -1003,6 +1018,7 @@ inline sParamRenderCl clCopySParamRenderCl(const sParamRender &source)
 	target.relMaxMarchingStep = source.relMaxMarchingStep;
 	target.relMinMarchingStep = source.relMinMarchingStep;
 	target.resolution = source.resolution;
+	target.shadowRayMaxDistance = source.shadowRayMaxDistance;
 	target.smoothness = source.smoothness;
 	target.stereoEyeDistance = source.stereoEyeDistance;
 	target.stereoInfiniteCorrection = source.stereoInfiniteCorrection;
@@ -1037,6 +1053,7 @@ inline sParamRenderCl clCopySParamRenderCl(const sParamRender &source)
 	target.maxRaymarchingSteps = source.maxRaymarchingSteps;
 	target.perspectiveType = source.perspectiveType;
 	target.ambientOcclusionMode = source.ambientOcclusionMode;
+	target.indirectShadingQuality = source.indirectShadingQuality;
 	target.texturedBackgroundMapType = source.texturedBackgroundMapType;
 	target.delta_DE_method = source.delta_DE_method;
 	target.delta_DE_function = source.delta_DE_function;

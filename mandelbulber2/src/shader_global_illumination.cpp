@@ -37,6 +37,7 @@
 #include "fractparams.hpp"
 #include "render_data.hpp"
 #include "render_worker.hpp"
+#include "secondary_ray_budgets.h"
 
 sRGBFloat cRenderWorker::GlobalIlumination(
 	const sShaderInputData &input, sRGBAFloat objectColor, bool volumetricMode) const
@@ -54,9 +55,12 @@ sRGBFloat cRenderWorker::GlobalIlumination(
 	double totalOpacity = 0.0;
 
 	bool finished = false;
-	int maxDepth = (volumetricMode) ? 2 : params->reflectionsMax;
+	// GI depth is capped independently of reflectionsMax (which can be 1000).
+	int maxDepth = (volumetricMode) ? 2 : std::min(params->reflectionsMax, GI_MAX_DEPTH);
 	for (int rayDepth = 0; rayDepth < maxDepth; rayDepth++)
 	{
+		if (totalOpacity > 1.0) break;
+
 		CVector3 reflectedDirection = inputCopy.normal;
 		double randomX = (Random(20000) - 10000) / 10000.0;
 		double randomY = (Random(20000) - 10000) / 10000.0;
@@ -72,9 +76,13 @@ sRGBFloat cRenderWorker::GlobalIlumination(
 		inputCopy.stepCount = 0;
 		int stepCount = 0;
 
+		int giSteps = 0;
 		for (double scan = inputCopy.distThresh; scan < params->viewDistanceMax;
 			scan += dist * params->DEFactor)
 		{
+			// Hard budget: protects deep-zoom GI rays with a tiny DE.
+			if (giSteps >= MAX_GI_STEPS) break;
+			giSteps++;
 			if (stepCount >= maxRaymarchingSteps) break;
 			sStep step;
 			step.step = dist * params->DEFactor;
@@ -121,6 +129,11 @@ sRGBFloat cRenderWorker::GlobalIlumination(
 				found = true;
 				break;
 			}
+
+			// No progress: a step much smaller than the local threshold would
+			// otherwise burn the whole budget without reaching the surface.
+			if (dist * params->DEFactor < GI_NO_PROGRESS_EPSILON * distThresh) break;
+
 			stepCount++;
 		}
 
@@ -167,7 +180,8 @@ sRGBFloat cRenderWorker::GlobalIlumination(
 
 			sGradientsCollection gradients;
 			sRGBAFloat objectShader = ObjectShader(inputCopy, &hitObjectColor, &specular, &iridescence,
-				&outShadow, &outLuminosityEmissive, &gradients);
+				&outShadow, &outLuminosityEmissive, &gradients,
+				int(params->indirectShadingQuality));
 
 			newColor = hitObjectColor;
 			resultShader.R = objectShader.R + specular.R;

@@ -37,6 +37,7 @@
 #include "fractparams.hpp"
 #include "render_data.hpp"
 #include "render_worker.hpp"
+#include "secondary_ray_budgets.h"
 
 sRGBAFloat cRenderWorker::AmbientOcclusion(const sShaderInputData &input) const
 {
@@ -64,9 +65,16 @@ sRGBAFloat cRenderWorker::AmbientOcclusion(const sShaderInputData &input) const
 
 		double opacity = 0.0;
 		double shadowTemp = 1.0;
+		int aoSteps = 0;
 
 		for (double r = start_dist; r < end_dist; r += dist * 2.0)
 		{
+			// Hard budget and negligible-contribution stop for deep AO rays.
+			if (aoSteps >= MAX_AO_STEPS) break;
+			const double remaining = (end_dist > 0.0) ? (end_dist - r) / end_dist : 0.0;
+			if (shadowTemp < AO_MIN_SHADOW || remaining < AO_MIN_REMAINING) break;
+			aoSteps++;
+
 			CVector3 point2 = input.point + v.v * r;
 
 			sDistanceOut distanceOut;

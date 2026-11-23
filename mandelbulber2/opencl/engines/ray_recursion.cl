@@ -159,7 +159,18 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 	formulaOut outF;
 	REAL step = 0.0;
 
-	REAL searchAccuracy = 0.001 * consts->params.detailLevel;
+	// Last coarse-march point before the current one. When the current point is
+	// a hit, this is the outside end of the root-finding bracket.
+	REAL previousScan = scan;
+	REAL previousDistance = 0.0;
+	REAL previousDistThresh = 0.0;
+	bool havePrevious = false;
+
+	// Relative width of the accepted hit band below distThresh. 0.01 means the
+	// final point may be off the exact surface by at most ~1% of a pixel, which
+	// is far below what the image can show. The former 0.001 spent many extra
+	// distance estimations to refine far beyond display precision.
+	REAL searchAccuracy = 0.01 * consts->params.detailLevel;
 	REAL searchLimit = 1.0 - searchAccuracy;
 
 	// ray-marching
@@ -211,6 +222,13 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 			break;
 		}
 
+		// This point is outside the surface and becomes the outside end of the
+		// bracket if the next coarse step hits.
+		previousScan = scan;
+		previousDistance = distance;
+		previousDistThresh = distThresh;
+		havePrevious = true;
+
 #ifdef INTERIOR_MODE
 		step = (distance - 0.8 * distThresh) * consts->params.DEFactor;
 #else
@@ -235,51 +253,139 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 
 	point = in.start + in.direction * scan;
 
-	// final binary searching
-	if (found)
+	// final binary searching (bracketed false position / Illinois)
+	if (found && in.binaryEnable && havePrevious)
 	{
-		step *= 0.5;
-		for (int i = 0; i < 30; i++)
+		// The coarse hit and the point before it bracket the surface:
+		// fOutside = previousDistance - previousDistThresh > 0
+		// fInside  = distance - distThresh < 0
+		// Interpolate the root of f(scan) = distance(scan) - distThresh. If the
+		// interpolation stalls or returns an inconsistent sample, use bisection.
+		REAL scanOutside = previousScan;
+		REAL scanInside = scan;
+		REAL fOutside = previousDistance - previousDistThresh;
+		REAL fInside = distance - distThresh;
+
+		if (fOutside > 0.0 && fInside < 0.0 && scanInside > scanOutside)
 		{
-			bsIterations++;
-			if (distance < distThresh && distance > distThresh * searchLimit)
+			// Illinois weights: halved when the same endpoint is replaced twice.
+			REAL wOutside = fOutside;
+			REAL wInside = fInside;
+			int lastReplaced = 0; // 0 = none, 1 = inside, 2 = outside
+			bool forceBisection = false;
+
+			for (int i = 0; i < 8; i++)
 			{
-				break;
-			}
-			else
-			{
-				if (distance > distThresh)
+				const REAL tolerance = distThresh * searchAccuracy * invDirectionLength;
+				if ((distance < distThresh && distance > distThresh * searchLimit)
+						|| (scanInside - scanOutside) <= tolerance)
 				{
-					scan += step;
-					point = in.start + in.direction * scan;
+					break;
 				}
-				else if (distance < distThresh * searchLimit)
+
+				REAL t;
+				if (forceBisection)
 				{
-					scan -= step;
-					point = in.start + in.direction * scan;
+					t = 0.5;
 				}
+				else
+				{
+					t = wOutside / (wOutside - wInside);
+					if (!(t > 0.0 && t < 1.0)) t = 0.5;
+					t = clamp(t, (REAL)0.05, (REAL)0.95);
+				}
+
+				REAL scanNew = scanOutside + t * (scanInside - scanOutside);
+				if (!(scanNew > scanOutside && scanNew < scanInside))
+				{
+					scanNew = 0.5 * (scanOutside + scanInside);
+					forceBisection = true;
+				}
+				const REAL oldWidth = scanInside - scanOutside;
+
+				point = in.start + in.direction * scanNew;
+				REAL candidateThresh = CalcDistThresh(point, consts);
+				calcParam.distThresh = candidateThresh;
+				calcParam.detailSize = candidateThresh;
+				outF = CalculateDistance(consts, point, &calcParam, renderData);
+				REAL newDistance = outF.distance;
+
+				// statistics: binary search performs additional distance estimations too
+				bsIterations++;
+				rmStats->deCalls++;
+				rmStats->itersSum += (uint)outF.iters;
+
+				REAL detailMultiplier = 1.0;
+				if (outF.objectId >= 0 && outF.objectId < renderData->numberOfObjects)
+				{
+					detailMultiplier = renderData->objectsData[outF.objectId].detailLevelMultiplier;
+				}
+				if (detailMultiplier > 0.0) candidateThresh *= detailMultiplier;
+
+#ifdef USE_REFRACTION
+				if (in.invertMode)
+				{
+					newDistance = candidateThresh * 1.99 - newDistance;
+					if (newDistance < 0.0) newDistance = 0.0;
+				}
+#endif
+
+				const REAL fNew = newDistance - candidateThresh;
+				if (!isfinite(fNew))
+				{
+					forceBisection = true;
+					continue;
+				}
+
+				bool inconsistent = false;
+				if (fNew < 0.0)
+				{
+					inconsistent = (-fNew) > (-fInside);
+					if (lastReplaced == 1) wOutside *= 0.5;
+					lastReplaced = 1;
+					scanInside = scanNew;
+					fInside = fNew;
+					wInside = fNew;
+					distance = newDistance;
+					distThresh = candidateThresh;
+					out->objectId = outF.objectId;
+					out->sequenceIndex = outF.sequenceIndex;
+					out->transformedPoint = outF.transformedPoint;
+					out->hasTransformedPoint = outF.hasTransformedPoint;
+					out->detailLevelMultiplier = detailMultiplier;
+				}
+				else if (fNew > 0.0)
+				{
+					inconsistent = fNew > fOutside;
+					if (lastReplaced == 2) wInside *= 0.5;
+					lastReplaced = 2;
+					scanOutside = scanNew;
+					fOutside = fNew;
+					wOutside = fNew;
+				}
+				else
+				{
+					// Exact root.
+					scanInside = scanNew;
+					fInside = 0.0;
+					distance = newDistance;
+					distThresh = candidateThresh;
+					out->objectId = outF.objectId;
+					out->sequenceIndex = outF.sequenceIndex;
+					out->transformedPoint = outF.transformedPoint;
+					out->hasTransformedPoint = outF.hasTransformedPoint;
+					out->detailLevelMultiplier = detailMultiplier;
+					break;
+				}
+
+				const REAL newWidth = scanInside - scanOutside;
+				forceBisection = inconsistent || (newWidth >= oldWidth * 0.99);
 			}
-			outF = CalculateDistance(consts, point, &calcParam, renderData);
-			distance = outF.distance;
 
-			// statistics: binary search performs additional distance estimations too
-			rmStats->deCalls++;
-			rmStats->itersSum += (uint)outF.iters;
-
-			out->objectId = outF.objectId;
-			out->sequenceIndex = outF.sequenceIndex;
-			out->transformedPoint = outF.transformedPoint;
-			out->hasTransformedPoint = outF.hasTransformedPoint;
-
-			// #ifdef USE_REFRACTION
-			if (in.invertMode)
-			{
-				distance = distThresh * 1.99 - distance;
-				if (distance < 0.0) distance = 0.0;
-			}
-			// #endif
-
-			step *= 0.5;
+			// Return the latest inside sample, which is guaranteed to be no
+			// farther than the bracket tolerance from the surface.
+			scan = scanInside;
+			point = in.start + in.direction * scan;
 		}
 	}
 
@@ -824,9 +930,13 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 				specular = 0.0;
 				REAL alpha = 1.0;
 				REAL3 outLuminosityEmissive = 0.0;
+				// Deeper reflection/refraction bounces may use the reduced indirect shading.
+				const int shadingQuality =
+					(rayIndex > 1) ? consts->params.indirectShadingQuality : indirectShadingFull;
 				objectShader =
 					ObjectShader(consts, renderData, &shaderInputData, &calcParam, &objectColour, &specular,
-						&iridescence, &recursionOut.outShadow, &outLuminosityEmissive, &alpha, &gradients);
+						&iridescence, &recursionOut.outShadow, &outLuminosityEmissive, &alpha, &gradients,
+						shadingQuality);
 				recursionOut.specular = specular;
 
 #ifdef MONTE_CARLO_DOF_GLOBAL_ILLUMINATION

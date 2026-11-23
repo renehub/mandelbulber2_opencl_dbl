@@ -239,7 +239,7 @@ private:
 	// shaders
 	sRGBAFloat ObjectShader(const sShaderInputData &input, sRGBAFloat *surfaceColour,
 		sRGBAFloat *specularOut, sRGBFloat *iridescence, sRGBAFloat *outShadow,
-		sRGBFloat *luminosityEmissiveOut, sGradientsCollection *gradients) const;
+		sRGBFloat *luminosityEmissiveOut, sGradientsCollection *gradients, int shadingQuality) const;
 	CVector3 CalculateNormals(const sShaderInputData &input) const;
 	sRGBAFloat SpecularHighlight(const sShaderInputData &input, CVector3 lightVector,
 		float specularWidth, float roughness, sRGBFloat diffuseGradient) const;
@@ -251,11 +251,13 @@ private:
 	sRGBAFloat AmbientOcclusion(const sShaderInputData &input) const;
 	sRGBAFloat EnvMapping(const sShaderInputData &input) const;
 	sRGBAFloat AuxLightsShader(sShaderInputData &input, sRGBAFloat surfaceColor,
-		sGradientsCollection *gradients, sRGBAFloat *specularOut, sRGBAFloat *outShadow) const;
+		sGradientsCollection *gradients, sRGBAFloat *specularOut, sRGBAFloat *outShadow,
+		bool allowShadows) const;
 	sRGBAFloat AuxShadow(
 		sShaderInputData &input, const cLight *light, double distance, CVector3 lightVector) const;
 	sRGBAFloat LightShading(sShaderInputData &input, sRGBAFloat surfaceColor, const cLight *light,
-		sGradientsCollection *gradients, sRGBAFloat *outSpecular, sRGBAFloat *outShadow) const;
+		sGradientsCollection *gradients, sRGBAFloat *outSpecular, sRGBAFloat *outShadow,
+		bool allowShadows) const;
 	sRGBAFloat BackgroundShader(const sShaderInputData &input) const;
 	sRGBAFloat FakeLights(
 		const sShaderInputData &input, sRGBAFloat surfaceColor, sRGBAFloat *fakeSpec) const;

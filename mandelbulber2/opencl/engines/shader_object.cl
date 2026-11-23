@@ -35,8 +35,15 @@
 REAL3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 	sShaderInputDataCl *input, sClCalcParams *calcParam, REAL3 *outSurfaceColor, REAL3 *outSpecular,
 	REAL3 *iridescenceOut, REAL3 *outShadow, REAL3 *outLuminosityEmissive, REAL *alphaOut,
-	sClGradientsCollection *gradients)
+	sClGradientsCollection *gradients, int shadingQuality)
 {
+	// full: primary/direct shading (0)
+	// fast: indirect rays skip AO and shadow rays (1)
+	// off:  indirect rays use surface colour, luminosity and direct light only (2)
+	const bool allowAO = (shadingQuality == 0);
+	const bool allowShadows = (shadingQuality == 0);
+	const bool allowExtraShading = (shadingQuality < 2);
+
 	REAL3 color = 0.7;
 
 	REAL3 shade = 0.0;
@@ -89,7 +96,7 @@ REAL3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 	}
 
 	REAL3 AO = 0.0;
-	if (consts->params.ambientOcclusionEnabled)
+	if (allowAO && consts->params.ambientOcclusionEnabled)
 	{
 #ifdef AO_MODE_FAST
 		AO = FastAmbientOcclusion(consts, renderData, input, calcParam);
@@ -102,35 +109,40 @@ REAL3 ObjectShader(__constant sClInConstants *consts, sRenderData *renderData,
 
 	REAL3 envMapping = 0.0;
 #ifdef USE_ENV_MAPPING
-	envMapping = EnvMappingShader(consts, renderData, input);
-	envMapping *= input->material->reflectance;
+	if (allowExtraShading)
+	{
+		envMapping = EnvMappingShader(consts, renderData, input);
+		envMapping *= input->material->reflectance;
 #ifdef USE_TEXTURES
 #ifdef USE_DIFFUSION_TEXTURE
-	envMapping *= TO_REAL3(input->texDiffuse);
+		envMapping *= TO_REAL3(input->texDiffuse);
 #endif
 #endif
-
+	}
 #endif
 
 	REAL3 auxLights = 0.0;
 	REAL3 auxSpecular = 0.0;
 
 #ifdef AUX_LIGHTS
-	auxLights = AuxLightsShader(
-		consts, renderData, input, calcParam, surfaceColor, gradients, &auxSpecular, outShadow);
+	auxLights = AuxLightsShader(consts, renderData, input, calcParam, surfaceColor, gradients,
+		&auxSpecular, outShadow, allowShadows);
 #endif
 
 	REAL3 fakeLights = 0.0;
 	REAL3 fakeLightsSpecular = 0.0;
 #ifdef FAKE_LIGHTS
-	fakeLights =
-		FakeLightsShader(consts, input, calcParam, surfaceColor, gradients, &fakeLightsSpecular,
-			renderData);
+	if (allowExtraShading)
+	{
+		fakeLights =
+			FakeLightsShader(consts, input, calcParam, surfaceColor, gradients, &fakeLightsSpecular,
+				renderData);
+	}
 #endif
 
 	REAL3 iridescence = 1.0;
 #ifdef USE_IRIDESCENCE
-	if (input->material->iridescenceEnabled)
+	if (allowExtraShading && input->material->iridescenceEnabled)
 	{
 		iridescence = IridescenceShader(consts, renderData, input, calcParam);
 	}

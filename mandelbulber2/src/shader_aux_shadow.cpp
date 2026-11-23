@@ -35,6 +35,7 @@
 #include "fractparams.hpp"
 #include "render_data.hpp"
 #include "render_worker.hpp"
+#include "secondary_ray_budgets.h"
 
 sRGBAFloat cRenderWorker::AuxShadow(
 	sShaderInputData &input, const cLight *light, double distance, CVector3 lightVector) const
@@ -45,13 +46,16 @@ sRGBAFloat cRenderWorker::AuxShadow(
 
 	bool cloudMode = params->cloudsEnable;
 
+	// Optional cap for directional lights, which would otherwise march to
+	// viewDistanceMax. 0 means unchanged (unlimited to viewDistanceMax).
+	if (light->type == cLight::lightDirectional && params->shadowRayMaxDistance > 0.0)
+	{
+		distance = std::min(distance, params->shadowRayMaxDistance);
+	}
+
 	double DEFactor = params->DEFactor;
 	if (params->iterFogEnabled || light->volumetric || params->distanceFogShadows) DEFactor = 1.0;
 	if (cloudMode) DEFactor = params->DEFactor * params->volumetricLightDEFactor;
-
-	// remark: for aux light was: i = input.delta;
-	double start = input.distThresh;
-	if (params->interiorMode) start = input.distThresh * DEFactor;
 
 	double softRange;
 	if (params->monteCarloSoftShadows && light->type != cLight::lightDirectional)
@@ -70,10 +74,20 @@ sRGBAFloat cRenderWorker::AuxShadow(
 
 	double maxSoft = 0.0;
 
-	const bool bSoft = !goThrough && !cloudMode && !params->iterFogEnabled
-										 && !params->distanceFogShadows && !params->fogCastShadows
-										 && !params->common.iterThreshMode && !params->interiorMode && softRange > 0.0
-										 && !(params->monteCarloSoftShadows && params->DOFMonteCarlo);
+	const bool simpleShadowCase = !goThrough && !cloudMode && !params->iterFogEnabled
+																&& !params->distanceFogShadows && !params->fogCastShadows
+																&& !params->common.iterThreshMode && !params->interiorMode
+																&& !(params->monteCarloSoftShadows && params->DOFMonteCarlo);
+	const bool bSoft = simpleShadowCase && softRange > 0.0;
+	const bool hardShadow = simpleShadowCase && softRange <= 0.0;
+
+	// Hard shadows do not need the scene's safety factor; full SDF steps are
+	// safe. Soft shadows keep the smaller DEFactor for penumbra density.
+	if (hardShadow) DEFactor = 1.0;
+
+	// remark: for aux light was: i = input.delta;
+	double start = input.distThresh;
+	if (params->interiorMode) start = input.distThresh * DEFactor;
 
 	if (params->DOFMonteCarlo && params->monteCarloSoftShadows)
 	{
@@ -93,6 +107,9 @@ sRGBAFloat cRenderWorker::AuxShadow(
 
 	for (double i = start; i < distance; i += step)
 	{
+		// Dedicated hard budget for shadow rays (maxRaymarchingSteps can be 10000).
+		if (count >= MAX_SHADOW_STEPS || count >= params->maxRaymarchingSteps) break;
+
 		CVector3 point2 = input.point + lightVector * i;
 
 		float dist_thresh;
@@ -286,7 +303,7 @@ sRGBAFloat cRenderWorker::AuxShadow(
 
 		shadowTemp = 1.0 - totalOpacity;
 
-		if ((!goThrough && (dist < dist_thresh || shadowTemp < 0.0))
+		if ((!goThrough && (dist < dist_thresh || shadowTemp < SHADOW_MIN))
 				|| (goThrough && shadowTemp < 0.0001))
 		{
 			if (light->penetrating)

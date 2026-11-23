@@ -46,36 +46,37 @@ CVector3 cRenderWorker::CalculateNormals(const sShaderInputData &input) const
 		double delta = input.distThresh * params->smoothness;
 		if (params->interiorMode) delta = input.distThresh * 0.2 * params->smoothness;
 
-		double sx1, sx2, sy1, sy2, sz1, sz2;
+		// Tetrahedral normal estimator: four diagonal distance samples instead
+		// of six axis-aligned central differences. Same O(h^2) gradient accuracy
+		// with two fewer DE calls per normal.
+		const CVector3 k(1.0, -1.0, -1.0);
+		const CVector3 k0(k.x, k.y, k.y); // k.xyy
+		const CVector3 k1(k.y, k.y, k.x); // k.yyx
+		const CVector3 k2(k.y, k.x, k.y); // k.yxy
+		const CVector3 k3(k.x, k.x, k.x); // k.xxx
+
 		sDistanceOut distanceOut;
-
-		CVector3 deltaX(delta, 0.0, 0.0);
-		sDistanceIn distanceIn1(input.point + deltaX, input.distThresh, true);
-		sx1 = CalculateDistance(*params, *fractal, distanceIn1, &distanceOut, data, &objectStack);
-		data->statistics.totalNumberOfIterations += distanceOut.totalIters;
-		sDistanceIn distanceIn2(input.point - deltaX, input.distThresh, true);
-		sx2 = CalculateDistance(*params, *fractal, distanceIn2, &distanceOut, data, &objectStack);
+		sDistanceIn distanceIn0(input.point + k0 * delta, input.distThresh, true);
+		const double s0 =
+			CalculateDistance(*params, *fractal, distanceIn0, &distanceOut, data, &objectStack);
 		data->statistics.totalNumberOfIterations += distanceOut.totalIters;
 
-		CVector3 deltaY(0.0, delta, 0.0);
-		sDistanceIn distanceIn3(input.point + deltaY, input.distThresh, true);
-		sy1 = CalculateDistance(*params, *fractal, distanceIn3, &distanceOut, data, &objectStack);
-		data->statistics.totalNumberOfIterations += distanceOut.totalIters;
-		sDistanceIn distanceIn4(input.point - deltaY, input.distThresh, true);
-		sy2 = CalculateDistance(*params, *fractal, distanceIn4, &distanceOut, data, &objectStack);
+		sDistanceIn distanceIn1(input.point + k1 * delta, input.distThresh, true);
+		const double s1 =
+			CalculateDistance(*params, *fractal, distanceIn1, &distanceOut, data, &objectStack);
 		data->statistics.totalNumberOfIterations += distanceOut.totalIters;
 
-		CVector3 deltaZ(0.0, 0.0, delta);
-		sDistanceIn distanceIn5(input.point + deltaZ, input.distThresh, true);
-		sz1 = CalculateDistance(*params, *fractal, distanceIn5, &distanceOut, data, &objectStack);
-		data->statistics.totalNumberOfIterations += distanceOut.totalIters;
-		sDistanceIn distanceIn6(input.point - deltaZ, input.distThresh, true);
-		sz2 = CalculateDistance(*params, *fractal, distanceIn6, &distanceOut, data, &objectStack);
+		sDistanceIn distanceIn2(input.point + k2 * delta, input.distThresh, true);
+		const double s2 =
+			CalculateDistance(*params, *fractal, distanceIn2, &distanceOut, data, &objectStack);
 		data->statistics.totalNumberOfIterations += distanceOut.totalIters;
 
-		normal.x = sx1 - sx2;
-		normal.y = sy1 - sy2;
-		normal.z = sz1 - sz2;
+		sDistanceIn distanceIn3(input.point + k3 * delta, input.distThresh, true);
+		const double s3 =
+			CalculateDistance(*params, *fractal, distanceIn3, &distanceOut, data, &objectStack);
+		data->statistics.totalNumberOfIterations += distanceOut.totalIters;
+
+		normal = k0 * s0 + k1 * s1 + k2 * s2 + k3 * s3;
 	}
 
 	// calculating normal vector based on average value of binary central difference

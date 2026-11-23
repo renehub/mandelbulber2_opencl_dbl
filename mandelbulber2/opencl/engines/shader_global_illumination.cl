@@ -43,7 +43,8 @@ REAL3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderDa
 	REAL totalOpacity = 0.0;
 
 	bool finished = false;
-	int maxDepth = (volumetricMode) ? 2 : consts->params.reflectionsMax;
+	// GI depth is capped independently of reflectionsMax (which can be 1000).
+	int maxDepth = (volumetricMode) ? 2 : min((int)consts->params.reflectionsMax, GI_MAX_DEPTH);
 
 	REAL lastReflectance = 0.0;
 	REAL3 lastReflectanceColor = 0.0;
@@ -51,6 +52,8 @@ REAL3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderDa
 
 	for (int rayDepth = 0; rayDepth < maxDepth; rayDepth++)
 	{
+		if (totalOpacity > 1.0) break;
+
 		REAL3 reflectedDirection = inputCopy.normal;
 		REAL randomX = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0;
 		REAL randomY = (Random(20000, &calcParam->randomSeed) - 10000) / 10000.0;
@@ -92,9 +95,14 @@ REAL3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderDa
 		REAL4 resultShader = 0.0;
 		REAL3 newColor = objectColor;
 
+		int giSteps = 0;
 		for (REAL scan = inputCopy.distThresh; scan < consts->params.viewDistanceMax;
 			scan += dist * consts->params.DEFactor)
 		{
+			// Hard budget: protects deep-zoom GI rays with a tiny DE.
+			if (giSteps >= MAX_GI_STEPS) break;
+			giSteps++;
+
 			REAL3 point = inputCopy.point + scan * randomizedDirection;
 
 			REAL distThresh = CalcDistThresh(point, consts);
@@ -132,6 +140,10 @@ REAL3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderDa
 				found = true;
 				break;
 			}
+
+			// No progress: a step much smaller than the local threshold would
+			// otherwise burn the whole budget without reaching the surface.
+			if (dist * consts->params.DEFactor < GI_NO_PROGRESS_EPSILON * distThresh) break;
 		}
 
 		if (found)
@@ -209,7 +221,8 @@ REAL3 GlobalIlumination(__constant sClInConstants *consts, sRenderData *renderDa
 			REAL3 outLuminosityEmissive = 0.0;
 
 			REAL3 objectShader = ObjectShader(consts, renderData, &inputCopy, calcParam, &objectColor,
-				&specular, &iridescence, &outShadow, &outLuminosityEmissive, &alpha, &gradients);
+				&specular, &iridescence, &outShadow, &outLuminosityEmissive, &alpha, &gradients,
+				consts->params.indirectShadingQuality);
 
 			newColor = objectColor;
 			resultShader.xyz = objectShader + outLuminosityEmissive;

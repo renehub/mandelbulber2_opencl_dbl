@@ -336,8 +336,11 @@ void InitParams(std::shared_ptr<cParameterContainer> par)
 	par->addParam("DOF_MC_CA_dispersion_gain", 1.0, 1e-15, 1000.0, morphLinear, paramStandard);
 	par->addParam("DOF_MC_CA_camera_dispersion", 1.0, 1e-15, 1000.0, morphLinear, paramStandard);
 	par->addParam("MC_soft_shadows_enable", false, morphLinear, paramStandard);
+	par->addParam("shadow_ray_max_distance", 0.0, 0.0, 1e15, morphLinear, paramStandard);
 	par->addParam("MC_GI_radiance_limit", 10.0, 0.001, 1e10, morphLinear, paramStandard);
 	par->addParam("MC_GI_use_reflectance", false, morphLinear, paramStandard);
+	par->addParam("indirect_shading_quality", int(params::indirectShadingFull), morphNone,
+		paramStandard, QStringList({"full", "fast", "off"}));
 	par->addParam("MC_denoiser_enable", false, morphLinear, paramStandard);
 	par->addParam("MC_denoiser_strength", 1, 0, 3, morphLinear, paramStandard);
 	par->addParam("MC_denoiser_preserve_geometry", true, morphLinear, paramStandard);
