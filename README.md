@@ -1,6 +1,5 @@
-This fork adds opencl double precision to mandelbulberv2 (https://github.com/buddhi1980/mandelbulber2).
-Code generated using project maya (https://github.com/mw00/project-maya) with the Deepseek V4.1 Flash Maya-XS model.
+This fork adds opencl double precision to mandelbulberv2 (https://github.com/buddhi1980/mandelbulber2) at the cost of a lot of features.
 Appimage can be found here: https://www.rele.be/var/Mandelbulber_v2-x86_64_dbl.AppImage
-(sha256sum: ca2cdd8464c3653b2a7d3fa24f76f2bdf20b5c72aac01548ca6e1637d69103fb)
-This is a proof of concept.
-Thanks and credits to contributers of mandelbulberv2 and deepseek team.
+(sha256sum: 7a794f993953f4f72523d256911a7b333d9c0fa8c534e25b9552597d88c13fcd)
+This is a proof of concept. No warranty.
+Thanks and credits to contributers of mandelbulberv2.
