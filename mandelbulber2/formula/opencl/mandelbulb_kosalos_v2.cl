@@ -49,7 +49,7 @@ REAL4 MandelbulbKosalosV2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 	theta = (theta + fractal->bulb.betaAngleOffset) * power;
 
 	REAL phi = atan2(z.y, z.x) * power;
-	REAL pwr = pow(aux->r, power);
+	REAL pwr = PowR(aux->r, power);
 
 	if (!fractal->transformCommon.addCpixelEnabledFalse) // z = old z + new z
 	{
@@ -67,7 +67,7 @@ REAL4 MandelbulbKosalosV2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 			z.y += cs * native_cos(phi);
 			z.z += pwr * native_sin(theta);
 		}
-		aux->DE += (pow(aux->r, power - 1.0) * power * aux->DE);
+		aux->DE += (PowR(aux->r, power - 1.0) * power * aux->DE);
 		z.z += fractal->transformCommon.offset0;
 	}
 	else // z = f(z) + c
@@ -86,7 +86,7 @@ REAL4 MandelbulbKosalosV2Iteration(REAL4 z, __global sFractalCl *fractal, sExten
 			z.y += cs * native_cos(phi);
 			z.z += pwr * native_sin(theta * power);
 		}
-		aux->DE = (pow(aux->r, power - 1.0) * power * aux->DE);
+		aux->DE = (PowR(aux->r, power - 1.0) * power * aux->DE);
 		z.z += fractal->transformCommon.offset0;
 		c *= fractal->transformCommon.constantMultiplierC111;
 		if (!fractal->transformCommon.functionEnabledyFalse)

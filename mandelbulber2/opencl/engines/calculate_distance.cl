@@ -56,22 +56,24 @@
 #define APPLY_DISPLACEMENT
 #endif
 
-// calculation of distance where ray-marching stops
-REAL CalcDistThresh(REAL3 point, __constant sClInConstants *consts)
+// calculation of distance where ray-marching stops, from an already computed
+// length(consts->params.camera - point). Callers that also need CalcDelta can
+// share the same distance instead of evaluating the length twice.
+REAL CalcDistThreshFromCameraDistance(
+	REAL cameraDistance, __constant sClInConstants *consts)
 {
 	REAL distThresh;
 	if (consts->params.common.iterThreshMode)
 	{
-		distThresh =
-			length(consts->params.camera - point) * consts->params.resolution * consts->params.fov;
+		distThresh = cameraDistance * consts->params.resolution * consts->params.fov;
 	}
 	else
 	{
 		if (consts->params.constantDEThreshold)
 			distThresh = consts->params.DEThresh;
 		else
-			distThresh = length(consts->params.camera - point) * consts->params.resolution
-									 * consts->params.fov / consts->params.detailLevel;
+			distThresh = cameraDistance * consts->params.resolution * consts->params.fov
+									 / consts->params.detailLevel;
 	}
 
 #if defined(PERSP_EQUIRECTANGULAR)
@@ -92,11 +94,15 @@ REAL CalcDistThresh(REAL3 point, __constant sClInConstants *consts)
 	return distThresh;
 }
 
-// calculation of "voxel" size
-REAL CalcDelta(REAL3 point, __constant sClInConstants *consts)
+REAL CalcDistThresh(REAL3 point, __constant sClInConstants *consts)
 {
-	REAL delta;
-	delta = length(consts->params.camera - point) * consts->params.resolution * consts->params.fov;
+	return CalcDistThreshFromCameraDistance(length(consts->params.camera - point), consts);
+}
+
+// calculation of "voxel" size, from an already computed camera distance
+REAL CalcDeltaFromCameraDistance(REAL cameraDistance, __constant sClInConstants *consts)
+{
+	REAL delta = cameraDistance * consts->params.resolution * consts->params.fov;
 
 #if defined(PERSP_EQUIRECTANGULAR)
 	delta *= 0.5;
@@ -106,6 +112,11 @@ REAL CalcDelta(REAL3 point, __constant sClInConstants *consts)
 	delta = max(delta, 1e-6f);
 #endif
 	return delta;
+}
+
+REAL CalcDelta(REAL3 point, __constant sClInConstants *consts)
+{
+	return CalcDeltaFromCameraDistance(length(consts->params.camera - point), consts);
 }
 
 formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, REAL3 point,
@@ -213,28 +224,34 @@ formulaOut CalculateDistanceSimple(__constant sClInConstants *consts, REAL3 poin
 		if (calcParam->normalCalculationMode) maxiter = false;
 #endif
 
-		REAL3 deltas[6];
-		deltas[0] = (REAL3){delta, 0.0, 0.0};
-		deltas[1] = (REAL3){-delta, 0.0, 0.0};
-		deltas[2] = (REAL3){0.0, delta, 0.0};
-		deltas[3] = (REAL3){0.0, -delta, 0.0};
-		deltas[4] = (REAL3){0.0, 0.0, delta};
-		deltas[5] = (REAL3){0.0, 0.0, -delta};
-
-		REAL rDelta[6];
-		for (int i = 0; i < 6; i++)
+		// Tetrahedral delta-DE gradient: four diagonal samples instead of six
+		// axis-aligned central differences (same pattern as NormalVector()).
+		const REAL3 k = (REAL3){1.0, -1.0, -1.0};
+		REAL rDelta[4];
+		rDelta[0] = length(Fractal(consts, point + k.xyy * delta, calcParam, calcModeDeltaDE2, NULL,
+			internalObjectId, renderData, hybridSequenceIndex, point, false)
+				.z);
+		rDelta[1] = length(Fractal(consts, point + k.yyx * delta, calcParam, calcModeDeltaDE2, NULL,
+			internalObjectId, renderData, hybridSequenceIndex, point, false)
+				.z);
+		rDelta[2] = length(Fractal(consts, point + k.yxy * delta, calcParam, calcModeDeltaDE2, NULL,
+			internalObjectId, renderData, hybridSequenceIndex, point, false)
+				.z);
+		rDelta[3] = length(Fractal(consts, point + k.xxx * delta, calcParam, calcModeDeltaDE2, NULL,
+			internalObjectId, renderData, hybridSequenceIndex, point, false)
+				.z);
+		for (int i = 0; i < 4; i++)
 		{
-			rDelta[i] = length(Fractal(consts, point + deltas[i], calcParam, calcModeDeltaDE2, NULL,
-				internalObjectId, renderData, hybridSequenceIndex, point, false)
-					.z);
 			if (isnan(rDelta[i]) || isinf(rDelta[i]))
 			{
 				rDelta[i] = 0.0;
 			}
+			// The common r term cancels because sum(k) = 0; subtracting it first
+			// keeps the differences small and avoids cancellation.
+			rDelta[i] -= r;
 		}
-		dr.x = min(fabs(rDelta[0] - r), fabs(rDelta[1] - r)) / delta;
-		dr.y = min(fabs(rDelta[2] - r), fabs(rDelta[3] - r)) / delta;
-		dr.z = min(fabs(rDelta[4] - r), fabs(rDelta[5] - r)) / delta;
+		dr = (k.xyy * rDelta[0] + k.yyx * rDelta[1] + k.yxy * rDelta[2] + k.xxx * rDelta[3]) /
+				 (4.0 * delta);
 
 		REAL d = length(dr);
 

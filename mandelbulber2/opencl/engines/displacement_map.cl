@@ -93,7 +93,8 @@ REAL3 FractalizeTexture(REAL3 point, __constant sClInConstants *consts, sClCalcP
 		outF = Fractal(consts, point, calcParams, calcModeCubeOrbitTrap, mat, -1, renderData,
 			sequenceIndex, point, false);
 		pointFractalized = outF.z.xyz;
-		*reduceDisplacement = pow(2.0, outF.iters);
+		// 2^iters is exact as an exponent-bit construction; iters is integer-valued.
+		*reduceDisplacement = ldexp((REAL)1.0, (int)outF.iters);
 	}
 
 	return pointFractalized;

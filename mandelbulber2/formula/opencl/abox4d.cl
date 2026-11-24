@@ -47,7 +47,7 @@ REAL4 Abox4dIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 
 	REAL rr = dot(z, z);
 	rrCol = rr;
-	if (fractal->mandelboxVary4D.rPower != 1.0) rr = pow(rr, fractal->mandelboxVary4D.rPower);
+	if (fractal->mandelboxVary4D.rPower != 1.0) rr = PowR(rr, fractal->mandelboxVary4D.rPower);
 
 	z += fractal->transformCommon.offset0000;
 	if (rr < fractal->transformCommon.minR2p25)

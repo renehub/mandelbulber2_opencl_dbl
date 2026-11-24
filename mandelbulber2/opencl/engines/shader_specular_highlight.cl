@@ -71,7 +71,13 @@ REAL3 SpecularHighlight(sShaderInputDataCl *input, sClCalcParams *calcParam, REA
 	}
 #endif
 
+#ifdef DOUBLE_PRECISION
+	// On the tested NVIDIA double-precision driver pow() is ~2.5x slower than
+	// exp(log(x) * exponent) for this non-integer exponent.
+	specular = exp(log(specular) * (30.0 / specularWidth / diffuse)) / diffuse;
+#else
 	specular = pow(specular, 30.0 / specularWidth / diffuse) / diffuse;
+#endif
 
 	if (roughness > 0.0)
 	{

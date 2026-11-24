@@ -32,13 +32,13 @@ REAL4 TransfBenesiT5bIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	// z.z = (z.z > 0) ? 1e-21 : -1e-21;
 	REAL4 tempV2 = z;
 	tempV2.x =
-		fabs(pow(pow(z.y, fractal->transformCommon.int8X) + pow(z.z, fractal->transformCommon.int8X),
+		fabs(PowR(PowR(z.y, fractal->transformCommon.int8X) + PowR(z.z, fractal->transformCommon.int8X),
 			fractal->transformCommon.power025.x));
 	tempV2.y =
-		fabs(pow(pow(z.x, fractal->transformCommon.int8Y) + pow(z.z, fractal->transformCommon.int8Y),
+		fabs(PowR(PowR(z.x, fractal->transformCommon.int8Y) + PowR(z.z, fractal->transformCommon.int8Y),
 			fractal->transformCommon.power025.y));
 	tempV2.z =
-		fabs(pow(pow(z.x, fractal->transformCommon.int8Z) + pow(z.y, fractal->transformCommon.int8Z),
+		fabs(PowR(PowR(z.x, fractal->transformCommon.int8Z) + PowR(z.y, fractal->transformCommon.int8Z),
 			fractal->transformCommon.power025.z));
 	z = (fabs(tempV2 - fractal->transformCommon.offsetC111)) * fractal->transformCommon.scale3Dd222;
 

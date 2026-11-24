@@ -64,7 +64,7 @@ REAL4 BoxFold4dBulbPow2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 		REAL rr = dot(z, z);
 
 		// r power
-		if (fractal->mandelboxVary4D.rPower != 1.0) rr = pow(rr, fractal->mandelboxVary4D.rPower);
+		if (fractal->mandelboxVary4D.rPower != 1.0) rr = PowR(rr, fractal->mandelboxVary4D.rPower);
 		rrCol = rr;
 		// spherical fold
 		z += fractal->transformCommon.offset0000;

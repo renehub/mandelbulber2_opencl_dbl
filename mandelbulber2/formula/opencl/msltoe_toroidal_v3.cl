@@ -65,7 +65,7 @@ REAL4 MsltoeToroidalV3Iteration(REAL4 z, __global sFractalCl *fractal, sExtended
 
 	r = r + (aux->r - r) * fractal->transformCommon.offsetR0;
 
-	REAL rp = pow(r, fractal->bulb.power - 1.0) / fractal->transformCommon.scaleB1;
+	REAL rp = PowR(r, fractal->bulb.power - 1.0) / fractal->transformCommon.scaleB1;
 	aux->DE = rp * aux->DE * (fractal->bulb.power + fractal->analyticDE.offset1) + 1.0;
 	rp *= r;
 

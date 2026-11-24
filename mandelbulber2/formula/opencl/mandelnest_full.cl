@@ -18,14 +18,14 @@
 REAL4 MandelnestFullIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
 	REAL Power = fractal->bulb.power;
-	aux->DE = pow(aux->r, Power - 1.0) * aux->DE * Power + 1.0;
+	aux->DE = PowR(aux->r, Power - 1.0) * aux->DE * Power + 1.0;
 	// Dual +
 	REAL4 zp = z;
 	REAL M0 = length(zp);
 	zp.x = asin(zp.x / M0); // dual+
 	zp.y = asin(zp.y / M0);
 	zp.z = asin(zp.z / M0);
-	M0 = pow(M0, Power);
+	M0 = PowR(M0, Power);
 	zp *= Power;
 
 	zp.x = native_sin(zp.x);
@@ -44,7 +44,7 @@ REAL4 MandelnestFullIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 	zm.x = -asin(zm.x / M0); // dual-
 	zm.y = -asin(zm.y / M0);
 	zm.z = -asin(zm.z / M0);
-	M0 = pow(M0, Power);
+	M0 = PowR(M0, Power);
 	zm *= Power;
 
 	zm.x = native_sin(zm.x);

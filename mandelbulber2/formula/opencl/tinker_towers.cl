@@ -233,7 +233,7 @@ REAL4 TinkerTowersIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxC
 
 	// zXYZ ray hits unit sphere first.
 
-	REAL rp = pow(mag_zXYZ, power - 1.0); // what about julia bulb or proper bulb
+	REAL rp = PowR(mag_zXYZ, power - 1.0); // what about julia bulb or proper bulb
 
 	aux->DE = rp * aux->DE * power + 1.0;
 

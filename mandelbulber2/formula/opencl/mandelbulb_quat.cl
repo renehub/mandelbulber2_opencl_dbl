@@ -184,7 +184,7 @@ REAL4 MandelbulbQuatIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		else
 			ph0 += atan(v.y / v.z);
 
-		REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
+		REAL rp = PowR(aux->r, fractal->bulb.power - 1.0);
 		REAL th = th0 * fractal->bulb.power * fractal->transformCommon.scaleA1;
 		REAL ph = ph0 * fractal->bulb.power * fractal->transformCommon.scaleB1;
 

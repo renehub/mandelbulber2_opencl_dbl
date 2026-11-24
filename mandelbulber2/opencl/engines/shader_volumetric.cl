@@ -105,8 +105,9 @@ REAL4 VolumetricShader(__constant sClInConstants *consts, sRenderData *renderDat
 		REAL3 point = input->point - input->viewVector * scan;
 
 		input2.point = point;
-		input2.distThresh = CalcDistThresh(point, consts);
-		input2.delta = CalcDelta(point, consts);
+		const REAL cameraDistance = length(consts->params.camera - point);
+		input2.distThresh = CalcDistThreshFromCameraDistance(cameraDistance, consts);
+		input2.delta = CalcDeltaFromCameraDistance(cameraDistance, consts);
 
 		calcParam->distThresh = input2.distThresh;
 		calcParam->detailSize = input2.distThresh;

@@ -50,7 +50,7 @@ REAL4 MandelbulbTailsV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtende
 
 	ph = (ph + fractal->bulb.alphaAngleOffset) * fractal->bulb.power;
 
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
+	REAL rp = PowR(aux->r, fractal->bulb.power - 1.0);
 	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 	rp *= aux->r;
 	REAL cth = native_cos(th);

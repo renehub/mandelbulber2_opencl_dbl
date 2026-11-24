@@ -41,7 +41,7 @@ REAL4 MandelbulbPupukuIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		(t + fractal->bulb.betaAngleOffset) * fractal->bulb.power * fractal->transformCommon.scaleA1;
 	REAL ph = (atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset) * fractal->bulb.power
 						* fractal->transformCommon.scaleB1;
-	REAL rp = pow(aux->r, fractal->bulb.power - fractal->transformCommon.offset1);
+	REAL rp = PowR(aux->r, fractal->bulb.power - fractal->transformCommon.offset1);
 
 	if (fractal->transformCommon.functionEnabledXFalse
 			&& aux->i >= fractal->transformCommon.startIterationsX

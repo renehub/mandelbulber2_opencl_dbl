@@ -325,8 +325,14 @@ formulaOut Fractal(__constant sClInConstants *consts, REAL3 point, sClCalcParams
 				if (fractDataArray[sequence].useAdditionalBailoutCond)
 				{
 					out.maxiter = false;
-					if (length(z - lastZ) / aux.r < 0.1 / fractDataArray[sequence].bailout) break;
-					if (length(z - lastLastZ) / aux.r < 0.1 / fractDataArray[sequence].bailout) break;
+					// Compare in squared space to avoid two sqrt() calls per iteration:
+					// length(z - lastZ) / aux.r < 0.1 / bailout is equivalent to
+					// dot(z - lastZ, z - lastZ) < (0.1 / bailout * aux.r)^2.
+					const REAL additionalBailout = 0.1 / fractDataArray[sequence].bailout;
+					const REAL maxDelta = additionalBailout * aux.r;
+					const REAL maxDeltaSquared = maxDelta * maxDelta;
+					if (dot(z - lastZ, z - lastZ) < maxDeltaSquared) break;
+					if (dot(z - lastLastZ, z - lastLastZ) < maxDeltaSquared) break;
 				}
 			}
 			else if (mode == calcModeDeltaDE2)

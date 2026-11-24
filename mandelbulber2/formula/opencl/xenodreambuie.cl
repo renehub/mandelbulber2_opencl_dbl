@@ -17,7 +17,7 @@
 
 REAL4 XenodreambuieIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux)
 {
-	REAL rp = pow(aux->r, fractal->bulb.power - 1.0);
+	REAL rp = PowR(aux->r, fractal->bulb.power - 1.0);
 	aux->DE = rp * aux->DE * fractal->bulb.power + 1.0;
 	rp *= aux->r;
 

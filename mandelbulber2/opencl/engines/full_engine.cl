@@ -44,17 +44,32 @@ int GetInteger(int byte, __global char *array)
 kernel void fractal3D(__global sClPixel *out, __global char *inBuff, __global char *inTextureBuff,
 	__constant sClInConstants *consts, image2d_t image2dBackground, __global uchar *perlinNoiseSeeds,
 	int initRandomSeed, REAL2 antiAliasingOffset, cl_int sequenceSize, cl_int jobWidth,
-	__global cl_int *inPixelSequence)
+	__global cl_int *inPixelSequence, cl_int jobHeight, cl_int use2D)
 {
-	// get actual pixel
-	const int cl_offsetX = get_global_offset(0) % consts->params.imageWidth;
-	const int cl_offsetY = get_global_offset(0) / consts->params.imageWidth;
-
-	int imageX = inPixelSequence[get_global_id(0) - get_global_offset(0)] % jobWidth + cl_offsetX;
-	const int imageY =
-		inPixelSequence[get_global_id(0) - get_global_offset(0)] / jobWidth + cl_offsetY;
-
-	const int buffIndex = (imageX - cl_offsetX) + (imageY - cl_offsetY) * jobWidth;
+	// Pixel mapping: a 2D NDRange for unmasked tiles, otherwise the 1D pixel
+	// sequence used by monte-carlo / masked rendering.
+	int imageX, imageY, buffIndex;
+	const int cl_offsetX = use2D ? get_global_offset(0)
+															 : get_global_offset(0) % consts->params.imageWidth;
+	const int cl_offsetY = use2D ? get_global_offset(1)
+															 : get_global_offset(0) / consts->params.imageWidth;
+	if (use2D)
+	{
+		const int localX = get_global_id(0) - get_global_offset(0);
+		const int localY = get_global_id(1) - get_global_offset(1);
+		if (localX >= jobWidth || localY >= jobHeight) return;
+		imageX = cl_offsetX + localX;
+		imageY = cl_offsetY + localY;
+		buffIndex = localX + localY * jobWidth;
+	}
+	else
+	{
+		const int sequenceIndex = get_global_id(0) - get_global_offset(0);
+		if (sequenceIndex >= sequenceSize) return;
+		imageX = inPixelSequence[sequenceIndex] % jobWidth + cl_offsetX;
+		imageY = inPixelSequence[sequenceIndex] / jobWidth + cl_offsetY;
+		buffIndex = (imageX - cl_offsetX) + (imageY - cl_offsetY) * jobWidth;
+	}
 
 	// randomizing random seed
 	int randomSeed = imageX + imageY * consts->params.imageWidth + initRandomSeed;
@@ -428,7 +443,11 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff, __global ch
 #ifndef PERSP_FISH_EYE_CUT
 
 #ifdef PERSP_EQUIRECTANGULAR // reduce of stereo effect on poles
-		REAL stereoIntensity = 1.0 - pow(normalizedScreenPoint.y * 2.0, 10.0);
+		// x^10 by explicit multiplies: pow() is an exp2/log2 pair in double.
+		REAL stereoTerm = normalizedScreenPoint.y * 2.0;
+		REAL stereoTerm2 = stereoTerm * stereoTerm;
+		REAL stereoTerm4 = stereoTerm2 * stereoTerm2;
+		REAL stereoIntensity = 1.0 - stereoTerm4 * stereoTerm4 * stereoTerm2;
 #else
 		REAL stereoIntensity = 1.0;
 #endif
@@ -555,6 +574,7 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff, __global ch
 			pixel.image.s0 = pixelRightColor.s0;
 			pixel.image.s1 = pixelLeftColor.s1;
 			pixel.image.s2 = pixelLeftColor.s2;
+			pixel.image.s3 = 0.0f;
 			pixel.zBuffer = depth;
 			pixel.color = convert_uchar3(objectColour * 256.0);
 			pixel.opacity = opacity * 65535;
@@ -568,9 +588,9 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff, __global ch
 #else // no STEREO_REYCYAN
 
 #ifdef CHROMATIC_ABERRATION
-	pixel.image = convert_float3(resultShader.xyz * rgbFromHsv);
+	pixel.image = (float4)(convert_float3(resultShader.xyz * rgbFromHsv), 0.0f);
 #else
-	pixel.image = convert_float3(resultShader.xyz);
+	pixel.image = convert_float4(resultShader);
 #endif
 
 	pixel.zBuffer = depth;
@@ -580,6 +600,8 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff, __global ch
 	REAL3 pixelNormalWorld = normalize(normal);
 	pixel.normalWorld = convert_float3(pixelNormalWorld);
 
+	// sClPixel is an ALIGN16 float-only struct. All double->float demotions
+	// happen above; the final out[buffIndex] assignment is one aligned store.
 #ifdef OPTIONAL_IMAGE_CHANNELS
 	REAL3 pixelNormalRotated = Matrix33MulFloat3(rotInv, pixelNormalWorld);
 	pixel.normal.s0 = (1.0 + pixelNormalRotated.x) / 2.0;

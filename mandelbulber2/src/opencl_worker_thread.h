@@ -38,6 +38,7 @@
 #ifdef USE_OPENCL
 
 #include <memory>
+#include <vector>
 
 #include <QObject>
 
@@ -64,6 +65,7 @@ public:
 	void setImageWidth(quint64 imageWidth) { this->imageWidth = imageWidth; }
 	void setOptimalStepX(quint64 optimalStepX) { this->optimalStepX = optimalStepX; }
 	void setOptimalStepY(quint64 optimalStepY) { this->optimalStepY = optimalStepY; }
+	void setLocalWorkSize(int _localWorkSize) { localWorkSize = _localWorkSize; }
 	void setHardware(cOpenClHardware *_hardware) { hardware = _hardware; }
 	void setClKernel(const std::shared_ptr<cl::Kernel> &clKernel) { this->clKernel = clKernel; }
 	void setClQueue(const std::shared_ptr<cl::CommandQueue> &clQueue) { this->clQueue = clQueue; }
@@ -93,16 +95,47 @@ public:
 	bool wasFishedWithSuccess() { return finishedWithSuccess; }
 
 private:
-	bool ProcessClQueue(
-		quint64 jobX, quint64 jobY, quint64 pixelsLeftX, quint64 pixelsLeftY, quint64 seqienceSize);
+	struct sPendingOutput
+	{
+		bool valid = false;
+		int bufferIndex = 0;
+		cl::Event readEvent;
+		quint64 jobX = 0;
+		quint64 jobY = 0;
+		quint64 gridX = 0;
+		quint64 gridY = 0;
+		quint64 tileIndex = 0;
+		quint64 jobWidth = 0;
+		quint64 jobHeight = 0;
+		quint64 sequenceSize = 0;
+		int monteCarloLoop = 0;
+		int aaDepth = 0;
+		std::vector<cl_int> pixelSequence;
+	};
+
+	bool ProcessClQueue(quint64 jobX, quint64 jobY, quint64 pixelsLeftX, quint64 pixelsLeftY,
+		quint64 seqienceSize, int asyncOutputBuffer = -1);
 	static bool checkErr(cl_int err, QString functionName);
 	bool AddAntiAliasingParameters(int actualDepth, int repeatIndex);
 	quint64 UpdatePixelSequence(
 		quint64 jobX, quint64 jobY, quint64 jobWidth, quint64 jobHeight, qint64 imageWidth);
+	bool InitAsyncOutput();
+	bool EnqueueAsyncOutputRead(int bufferIndex, cl::Event &readEvent);
+	bool ProcessPendingOutput();
+	void QueuePendingOutput(quint64 jobX, quint64 jobY, quint64 gridX, quint64 gridY,
+		quint64 tileIndex, quint64 jobWidth, quint64 jobHeight, quint64 sequenceSize,
+		int monteCarloLoop, int aaDepth, int bufferIndex, const cl::Event &readEvent);
 
 	cOpenClHardware *hardware;
 	std::shared_ptr<cl::Kernel> clKernel;
 	std::shared_ptr<cl::CommandQueue> clQueue;
+	std::shared_ptr<cl::CommandQueue> readQueue;
+	std::shared_ptr<cl::Buffer> asyncOutputBuffers[2];
+	std::vector<char> asyncHostBuffers[2];
+	cl::Event lastKernelEvent;
+	sPendingOutput pendingOutput;
+	int asyncBufferIndex;
+	bool asyncOutputEnabled;
 
 	std::shared_ptr<cOpenCLWorkerOutputQueue> outputQueue;
 	std::shared_ptr<cOpenClScheduler> scheduler;
@@ -129,6 +162,7 @@ private:
 	int antiAliasingDepth;
 	int isFullEngine;
 	int maxWorkgroupSize;
+	int localWorkSize;
 	QString settingsFile;
 
 	const int deviceIndex;

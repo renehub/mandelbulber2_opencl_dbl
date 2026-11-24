@@ -114,12 +114,12 @@ REAL4 PseudoKleinianMod5Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	{
 		REAL4 lpN = fabs(z);
 		REAL pr = fractal->transformCommon.scale2;
-		lpN.x = pow(lpN.x, pr);
-		lpN.y = pow(lpN.y, pr);
-		lpN.z = pow(lpN.z, pr);
-		pNorm = pow((lpN.x + lpN.y + lpN.z), 1.0 / pr);
+		lpN.x = PowR(lpN.x, pr);
+		lpN.y = PowR(lpN.y, pr);
+		lpN.z = PowR(lpN.z, pr);
+		pNorm = PowR((lpN.x + lpN.y + lpN.z), 1.0 / pr);
 
-		pNorm = pow(pNorm, fractal->transformCommon.scaleA2);
+		pNorm = PowR(pNorm, fractal->transformCommon.scaleA2);
 		pNorm = max(pNorm, fractal->transformCommon.offset02);
 
 		REAL useScale = fractal->transformCommon.scale1p1 - aux->actualScaleA;

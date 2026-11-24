@@ -83,7 +83,7 @@ REAL4 MandelbulbSinCosV4Iteration(REAL4 z, __global sFractalCl *fractal, sExtend
 	ph = (ph + fractal->bulb.alphaAngleOffset)
 			 * (fractal->bulb.power + fractal->transformCommon.offsetA0);
 
-	REAL rp = pow(aux->r, (fractal->bulb.power - 1.0) * fractal->transformCommon.scaleA1);
+	REAL rp = PowR(aux->r, (fractal->bulb.power - 1.0) * fractal->transformCommon.scaleA1);
 	aux->DE = aux->DE * rp * fabs(fractal->bulb.power) + 1.0;
 	rp *= aux->r * fractal->transformCommon.scaleB1;
 

@@ -30,7 +30,7 @@ REAL4 MandelbulbPlusZIteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 
 	REAL theta = (asin(z.z / aux->r) + fractal->bulb.betaAngleOffset) * fractal->transformCommon.int2;
 	REAL phi = (atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset) * fractal->transformCommon.int2;
-	REAL rp = pow(aux->r, fractal->transformCommon.int2 - 1.0);
+	REAL rp = PowR(aux->r, fractal->transformCommon.int2 - 1.0);
 	aux->DE = rp * aux->DE * fractal->transformCommon.int2 + 1.0;
 
 	rp *= aux->r;

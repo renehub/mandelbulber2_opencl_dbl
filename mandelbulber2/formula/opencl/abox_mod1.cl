@@ -57,7 +57,7 @@ REAL4 AboxMod1Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *a
 			&& aux->i >= fractal->transformCommon.startIterationsK
 			&& aux->i < fractal->transformCommon.stopIterationsK)
 	{
-		rr = pow(rr, fractal->mandelboxVary4D.rPower);
+		rr = PowR(rr, fractal->mandelboxVary4D.rPower);
 	}
 
 	if (rr < fractal->transformCommon.minR0)

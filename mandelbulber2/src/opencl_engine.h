@@ -58,6 +58,8 @@ public:
 		sOptimalJob() {}
 
 		quint64 workGroupSize{0};
+		quint64 localWorkSize{0};
+		quint64 kernelPrivateMemSize{0};
 		quint64 workGroupSizeOptimalMultiplier{0};
 		quint64 stepSize{0};
 		quint64 stepSizeX{0};

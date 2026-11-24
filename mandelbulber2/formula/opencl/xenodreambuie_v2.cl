@@ -42,7 +42,7 @@ REAL4 XenodreambuieV2Iteration(REAL4 z, __global sFractalCl *fractal, sExtendedA
 	REAL ph = (atan2(z.y, z.x) + fractal->bulb.alphaAngleOffset) * fractal->bulb.power
 						* fractal->transformCommon.scaleB1;
 
-	REAL rp = pow(aux->r, fractal->bulb.power - fractal->transformCommon.offset1);
+	REAL rp = PowR(aux->r, fractal->bulb.power - fractal->transformCommon.offset1);
 
 	if (aux->i >= fractal->transformCommon.startIterationsX
 			&& aux->i < fractal->transformCommon.stopIterationsX)

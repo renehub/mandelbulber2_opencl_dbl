@@ -71,6 +71,9 @@ cOpenClWorkerThread::cOpenClWorkerThread(
 	antiAliasingDepth = 0;
 	isFullEngine = false;
 	maxWorkgroupSize = 0;
+	localWorkSize = 0;
+	asyncBufferIndex = 0;
+	asyncOutputEnabled = false;
 }
 
 cOpenClWorkerThread::~cOpenClWorkerThread()
@@ -105,6 +108,10 @@ void cOpenClWorkerThread::ProcessRenderingLoop()
 
 	int actualAADepth = 0;
 	int actualAARepeatIndex = 0;
+
+	// One-tile lookahead: compute tile N+1 while tile N is copied back on a
+	// separate queue. Only the unmasked 2D full-engine path is pipelined.
+	asyncOutputEnabled = InitAsyncOutput();
 
 	for (int monteCarloLoop = 1; monteCarloLoop <= maxMonteCarloSamples; monteCarloLoop++)
 	{
@@ -144,6 +151,7 @@ void cOpenClWorkerThread::ProcessRenderingLoop()
 
 			if (*stopRequest || systemData.globalStopRequest)
 			{
+				if (asyncOutputEnabled) ProcessPendingOutput();
 				emit finished();
 				finishedWithSuccess = false;
 				return;
@@ -152,50 +160,75 @@ void cOpenClWorkerThread::ProcessRenderingLoop()
 			if (jobX < imageWidth && jobY < imageHeight)
 			{
 				openclProcessingTime.restart();
-				int result = ProcessClQueue(jobX, jobY, pixelsLeftX, pixelsLeftY, sequenceSize);
+				const int writeBuffer = asyncOutputEnabled ? asyncBufferIndex : -1;
+				int result = ProcessClQueue(
+					jobX, jobY, pixelsLeftX, pixelsLeftY, sequenceSize, writeBuffer);
 				if (!result)
 				{
+					if (asyncOutputEnabled) ProcessPendingOutput();
 					emit finished();
 					finishedWithSuccess = false;
 					return;
 				}
 
-				result = engine->ReadBuffersFromQueue(deviceIndex);
-				if (!result)
+				if (asyncOutputEnabled)
 				{
-					emit finished();
-					finishedWithSuccess = false;
-					return;
+					cl::Event readEvent;
+					if (!EnqueueAsyncOutputRead(writeBuffer, readEvent))
+					{
+						emit finished();
+						finishedWithSuccess = false;
+						return;
+					}
+
+					// Process the previous tile while this tile's kernel runs.
+					if (!ProcessPendingOutput())
+					{
+						emit finished();
+						finishedWithSuccess = false;
+						return;
+					}
+
+					QueuePendingOutput(jobX, jobY, gridX, gridY, tile, jobWidth, jobHeight,
+						sequenceSize, monteCarloLoop, actualAADepth, writeBuffer, readEvent);
+					asyncBufferIndex ^= 1;
 				}
+				else
+				{
+					result = engine->ReadBuffersFromQueue(deviceIndex);
+					if (!result)
+					{
+						emit finished();
+						finishedWithSuccess = false;
+						return;
+					}
 
-				//				qDebug() << "finished tile" << tile << gridX << gridY << jobX << jobY << jobWidth
-				//								 << jobHeight;
+					openclprocessingTimeNanoSeconds = openclProcessingTime.nsecsElapsed();
 
-				openclprocessingTimeNanoSeconds = openclProcessingTime.nsecsElapsed();
+					quint64 outputItemSize = outputBuffers.at(outputIndex).itemSize;
+					quint64 outputItemlength = outputBuffers.at(outputIndex).length;
+					cOpenCLWorkerOutputQueue::sClDataBuffer dataBuffer(outputItemSize, outputItemlength);
 
-				quint64 outputItemSize = outputBuffers.at(outputIndex).itemSize;
-				quint64 outputItemlength = outputBuffers.at(outputIndex).length;
-				cOpenCLWorkerOutputQueue::sClDataBuffer dataBuffer(outputItemSize, outputItemlength);
+					char *startPtr = outputBuffers.at(outputIndex).ptr.get();
+					char *endPtr = startPtr + outputBuffers.at(outputIndex).size();
+					dataBuffer.data.assign(startPtr, endPtr);
 
-				char *startPtr = outputBuffers.at(outputIndex).ptr.get();
-				char *endPtr = startPtr + outputBuffers.at(outputIndex).size();
-				dataBuffer.data.assign(startPtr, endPtr);
+					cOpenCLWorkerOutputQueue::sClSingleOutput outputDataForQueue;
+					outputDataForQueue.jobX = jobX;
+					outputDataForQueue.jobY = jobY;
+					outputDataForQueue.gridX = gridX;
+					outputDataForQueue.gridY = gridY;
+					outputDataForQueue.tileIndex = tile;
+					outputDataForQueue.jobWidth = jobWidth;
+					outputDataForQueue.jobHeight = jobHeight;
+					outputDataForQueue.monteCarloLoop = monteCarloLoop;
+					outputDataForQueue.aaDepth = actualAADepth;
+					outputDataForQueue.outputBuffers.append(dataBuffer);
+					outputDataForQueue.pixelSequence = inPixelSequenceBuffer;
+					outputDataForQueue.sequenceSize = sequenceSize;
 
-				cOpenCLWorkerOutputQueue::sClSingleOutput outputDataForQueue;
-				outputDataForQueue.jobX = jobX;
-				outputDataForQueue.jobY = jobY;
-				outputDataForQueue.gridX = gridX;
-				outputDataForQueue.gridY = gridY;
-				outputDataForQueue.tileIndex = tile;
-				outputDataForQueue.jobWidth = jobWidth;
-				outputDataForQueue.jobHeight = jobHeight;
-				outputDataForQueue.monteCarloLoop = monteCarloLoop;
-				outputDataForQueue.aaDepth = actualAADepth;
-				outputDataForQueue.outputBuffers.append(dataBuffer);
-				outputDataForQueue.pixelSequence = inPixelSequenceBuffer;
-				outputDataForQueue.sequenceSize = sequenceSize;
-
-				outputQueue->AddToQueue(&outputDataForQueue);
+					outputQueue->AddToQueue(&outputDataForQueue);
+				}
 			}
 
 			// slow down to reduce length of queue
@@ -205,6 +238,14 @@ void cOpenClWorkerThread::ProcessRenderingLoop()
 				Wait((queueLength - 200));
 			}
 		} // next tile
+
+		// Drain the last lookahead tile before reporting progress/finishing.
+		if (asyncOutputEnabled && !ProcessPendingOutput())
+		{
+			emit finished();
+			finishedWithSuccess = false;
+			return;
+		}
 
 		if (*stopRequest || systemData.globalStopRequest)
 		{
@@ -230,8 +271,8 @@ void cOpenClWorkerThread::ProcessRenderingLoop()
 	emit finished();
 }
 
-bool cOpenClWorkerThread::ProcessClQueue(
-	quint64 jobX, quint64 jobY, quint64 pixelsLeftX, quint64 pixelsLeftY, quint64 sequenceSize)
+bool cOpenClWorkerThread::ProcessClQueue(quint64 jobX, quint64 jobY, quint64 pixelsLeftX,
+	quint64 pixelsLeftY, quint64 sequenceSize, int asyncOutputBuffer)
 {
 	size_t stepSizeX = optimalStepX;
 	if (pixelsLeftX < stepSizeX) stepSizeX = pixelsLeftX;
@@ -239,16 +280,48 @@ bool cOpenClWorkerThread::ProcessClQueue(
 	if (pixelsLeftY < stepSizeY) stepSizeY = pixelsLeftY;
 
 	cl_int err = 0;
+	const bool use2D = isFullEngine && pixelMask && pixelMask->empty();
 
-	if (sequenceSize == 0)
+	if (asyncOutputBuffer >= 0)
 	{
-		err = clQueue->enqueueNDRangeKernel(
-			*clKernel, cl::NDRange(jobX, jobY), cl::NDRange(stepSizeX, stepSizeY), cl::NullRange);
+		err = clKernel->setArg(0, *asyncOutputBuffers[asyncOutputBuffer]);
+		if (!checkErr(err, "kernel->setArg(0, async output buffer)")) return false;
+	}
+
+	if (use2D)
+	{
+		size_t localX = 8;
+		size_t localY = 8;
+		if (localWorkSize >= 128)
+		{
+			localX = 16;
+			localY = 8;
+		}
+		else if (localWorkSize < 64)
+		{
+			localX = size_t(localWorkSize > 0 ? localWorkSize : 1);
+			localY = 1;
+		}
+
+		const size_t globalX = ((stepSizeX + localX - 1) / localX) * localX;
+		const size_t globalY = ((stepSizeY + localY - 1) / localY) * localY;
+		err = clQueue->enqueueNDRangeKernel(*clKernel, cl::NDRange(jobX, jobY),
+			cl::NDRange(globalX, globalY), cl::NDRange(localX, localY), nullptr, &lastKernelEvent);
+	}
+	else if (sequenceSize == 0)
+	{
+		err = clQueue->enqueueNDRangeKernel(*clKernel, cl::NDRange(jobX, jobY),
+			cl::NDRange(stepSizeX, stepSizeY), cl::NullRange, nullptr, &lastKernelEvent);
 	}
 	else
 	{
-		err = clQueue->enqueueNDRangeKernel(
-			*clKernel, cl::NDRange(jobX + jobY * imageWidth), cl::NDRange(sequenceSize), cl::NullRange);
+		// Masked / monte-carlo full-engine tiles use the 1D pixel sequence.
+		// Pad the global size to whole work-groups; the kernel ignores extras.
+		const size_t local = size_t(localWorkSize > 0 ? localWorkSize : 1);
+		const size_t global = ((size_t(sequenceSize) + local - 1) / local) * local;
+		err = clQueue->enqueueNDRangeKernel(*clKernel,
+			cl::NDRange(size_t(jobX + jobY * imageWidth)), cl::NDRange(global), cl::NDRange(local),
+			nullptr, &lastKernelEvent);
 	}
 	if (!checkErr(err, "CommandQueue::enqueueNDRangeKernel()"))
 	{
@@ -257,6 +330,102 @@ bool cOpenClWorkerThread::ProcessClQueue(
 		return false;
 	}
 
+	return true;
+}
+
+bool cOpenClWorkerThread::InitAsyncOutput()
+{
+	if (!isFullEngine || !pixelMask || !pixelMask->empty()) return false;
+	if (outputBuffers.isEmpty()) return false;
+	if (asyncOutputBuffers[0]) return true;
+
+	const size_t bufferSize = outputBuffers.at(outputIndex).size();
+	if (bufferSize == 0) return false;
+
+	cl_int err = CL_SUCCESS;
+	for (int i = 0; i < 2; i++)
+	{
+		asyncOutputBuffers[i].reset(new cl::Buffer(
+			*hardware->getContext(deviceIndex), CL_MEM_WRITE_ONLY, bufferSize, nullptr, &err));
+		if (!checkErr(err, QString("new cl::Buffer(...) async output %1").arg(i))) return false;
+		asyncHostBuffers[i].resize(bufferSize);
+	}
+
+	readQueue.reset(new cl::CommandQueue(*hardware->getContext(deviceIndex),
+		*hardware->getEnabledDevices().at(deviceIndex), 0, &err));
+	if (!checkErr(err, "new cl::CommandQueue(...) async readback")) return false;
+
+	asyncOutputEnabled = true;
+	return true;
+}
+
+bool cOpenClWorkerThread::EnqueueAsyncOutputRead(int bufferIndex, cl::Event &readEvent)
+{
+	if (!asyncOutputEnabled || bufferIndex < 0 || bufferIndex > 1) return false;
+
+	std::vector<cl::Event> waitEvents;
+	waitEvents.push_back(lastKernelEvent);
+	readEvent = cl::Event();
+	cl_int err = readQueue->enqueueReadBuffer(*asyncOutputBuffers[bufferIndex], CL_FALSE, 0,
+		asyncHostBuffers[bufferIndex].size(), asyncHostBuffers[bufferIndex].data(), &waitEvents,
+		&readEvent);
+	return checkErr(err, "CommandQueue::enqueueReadBuffer() async output");
+}
+
+void cOpenClWorkerThread::QueuePendingOutput(quint64 jobX, quint64 jobY, quint64 gridX,
+	quint64 gridY, quint64 tileIndex, quint64 jobWidth, quint64 jobHeight, quint64 sequenceSize,
+	int monteCarloLoop, int aaDepth, int bufferIndex, const cl::Event &readEvent)
+{
+	pendingOutput.valid = true;
+	pendingOutput.bufferIndex = bufferIndex;
+	pendingOutput.readEvent = readEvent;
+	pendingOutput.jobX = jobX;
+	pendingOutput.jobY = jobY;
+	pendingOutput.gridX = gridX;
+	pendingOutput.gridY = gridY;
+	pendingOutput.tileIndex = tileIndex;
+	pendingOutput.jobWidth = jobWidth;
+	pendingOutput.jobHeight = jobHeight;
+	pendingOutput.sequenceSize = sequenceSize;
+	pendingOutput.monteCarloLoop = monteCarloLoop;
+	pendingOutput.aaDepth = aaDepth;
+	pendingOutput.pixelSequence = inPixelSequenceBuffer;
+}
+
+bool cOpenClWorkerThread::ProcessPendingOutput()
+{
+	if (!pendingOutput.valid) return true;
+
+	cl_int err = pendingOutput.readEvent.wait();
+	if (!checkErr(err, "cl::Event::wait() async output"))
+	{
+		pendingOutput.valid = false;
+		return false;
+	}
+
+	const quint64 outputItemSize = outputBuffers.at(outputIndex).itemSize;
+	const quint64 outputItemlength = outputBuffers.at(outputIndex).length;
+	cOpenCLWorkerOutputQueue::sClDataBuffer dataBuffer(outputItemSize, outputItemlength);
+
+	const std::vector<char> &hostBuffer = asyncHostBuffers[pendingOutput.bufferIndex];
+	dataBuffer.data.assign(hostBuffer.begin(), hostBuffer.end());
+
+	cOpenCLWorkerOutputQueue::sClSingleOutput outputDataForQueue;
+	outputDataForQueue.jobX = pendingOutput.jobX;
+	outputDataForQueue.jobY = pendingOutput.jobY;
+	outputDataForQueue.gridX = pendingOutput.gridX;
+	outputDataForQueue.gridY = pendingOutput.gridY;
+	outputDataForQueue.tileIndex = pendingOutput.tileIndex;
+	outputDataForQueue.jobWidth = pendingOutput.jobWidth;
+	outputDataForQueue.jobHeight = pendingOutput.jobHeight;
+	outputDataForQueue.monteCarloLoop = pendingOutput.monteCarloLoop;
+	outputDataForQueue.aaDepth = pendingOutput.aaDepth;
+	outputDataForQueue.outputBuffers.append(dataBuffer);
+	outputDataForQueue.pixelSequence = pendingOutput.pixelSequence;
+	outputDataForQueue.sequenceSize = pendingOutput.sequenceSize;
+
+	outputQueue->AddToQueue(&outputDataForQueue);
+	pendingOutput.valid = false;
 	return true;
 }
 
@@ -383,6 +552,35 @@ quint64 cOpenClWorkerThread::UpdatePixelSequence(
 	quint64 jobX, quint64 jobY, quint64 jobWidth, quint64 jobHeight, qint64 imageWidth)
 {
 	cl_int err = 0;
+
+	// Unmasked full-engine tiles use the direct 2D path. No pixel sequence or
+	// per-tile upload is needed; only a tiny dummy buffer is kept bound to the
+	// kernel argument that the 1D path uses.
+	const bool use2D = (isFullEngine && pixelMask && pixelMask->empty());
+	if (use2D)
+	{
+		if (!inClPixelSequenceBuffer)
+		{
+			cl_int dummy = 0;
+			inClPixelSequenceBuffer.reset(new cl::Buffer(*hardware->getContext(deviceIndex),
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_int), &dummy, &err));
+			if (!checkErr(err, "new cl::Buffer(...) for 2D pixel mapping")) return 0;
+		}
+
+		const quint64 tilePixels = jobWidth * jobHeight;
+		err = clKernel->setArg(8, cl_int(tilePixels));
+		if (!checkErr(err, "kernel->setArg(8, sequenceSize)")) return 0;
+		err = clKernel->setArg(9, cl_int(jobWidth));
+		if (!checkErr(err, "kernel->setArg(9, jobWidth)")) return 0;
+		err = clKernel->setArg(10, *inClPixelSequenceBuffer.get());
+		if (!checkErr(err, "kernel->setArg(10, inPixelSequenceBuffer)")) return 0;
+		err = clKernel->setArg(11, cl_int(jobHeight));
+		if (!checkErr(err, "kernel->setArg(11, jobHeight)")) return 0;
+		err = clKernel->setArg(12, cl_int(1));
+		if (!checkErr(err, "kernel->setArg(12, use2D)")) return 0;
+
+		return tilePixels;
+	}
 
 	inPixelSequenceBuffer.resize(jobWidth * jobHeight);
 	quint64 sequenceSize = 0;
@@ -529,6 +727,22 @@ quint64 cOpenClWorkerThread::UpdatePixelSequence(
 	if (!checkErr(err, "kernel->setArg(8, inClPixelSequenceBuffer)"))
 	{
 		EmitErrorMessage(tr("Cannot set OpenCL argument for %1").arg(tr("inClPixelSequenceBuffer")),
+			cErrorMessage::errorMessage, nullptr);
+		return 0;
+	}
+
+	// Masked / monte-carlo rendering keeps the pixel sequence path.
+	err = clKernel->setArg(11, cl_int(jobHeight));
+	if (!checkErr(err, "kernel->setArg(11, jobHeight)"))
+	{
+		EmitErrorMessage(tr("Cannot set OpenCL argument for %1").arg(tr("jobHeight")),
+			cErrorMessage::errorMessage, nullptr);
+		return 0;
+	}
+	err = clKernel->setArg(12, cl_int(0));
+	if (!checkErr(err, "kernel->setArg(12, use2D)"))
+	{
+		EmitErrorMessage(tr("Cannot set OpenCL argument for %1").arg(tr("use2D")),
 			cErrorMessage::errorMessage, nullptr);
 		return 0;
 	}

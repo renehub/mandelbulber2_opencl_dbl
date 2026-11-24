@@ -46,7 +46,11 @@ REAL CloudOpacity(__constant sClInConstants *consts, __global uchar *perlinNoise
 		point2 =
 			Matrix33MulFloat3(consts->params.mRotCloudsRotation, point - consts->params.cloudsCenter);
 		// h = clamp(1.0 - fabs(2.0 / consts->params.cloudsHeight * (point2.z)), 0.0, 1.0);
-		h = clamp(1.0 / (pow(point2.z / consts->params.cloudsHeight * 2.0, 6.0) + 0.99) - 0.01,
+		// x^6 by explicit multiplies: pow() is an exp2/log2 pair in double.
+		REAL cloudsHeightRatio = point2.z / consts->params.cloudsHeight * 2.0;
+		REAL cloudsHeightRatio2 = cloudsHeightRatio * cloudsHeightRatio;
+		h = clamp(
+			1.0 / (cloudsHeightRatio2 * cloudsHeightRatio2 * cloudsHeightRatio2 + 0.99) - 0.01,
 			0.0, 1.0);
 
 		distToGeometry = max(fabs(point2.z) - consts->params.cloudsHeight * 2.0, 0.0)
@@ -66,12 +70,13 @@ REAL CloudOpacity(__constant sClInConstants *consts, __global uchar *perlinNoise
 		//
 		//			0.0, 1.0);
 
-		h = clamp(1.0
-									/ (pow((distance - consts->params.cloudsDistance)
-													 / consts->params.cloudsDistanceLayer * 2.0,
-											 6.0)
-										 + 0.99)
-								- 0.01,
+		REAL cloudsDistanceRatio =
+			(distance - consts->params.cloudsDistance) / consts->params.cloudsDistanceLayer * 2.0;
+		REAL cloudsDistanceRatio2 = cloudsDistanceRatio * cloudsDistanceRatio;
+		h = clamp(
+			1.0
+					/ (cloudsDistanceRatio2 * cloudsDistanceRatio2 * cloudsDistanceRatio2 + 0.99)
+				- 0.01,
 			0.0, 1.0);
 
 		distToGeometry = max(distToGeometry, fabs(distance - consts->params.cloudsDistance)

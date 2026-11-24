@@ -34,6 +34,8 @@
 
 #include "render_worker.hpp"
 
+#include <algorithm>
+
 #include "ao_modes.h"
 #include "calculate_distance.hpp"
 #include "camera_target.hpp"
@@ -747,6 +749,7 @@ void cRenderWorker::RayMarching(
 	// below display precision.
 	double search_accuracy = 0.01 * params->detailLevel;
 	double search_limit = 1.0 - search_accuracy;
+	const double minRelativeStep = 1e-9;
 	int counter = 0;
 	double step = 0.0;
 	// Last coarse-march point before the current one. When the current point is
@@ -879,8 +882,22 @@ void cRenderWorker::RayMarching(
 		inOut->stepBuff[i].point = point;
 
 		(*inOut->buffCount) = i + 1;
+		// Adaptive early exit: a step that is this small relative to the distance
+		// already travelled cannot make useful progress in double precision. Treat
+		// it like the dead-computation case instead of consuming the fixed budget.
+		const double stepAlongRay = step * invDirectionLength;
+		if (stepAlongRay <= 0.0
+				|| stepAlongRay < minRelativeStep * std::max(scan + stepAlongRay, 1.0))
+		{
+			if (dist < 2.0 * distThresh)
+			{
+				found = true;
+				deadComputationFound = true;
+			}
+			break;
+		}
 		// divided by length of view Vector to eliminate overstepping when fov is big
-		scan += step * invDirectionLength;
+		scan += stepAlongRay;
 		if (scan > in.maxScan)
 		{
 			break;

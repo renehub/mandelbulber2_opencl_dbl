@@ -44,7 +44,9 @@
 
 typedef struct ALIGN16
 {
-	cl_float3 image;
+	// float4 keeps the main color a single 16-byte vector store; .w is unused
+	// by the host but preserves the 16-byte layout of the former float3.
+	cl_float4 image;
 	cl_float3 normal;
 	cl_float3 normalWorld;
 	cl_float3 specular;

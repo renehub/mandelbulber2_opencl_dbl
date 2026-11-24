@@ -122,7 +122,7 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 	}
 
 	ph0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleB1 * 0.5; // 0.5 retain
-	REAL zp = pow(aux->r, fractal->transformCommon.pwr8);
+	REAL zp = PowR(aux->r, fractal->transformCommon.pwr8);
 
 	if (fractal->transformCommon.functionEnabledzFalse)
 	{ // sine mode
@@ -137,14 +137,14 @@ REAL4 MandelbulbKaliMultiIteration(REAL4 z, __global sFractalCl *fractal, sExten
 
 	if (fractal->analyticDE.enabledFalse)
 	{ // analytic log DE adjustment
-		aux->DE = pow(aux->r, fractal->transformCommon.pwr8 - fractal->analyticDE.offset1) * aux->DE
+		aux->DE = PowR(aux->r, fractal->transformCommon.pwr8 - fractal->analyticDE.offset1) * aux->DE
 								* fractal->transformCommon.pwr8 * fractal->analyticDE.scale1
 							+ fractal->analyticDE.offset2;
 	}
 	else // default, i.e. scale1 & offset1 & offset2 = 1.0
 	{
 		aux->DE =
-			pow(aux->r, fractal->transformCommon.pwr8 - 1.0) * fractal->transformCommon.pwr8 * aux->DE
+			PowR(aux->r, fractal->transformCommon.pwr8 - 1.0) * fractal->transformCommon.pwr8 * aux->DE
 			+ 1.0;
 	}
 	if (fractal->transformCommon.addCpixelEnabledFalse)

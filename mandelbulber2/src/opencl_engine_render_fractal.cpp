@@ -1502,6 +1502,7 @@ void cOpenClEngineRenderFractal::CreateThreadsForOpenCLWorkers(int numberOfOpenC
 		workers[d]->setImageHeight(height);
 		workers[d]->setOptimalStepX(optimalJob.stepSizeX);
 		workers[d]->setOptimalStepY(optimalJob.stepSizeY);
+		workers[d]->setLocalWorkSize(int(optimalJob.localWorkSize));
 		workers[d]->setHardware(hardware);
 		workers[d]->setClKernel(clKernels[d]);
 		workers[d]->setClQueue(clQueues[d]);
@@ -2241,7 +2242,7 @@ bool cOpenClEngineRenderFractal::RenderMulti(
 
 		// initialize status bar
 		emit updateProgressAndStatus(
-			tr("OpenCl - rendering image (workgroup %1 pixels)").arg(optimalJob.workGroupSize),
+			tr("OpenCl - rendering image (local workgroup %1 pixels)").arg(optimalJob.localWorkSize),
 			progressText.getText(0.0), 0.0);
 		gApplication->processEvents(); // needed to process events to quit threads
 

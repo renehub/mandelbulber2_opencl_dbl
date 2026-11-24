@@ -22,7 +22,7 @@ REAL4 IqBulbIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl *aux
 	REAL wi = atan2(z.x, z.z);
 
 	// scale and rotate the point
-	wr = pow(wr, fractal->transformCommon.pwr8 - 1.0);
+	wr = PowR(wr, fractal->transformCommon.pwr8 - 1.0);
 	aux->DE = wr * aux->DE * fractal->transformCommon.pwr8 + 1.0;
 	wr *= aux->r;
 	wo *= fractal->transformCommon.pwr8;

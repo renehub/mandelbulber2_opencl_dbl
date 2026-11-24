@@ -18,7 +18,7 @@ REAL4 CoastalbrotIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAuxCl
 	(void)fractal;
 
 	REAL temp = aux->r;
-	temp = pow(temp, 7.7);
+	temp = PowR(temp, 7.7);
 	aux->DE = temp * aux->DE * 7.7;
 	temp *= aux->r;
 

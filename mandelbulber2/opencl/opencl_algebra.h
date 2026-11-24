@@ -390,12 +390,25 @@ inline matrix33 TransposeMatrix(matrix33 m)
 
 REAL SmoothConditionAGreaterB(REAL a, REAL b, REAL sharpness)
 {
+#ifdef DOUBLE_FAST_RADIUS
+	// Double exp is a software sequence on most GPUs. Under fast relaxed math
+	// the blend factor is accurate enough in float, where native_exp is a
+	// single hardware instruction.
+	const float e = native_exp((float)(sharpness * (b - a)));
+	return (REAL)native_recip(1.0f + e);
+#else
 	return native_recip(1.0 + native_exp(sharpness * (b - a)));
+#endif
 }
 
 REAL SmoothConditionALessB(REAL a, REAL b, REAL sharpness)
 {
+#ifdef DOUBLE_FAST_RADIUS
+	const float e = native_exp((float)(sharpness * (a - b)));
+	return (REAL)native_recip(1.0f + e);
+#else
 	return native_recip(1.0 + native_exp(sharpness * (a - b)));
+#endif
 }
 
 inline REAL3 wrap(REAL3 x, REAL3 a, REAL3 s)
@@ -413,6 +426,32 @@ inline REAL opSmoothUnion(REAL d1, REAL d2, REAL k)
 {
 	REAL h = clamp(0.5 + 0.5 * (d2 - d1) / k, 0.0, 1.0);
 	return mix(d2, d1, h) - k * h * (1.0 - h);
+}
+
+// Fast real power for the formula kernels. In double precision OpenCL's pow()
+// is an exp2/log2 software sequence on most GPUs, while formula powers are very
+// often small integer values stored as REAL parameters. Use exponentiation by
+// squaring for those and fall back to pow() for fractional exponents.
+inline REAL PowR(REAL x, REAL y)
+{
+	if (y >= 0.0 && y <= 1024.0)
+	{
+		const int n = (int)y;
+		if ((REAL)n == y)
+		{
+			REAL result = 1.0;
+			REAL base = x;
+			int e = n;
+			while (e > 0)
+			{
+				if (e & 1) result *= base;
+				e >>= 1;
+				if (e) base *= base;
+			}
+			return result;
+		}
+	}
+	return pow(x, y);
 }
 
 // Radius used by the fractal iteration. This is called once per fractal

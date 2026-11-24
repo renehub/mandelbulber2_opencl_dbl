@@ -42,6 +42,8 @@ REAL3 FastAmbientOcclusion(__constant sClInConstants *consts, sRenderData *rende
 	REAL aoTemp = 0;
 	REAL quality = consts->params.ambientOcclusionQuality;
 	REAL lastDist = 1e20;
+	// 1/2^i by repeated halving; exact for a power of two, and avoids pow().
+	REAL invPowerOfTwo = 0.5;
 	for (int i = 1; i < quality * quality; i++)
 	{
 		REAL scan = i * i * delta;
@@ -54,8 +56,9 @@ REAL3 FastAmbientOcclusion(__constant sClInConstants *consts, sRenderData *rende
 
 		if (dist > lastDist * 2.0) dist = lastDist * 2.0;
 		lastDist = dist;
-		aoTemp += 1.0 / pow(2.0, i) * (scan - consts->params.ambientOcclusionFastTune * dist)
+		aoTemp += invPowerOfTwo * (scan - consts->params.ambientOcclusionFastTune * dist)
 							/ input->distThresh;
+		invPowerOfTwo *= 0.5;
 	}
 	REAL ao = 1.0 - 0.2 * aoTemp;
 	if (ao < 0) ao = 0;

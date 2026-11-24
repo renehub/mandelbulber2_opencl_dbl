@@ -337,15 +337,41 @@ bool cOpenClEngine::CreateKernels()
 			WriteLogSizeT(
 				"CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE", workGroupSizeOptimalMultiplier, 2);
 
+			size_t privateMemSize = 0;
+			cl_int privateMemErr = clKernels[d]->getWorkGroupInfo(
+				*hardware->getEnabledDevices().at(d), CL_KERNEL_PRIVATE_MEM_SIZE, &privateMemSize);
+			if (privateMemErr == CL_SUCCESS)
+			{
+				WriteLogSizeT("CL_KERNEL_PRIVATE_MEM_SIZE", privateMemSize, 2);
+			}
+			else
+			{
+				privateMemSize = 0;
+				WriteLog(QStringLiteral("CL_KERNEL_PRIVATE_MEM_SIZE is not available"), 2);
+			}
+
+			// Prefer 128 work-items per group, fall back to 64 when the device
+			// cannot launch 128 or when the kernel already uses a lot of private
+			// memory (which lowers occupancy in double precision).
+			size_t localWorkSize = 128;
+			if (workGroupSize < 128) localWorkSize = (workGroupSize >= 64) ? 64 : workGroupSize;
+			if (privateMemSize > 4096 && localWorkSize > 64) localWorkSize = 64;
+			if (localWorkSize == 0) localWorkSize = 1;
+
 			if (d == 0)
 			{
 				optimalJob.workGroupSize = workGroupSize;
+				optimalJob.localWorkSize = localWorkSize;
+				optimalJob.kernelPrivateMemSize = privateMemSize;
 				optimalJob.workGroupSizeOptimalMultiplier =
 					workGroupSizeOptimalMultiplier * optimalJob.jobSizeMultiplier;
 			}
 			else
 			{
 				optimalJob.workGroupSize = qMin(quint64(workGroupSize), optimalJob.workGroupSize);
+				optimalJob.localWorkSize = qMin(quint64(localWorkSize), optimalJob.localWorkSize);
+				optimalJob.kernelPrivateMemSize =
+					qMax(quint64(privateMemSize), optimalJob.kernelPrivateMemSize);
 				optimalJob.workGroupSizeOptimalMultiplier =
 					qMax(workGroupSizeOptimalMultiplier * optimalJob.jobSizeMultiplier,
 						optimalJob.workGroupSizeOptimalMultiplier);

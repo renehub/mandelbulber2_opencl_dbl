@@ -39,20 +39,20 @@ REAL4 MandelbulbKaliIteration(REAL4 z, __global sFractalCl *fractal, sExtendedAu
 		acos(z.z / aux->r) + fractal->transformCommon.betaAngleOffset; // MUST keep exception catch ??;
 	ph0 = atan(z.y / z.x);
 	ph0 *= fractal->transformCommon.pwr8 * fractal->transformCommon.scaleB1;
-	REAL zp = pow(aux->r, fractal->transformCommon.pwr8);
+	REAL zp = PowR(aux->r, fractal->transformCommon.pwr8);
 	sinth = native_sin(th0);
 	z = zp * (REAL4){sinth * native_cos(ph0), native_sin(ph0) * sinth, native_cos(th0), 0.0};
 
 	if (fractal->analyticDE.enabledFalse)
 	{ // analytic log DE adjustment
-		aux->DE = pow(aux->r, fractal->transformCommon.pwr8 - fractal->analyticDE.offset1) * aux->DE
+		aux->DE = PowR(aux->r, fractal->transformCommon.pwr8 - fractal->analyticDE.offset1) * aux->DE
 								* fractal->transformCommon.pwr8 * fractal->analyticDE.scale1
 							+ fractal->analyticDE.offset2;
 	}
 	else // default, i.e. scale1 & offset1 & offset2 = 1.0
 	{
 		aux->DE =
-			pow(aux->r, fractal->transformCommon.pwr8 - 1.0) * fractal->transformCommon.pwr8 * aux->DE
+			PowR(aux->r, fractal->transformCommon.pwr8 - 1.0) * fractal->transformCommon.pwr8 * aux->DE
 			+ 1.0;
 	}
 	return z;

@@ -46,16 +46,14 @@ typedef struct
 typedef struct
 {
 	REAL3 point;
+	REAL3 transformedPoint;
 	REAL lastDist;
 	REAL depth;
-	REAL distThresh;
 	int objectId;
 	int sequenceIndex;
-	bool found;
 	int count;
-	REAL3 transformedPoint;
+	bool found;
 	bool hasTransformedPoint;
-	REAL detailLevelMultiplier;
 } sRayMarchingOut;
 
 typedef enum
@@ -77,7 +75,6 @@ typedef struct
 typedef struct
 {
 	sRayMarchingOut rayMarchingOut;
-	REAL3 point;
 	REAL4 resultShader;
 	REAL3 objectColour;
 	REAL3 normal;
@@ -91,7 +88,11 @@ typedef struct
 typedef struct
 {
 	sRayRecursionIn in;
-	sRayRecursionOut out;
+	// Only these two fields are read again when a bounce is revisited after a
+	// reflection/refraction child returns. The full sRayRecursionOut is kept
+	// once for the final result, not for every stack level.
+	sRayMarchingOut rayMarchingOut;
+	REAL3 normal;
 #ifdef USE_REFLECTANCE
 	REAL4 reflectShader;
 #endif
@@ -173,6 +174,30 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 	REAL searchAccuracy = 0.01 * consts->params.detailLevel;
 	REAL searchLimit = 1.0 - searchAccuracy;
 
+	// In double precision a step that is this small relative to the distance
+	// already travelled cannot make useful progress. Stop instead of consuming
+	// the fixed MAX_RAYMARCHING budget on a stalled ray.
+	const REAL minRelativeStep = 1e-9;
+
+	// Keep the per-raymarch counters in registers; the stats struct is written
+	// once at the end instead of doing private-memory traffic for every DE call.
+	uint statDeCalls = 0;
+	uint statItersSum = 0;
+	uint statHitIters = 0;
+	bool statHit = false;
+	bool statMissedDE = false;
+
+	// Safe defaults for a missed ray; only a hit needs the object fields.
+	out->objectId = 0;
+	out->sequenceIndex = 0;
+	out->transformedPoint = (REAL3){0.0, 0.0, 0.0};
+	out->hasTransformedPoint = false;
+
+	// The detail multiplier only changes when the closest object changes; avoid
+	// reloading it from global memory on every coarse step.
+	int cachedObjectId = -1;
+	REAL cachedDetailLevelMultiplier = 1.0;
+
 	// ray-marching
 	for (count = 0; count < MAX_RAYMARCHING && scan < in.maxScan; count++)
 	{
@@ -184,23 +209,25 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 		distance = outF.distance;
 
 		// statistics: one sample per distance estimation call
-		rmStats->deCalls++;
-		rmStats->itersSum += (uint)outF.iters;
+		statDeCalls++;
+		statItersSum += (uint)outF.iters;
 
-		out->objectId = outF.objectId;
-		out->sequenceIndex = outF.sequenceIndex;
-		out->transformedPoint = outF.transformedPoint;
-		out->hasTransformedPoint = outF.hasTransformedPoint;
-		out->detailLevelMultiplier = 1.0;
-		if (outF.objectId >= 0 && outF.objectId < renderData->numberOfObjects)
+		if (outF.objectId != cachedObjectId)
 		{
-			out->detailLevelMultiplier = renderData->objectsData[outF.objectId].detailLevelMultiplier;
+			cachedObjectId = outF.objectId;
+			cachedDetailLevelMultiplier = 1.0;
+			if (outF.objectId >= 0 && outF.objectId < renderData->numberOfObjects)
+			{
+				cachedDetailLevelMultiplier =
+					renderData->objectsData[outF.objectId].detailLevelMultiplier;
+			}
 		}
+		REAL detailLevelMultiplier = cachedDetailLevelMultiplier;
 
 		// Apply per-object detailLevelMultiplier to distThresh dynamically
-		if (out->detailLevelMultiplier > 0.0)
+		if (detailLevelMultiplier > 0.0)
 		{
-			distThresh *= out->detailLevelMultiplier;
+			distThresh *= detailLevelMultiplier;
 		}
 
 #ifdef USE_REFRACTION
@@ -213,11 +240,17 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 
 		if (distance < distThresh)
 		{
+			// The object fields are only needed for the hit branch.
+			out->objectId = outF.objectId;
+			out->sequenceIndex = outF.sequenceIndex;
+			out->transformedPoint = outF.transformedPoint;
+			out->hasTransformedPoint = outF.hasTransformedPoint;
+
 			// statistics: record the iteration count at the surface hit point;
 			// a hit far below the threshold means a bad distance estimation
-			rmStats->hit = true;
-			rmStats->hitIters = (uint)outF.iters;
-			if (distance < 0.1 * distThresh) rmStats->missedDE = true;
+			statHit = true;
+			statHitIters = (uint)outF.iters;
+			if (distance < 0.1 * distThresh) statMissedDE = true;
 			found = true;
 			break;
 		}
@@ -248,7 +281,27 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 				consts->params.relMaxMarchingStep * distThresh);
 #endif
 
-		scan += step * invDirectionLength;
+		const REAL stepAlongRay = step * invDirectionLength;
+		if (stepAlongRay <= 0.0
+				|| stepAlongRay < minRelativeStep * max(scan + stepAlongRay, (REAL)1.0))
+		{
+			// Stalled below the useful relative resolution. Accept the current
+			// sample only if it is already within the surface band; otherwise
+			// terminate the ray as a miss instead of consuming the remaining
+			// fixed iteration budget.
+			if (distance < 2.0 * distThresh)
+			{
+				out->objectId = outF.objectId;
+				out->sequenceIndex = outF.sequenceIndex;
+				out->transformedPoint = outF.transformedPoint;
+				out->hasTransformedPoint = outF.hasTransformedPoint;
+				statHit = true;
+				statHitIters = (uint)outF.iters;
+				found = true;
+			}
+			break;
+		}
+		scan += stepAlongRay;
 	}
 
 	point = in.start + in.direction * scan;
@@ -312,8 +365,8 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 
 				// statistics: binary search performs additional distance estimations too
 				bsIterations++;
-				rmStats->deCalls++;
-				rmStats->itersSum += (uint)outF.iters;
+				statDeCalls++;
+				statItersSum += (uint)outF.iters;
 
 				REAL detailMultiplier = 1.0;
 				if (outF.objectId >= 0 && outF.objectId < renderData->numberOfObjects)
@@ -352,7 +405,6 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 					out->sequenceIndex = outF.sequenceIndex;
 					out->transformedPoint = outF.transformedPoint;
 					out->hasTransformedPoint = outF.hasTransformedPoint;
-					out->detailLevelMultiplier = detailMultiplier;
 				}
 				else if (fNew > 0.0)
 				{
@@ -374,7 +426,6 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 					out->sequenceIndex = outF.sequenceIndex;
 					out->transformedPoint = outF.transformedPoint;
 					out->hasTransformedPoint = outF.hasTransformedPoint;
-					out->detailLevelMultiplier = detailMultiplier;
 					break;
 				}
 
@@ -392,10 +443,16 @@ void RayMarching(sRayMarchingIn in, sRayMarchingOut *out, __constant sClInConsta
 	out->found = found;
 	out->lastDist = distance;
 	out->depth = scan;
-	out->distThresh = distThresh;
 	out->point = point;
 	out->count = count;
+
+	// Single write-back of all per-raymarch statistics.
+	rmStats->deCalls = statDeCalls;
+	rmStats->itersSum = statItersSum;
+	rmStats->hitIters = statHitIters;
 	rmStats->steps = (ushort)(count + bsIterations);
+	rmStats->hit = statHit;
+	rmStats->missedDE = statMissedDE;
 }
 
 sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
@@ -405,6 +462,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 	int rayIndex = 0; // level of recursion
 
 	sRayStack rayStack[REFLECTIONS_MAX + 2];
+	sRayRecursionOut finalOut = (sRayRecursionOut){0};
 
 	rayStack[rayIndex].in = in;
 	rayStack[rayIndex].rayBranch = rayBranchReflection;
@@ -413,6 +471,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 	for (int i = 0; i < renderData->reflectionsMax + 1; i++)
 	{
 		rayStack[i].rayBranch = rayBranchReflection;
+		rayStack[i].normal = (REAL3){0.0, 0.0, 0.0};
 
 #ifdef USE_REFLECTANCE
 		rayStack[i].reflectShader = 0.0;
@@ -464,7 +523,8 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			bool found = rayMarchingOut.found;
 			REAL depth = rayMarchingOut.depth;
 
-			REAL distThresh = CalcDistThresh(point, consts);
+			const REAL cameraDistance = length(consts->params.camera - point);
+			REAL distThresh = CalcDistThreshFromCameraDistance(cameraDistance, consts);
 
 			sClCalcParams calcParam;
 			calcParam.N = consts->params.N;
@@ -473,7 +533,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 
 			sShaderInputDataCl shaderInputData;
 			shaderInputData.distThresh = distThresh;
-			shaderInputData.delta = CalcDelta(point, consts);
+			shaderInputData.delta = CalcDeltaFromCameraDistance(cameraDistance, consts);
 			shaderInputData.point = point;
 			shaderInputData.viewVector = rayStack[rayIndex].in.rayMarchingIn.direction;
 			shaderInputData.viewVectorNotRotated = renderData->viewVectorNotRotated;
@@ -539,7 +599,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			REAL reflect = shaderInputData.material->reflectance;
 			REAL transparent = shaderInputData.material->transparencyOfSurface;
 
-			rayStack[rayIndex].out.rayMarchingOut = rayMarchingOut;
+			rayStack[rayIndex].rayMarchingOut = rayMarchingOut;
 
 			// if found any object
 			if (found)
@@ -610,7 +670,7 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 #endif
 #endif
 
-				rayStack[rayIndex].out.normal = normal;
+				rayStack[rayIndex].normal = normal;
 
 #if defined(USE_REFRACTION) || defined(USE_REFLECTANCE)
 				// prepare refraction values
@@ -762,10 +822,11 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 		if (!rayStack[rayIndex].goDeeper)
 		{
 			sRayRecursionOut recursionOut;
-
-			recursionOut = rayStack[rayIndex].out;
+			recursionOut.rayMarchingOut = rayStack[rayIndex].rayMarchingOut;
+			recursionOut.normal = rayStack[rayIndex].normal;
 			recursionOut.specular = 0.0;
 			recursionOut.outShadow = 0.0;
+			recursionOut.outGlobalIllumination = 0.0;
 
 			sRayMarchingOut rayMarchingOut = recursionOut.rayMarchingOut;
 
@@ -778,11 +839,12 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			REAL4 transparentShader = rayStack[rayIndex].transparentShader;
 #endif
 
-			REAL distThresh = CalcDistThresh(point, consts);
+			const REAL cameraDistance = length(consts->params.camera - point);
+			REAL distThresh = CalcDistThreshFromCameraDistance(cameraDistance, consts);
 
 			sShaderInputDataCl shaderInputData;
 			shaderInputData.distThresh = distThresh;
-			shaderInputData.delta = CalcDelta(point, consts);
+			shaderInputData.delta = CalcDeltaFromCameraDistance(cameraDistance, consts);
 			shaderInputData.point = point;
 			shaderInputData.viewVector = rayStack[rayIndex].in.rayMarchingIn.direction;
 			shaderInputData.viewVectorNotRotated = renderData->viewVectorNotRotated;
@@ -1316,7 +1378,6 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 					image2dBackground, resultShader, &opacityOut);
 			}
 
-			recursionOut.point = point;
 			recursionOut.rayMarchingOut = rayMarchingOut;
 			recursionOut.objectColour = objectColour;
 			recursionOut.resultShader = resultShader;
@@ -1324,7 +1385,11 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 			recursionOut.fogOpacity = opacityOut;
 			recursionOut.normal = shaderInputData.normal;
 
-			rayStack[rayIndex].out = recursionOut;
+			// Only the ray-march result and normal are needed if this level is
+			// revisited after a child bounce. The final output is kept once.
+			rayStack[rayIndex].rayMarchingOut = rayMarchingOut;
+			rayStack[rayIndex].normal = recursionOut.normal;
+			if (rayIndex == 0) finalOut = recursionOut;
 
 #if defined(USE_REFRACTION) || defined(USE_REFLECTANCE)
 			if (rayIndex > 0)
@@ -1351,7 +1416,5 @@ sRayRecursionOut RayRecursion(sRayRecursionIn in, sRenderData *renderData,
 		// prepare final result
 	} while (rayIndex >= 0);
 
-	sRayRecursionOut out = rayStack[0].out;
-
-	return out;
+	return finalOut;
 }

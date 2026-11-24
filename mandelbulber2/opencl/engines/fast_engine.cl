@@ -428,6 +428,7 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 			pixel.image.s0 = pixelRightColor.s0;
 			pixel.image.s1 = pixelLeftColor.s1;
 			pixel.image.s2 = pixelLeftColor.s2;
+			pixel.image.s3 = 0.0f;
 			pixel.zBuffer = scan;
 			pixel.color = 128;
 			pixel.opacity = 0;
@@ -442,6 +443,7 @@ kernel void fractal3D(__global sClPixel *out, __global char *inBuff,
 	pixel.image.s0 = colour.s0 + glow;
 	pixel.image.s1 = colour.s1 * glow * 10.0;
 	pixel.image.s2 = colour.s2;
+	pixel.image.s3 = 0.0f;
 	pixel.zBuffer = scan;
 	pixel.color = 128;
 	pixel.opacity = 0;

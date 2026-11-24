@@ -58,7 +58,7 @@ REAL4 TestingTransformIteration(REAL4 z, __global sFractalCl *fractal, sExtended
 		zc.z = temp;
 	}
 
-	REAL u = pow(zc.x, fractal->transformCommon.scale2);
+	REAL u = PowR(zc.x, fractal->transformCommon.scale2);
 	REAL r = u * zc.x + zc.y * zc.y + zc.z * zc.z + fractal->transformCommon.offsetB0;
 	r = (r < 0.0) ? 0.0 : native_sqrt(r);
 	REAL t = u + fractal->transformCommon.offsetC0;
